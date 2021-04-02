@@ -176,42 +176,32 @@ class test_msg PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kQueryFieldNumber = 1,
-    kPageNumberFieldNumber = 2,
-    kResultPerPageFieldNumber = 3,
+    kTestStringFieldNumber = 1,
+    kTestIntFieldNumber = 2,
   };
-  // string query = 1;
-  void clear_query();
-  const std::string& query() const;
-  void set_query(const std::string& value);
-  void set_query(std::string&& value);
-  void set_query(const char* value);
-  void set_query(const char* value, size_t size);
-  std::string* mutable_query();
-  std::string* release_query();
-  void set_allocated_query(std::string* query);
+  // string test_string = 1;
+  void clear_test_string();
+  const std::string& test_string() const;
+  void set_test_string(const std::string& value);
+  void set_test_string(std::string&& value);
+  void set_test_string(const char* value);
+  void set_test_string(const char* value, size_t size);
+  std::string* mutable_test_string();
+  std::string* release_test_string();
+  void set_allocated_test_string(std::string* test_string);
   private:
-  const std::string& _internal_query() const;
-  void _internal_set_query(const std::string& value);
-  std::string* _internal_mutable_query();
+  const std::string& _internal_test_string() const;
+  void _internal_set_test_string(const std::string& value);
+  std::string* _internal_mutable_test_string();
   public:
 
-  // int32 page_number = 2;
-  void clear_page_number();
-  ::PROTOBUF_NAMESPACE_ID::int32 page_number() const;
-  void set_page_number(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // int32 test_int = 2;
+  void clear_test_int();
+  ::PROTOBUF_NAMESPACE_ID::int32 test_int() const;
+  void set_test_int(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_page_number() const;
-  void _internal_set_page_number(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // int32 result_per_page = 3;
-  void clear_result_per_page();
-  ::PROTOBUF_NAMESPACE_ID::int32 result_per_page() const;
-  void set_result_per_page(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_result_per_page() const;
-  void _internal_set_result_per_page(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_test_int() const;
+  void _internal_set_test_int(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:test_msg)
@@ -221,9 +211,8 @@ class test_msg PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr query_;
-  ::PROTOBUF_NAMESPACE_ID::int32 page_number_;
-  ::PROTOBUF_NAMESPACE_ID::int32 result_per_page_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr test_string_;
+  ::PROTOBUF_NAMESPACE_ID::int32 test_int_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_example_2eproto;
 };
@@ -238,106 +227,86 @@ class test_msg PROTOBUF_FINAL :
 #endif  // __GNUC__
 // test_msg
 
-// string query = 1;
-inline void test_msg::clear_query() {
-  query_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+// string test_string = 1;
+inline void test_msg::clear_test_string() {
+  test_string_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
-inline const std::string& test_msg::query() const {
-  // @@protoc_insertion_point(field_get:test_msg.query)
-  return _internal_query();
+inline const std::string& test_msg::test_string() const {
+  // @@protoc_insertion_point(field_get:test_msg.test_string)
+  return _internal_test_string();
 }
-inline void test_msg::set_query(const std::string& value) {
-  _internal_set_query(value);
-  // @@protoc_insertion_point(field_set:test_msg.query)
+inline void test_msg::set_test_string(const std::string& value) {
+  _internal_set_test_string(value);
+  // @@protoc_insertion_point(field_set:test_msg.test_string)
 }
-inline std::string* test_msg::mutable_query() {
-  // @@protoc_insertion_point(field_mutable:test_msg.query)
-  return _internal_mutable_query();
+inline std::string* test_msg::mutable_test_string() {
+  // @@protoc_insertion_point(field_mutable:test_msg.test_string)
+  return _internal_mutable_test_string();
 }
-inline const std::string& test_msg::_internal_query() const {
-  return query_.Get();
+inline const std::string& test_msg::_internal_test_string() const {
+  return test_string_.Get();
 }
-inline void test_msg::_internal_set_query(const std::string& value) {
+inline void test_msg::_internal_set_test_string(const std::string& value) {
   
-  query_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  test_string_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
-inline void test_msg::set_query(std::string&& value) {
+inline void test_msg::set_test_string(std::string&& value) {
   
-  query_.Set(
+  test_string_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:test_msg.query)
+  // @@protoc_insertion_point(field_set_rvalue:test_msg.test_string)
 }
-inline void test_msg::set_query(const char* value) {
+inline void test_msg::set_test_string(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  query_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  test_string_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
-  // @@protoc_insertion_point(field_set_char:test_msg.query)
+  // @@protoc_insertion_point(field_set_char:test_msg.test_string)
 }
-inline void test_msg::set_query(const char* value,
+inline void test_msg::set_test_string(const char* value,
     size_t size) {
   
-  query_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  test_string_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:test_msg.query)
+  // @@protoc_insertion_point(field_set_pointer:test_msg.test_string)
 }
-inline std::string* test_msg::_internal_mutable_query() {
+inline std::string* test_msg::_internal_mutable_test_string() {
   
-  return query_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  return test_string_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
-inline std::string* test_msg::release_query() {
-  // @@protoc_insertion_point(field_release:test_msg.query)
-  return query_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+inline std::string* test_msg::release_test_string() {
+  // @@protoc_insertion_point(field_release:test_msg.test_string)
+  return test_string_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
-inline void test_msg::set_allocated_query(std::string* query) {
-  if (query != nullptr) {
+inline void test_msg::set_allocated_test_string(std::string* test_string) {
+  if (test_string != nullptr) {
     
   } else {
     
   }
-  query_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), query,
+  test_string_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), test_string,
       GetArena());
-  // @@protoc_insertion_point(field_set_allocated:test_msg.query)
+  // @@protoc_insertion_point(field_set_allocated:test_msg.test_string)
 }
 
-// int32 page_number = 2;
-inline void test_msg::clear_page_number() {
-  page_number_ = 0;
+// int32 test_int = 2;
+inline void test_msg::clear_test_int() {
+  test_int_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 test_msg::_internal_page_number() const {
-  return page_number_;
+inline ::PROTOBUF_NAMESPACE_ID::int32 test_msg::_internal_test_int() const {
+  return test_int_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 test_msg::page_number() const {
-  // @@protoc_insertion_point(field_get:test_msg.page_number)
-  return _internal_page_number();
+inline ::PROTOBUF_NAMESPACE_ID::int32 test_msg::test_int() const {
+  // @@protoc_insertion_point(field_get:test_msg.test_int)
+  return _internal_test_int();
 }
-inline void test_msg::_internal_set_page_number(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void test_msg::_internal_set_test_int(::PROTOBUF_NAMESPACE_ID::int32 value) {
   
-  page_number_ = value;
+  test_int_ = value;
 }
-inline void test_msg::set_page_number(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_page_number(value);
-  // @@protoc_insertion_point(field_set:test_msg.page_number)
-}
-
-// int32 result_per_page = 3;
-inline void test_msg::clear_result_per_page() {
-  result_per_page_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 test_msg::_internal_result_per_page() const {
-  return result_per_page_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 test_msg::result_per_page() const {
-  // @@protoc_insertion_point(field_get:test_msg.result_per_page)
-  return _internal_result_per_page();
-}
-inline void test_msg::_internal_set_result_per_page(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  result_per_page_ = value;
-}
-inline void test_msg::set_result_per_page(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_result_per_page(value);
-  // @@protoc_insertion_point(field_set:test_msg.result_per_page)
+inline void test_msg::set_test_int(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_test_int(value);
+  // @@protoc_insertion_point(field_set:test_msg.test_int)
 }
 
 #ifdef __GNUC__

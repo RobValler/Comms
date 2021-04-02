@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 message test_msg {
-  string query = 1;
-  int32 page_number = 2;
-  int32 result_per_page = 3;
+  string test_string = 1;
+  int32 test_int = 2;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************
- * Copyright (C) 2017-2019 Robert Valler - All rights reserved.
+ * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
  *
  * This file is part of the project: StarterApp
  *
@@ -7,15 +7,10 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#include <gtest/gtest.h>
-
-#include "comms.h"
-
-TEST(Comms, BasicTest)
+class IProtocol
 {
-    CComms send, rec;
-    send.write();
-    send.read();
-
-
-}
+public:
+    virtual ~IProtocol(){}
+    virtual void read()=0;
+    virtual void write()=0;
+};

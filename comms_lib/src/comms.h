@@ -11,7 +11,7 @@ class CComms
 {
 public:
     CComms();
-    ~CComms()=default;
+    ~CComms();
 
     void read();
     void write();
