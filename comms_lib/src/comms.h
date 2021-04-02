@@ -1,5 +1,5 @@
 /*****************************************************************
- * Copyright (C) 2017-2019 Robert Valler - All rights reserved.
+ * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
  *
  * This file is part of the project: StarterApp
  *
@@ -7,13 +7,15 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#include "example.pb.h"
-
-int main(int argc, char *argv[])
+class CComms
 {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
+public:
+    CComms();
+    ~CComms()=default;
 
+    void read();
+    void write();
 
+private:
 
-
-}
+};
