@@ -7,10 +7,15 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
+#pragma once
+
 class IProtocol
 {
 public:
     virtual ~IProtocol(){}
-    virtual void read()=0;
-    virtual void write()=0;
+    virtual bool server_connect()=0;
+    virtual bool client_connect()=0;
+    virtual bool disconnect()=0;
+    virtual bool recieve() =0;
+    virtual bool transmit() =0;
 };

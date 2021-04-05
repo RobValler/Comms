@@ -8,11 +8,11 @@
  *****************************************************************/
 
 #include "comms.h"
-#include "iprotocol.h"
-#include "example.pb.h"
+#include "tcpip.h"
 
 #include <string>
 #include <iostream>
+
 #include <google/protobuf/message.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -20,50 +20,57 @@
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 
-std::uint32_t siz;
-char *pkt;
-
 CComms::CComms()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+    m_pProtocol = std::make_shared<CTCPIP>();
 
 }
 
 CComms::~CComms()
 {
+    m_pProtocol->disconnect();
     google::protobuf::ShutdownProtobufLibrary();
 }
 
-void CComms::read()
+bool CComms::connect()
+{
+
+    return m_pProtocol->client_connect();
+}
+
+void CComms::read(::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
 
-    test_msg test;
+    //fetch data
+    m_pProtocol->recieve();
 
     google::protobuf::io::ArrayInputStream ais(pkt,siz+4);
     CodedInputStream coded_input(&ais);
     coded_input.ReadVarint32(&siz);
     google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(siz);
-    test.ParseFromCodedStream(&coded_input);
+    message.ParseFromCodedStream(&coded_input);
     coded_input.PopLimit(msgLimit);
-    int result_int = test.test_int();
-    std::string result_string = test.test_string();
+
+    delete pkt;
 }
 
-void CComms::write()
+void CComms::write(const ::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
+    std::cout << "size of test "<< sizeof(message) << std::endl;
+    std::cout << "size after serilizing is "<< message.ByteSizeLong() << std::endl;
 
-    test_msg test;
-    test.set_test_string("moose");
-    test.set_test_int(123);
-    std::cout << "size of test "<< sizeof(test) << std::endl;
-    std::cout << "size after serilizing is "<< test.ByteSizeLong() << std::endl;
-
-    siz = test.ByteSizeLong()+4;
+    siz = message.ByteSizeLong()+4;
     pkt = new char [siz];
     google::protobuf::io::ArrayOutputStream aos(pkt, siz);
     CodedOutputStream *coded_output = new CodedOutputStream(&aos);
-    coded_output->WriteVarint32(test.ByteSizeLong());
-    test.SerializeToCodedStream(coded_output);
+    coded_output->WriteVarint32(message.ByteSizeLong());
+    message.SerializeToCodedStream(coded_output);
+
+    // send data
+    m_pProtocol->transmit();
+
 }

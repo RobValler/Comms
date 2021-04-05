@@ -7,15 +7,30 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
+#pragma once
+
+//#include "iprotocol.h"
+
+#include <memory>
+
+
+namespace google{ namespace protobuf{ class Message; } }
+class IProtocol;
+
 class CComms
 {
 public:
     CComms();
     ~CComms();
 
-    void read();
-    void write();
+    bool connect();
+    void read(::google::protobuf::Message& message);
+    void write(const ::google::protobuf::Message& message);
 
 private:
+    std::shared_ptr<IProtocol> m_pProtocol;
 
+    // todo: fix this
+    std::uint32_t siz;
+    char *pkt;
 };
