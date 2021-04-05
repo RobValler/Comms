@@ -30,7 +30,6 @@ public:
 private:
     std::shared_ptr<IProtocol> m_pProtocol;
 
-    // todo: fix this
-    std::uint32_t siz;
-    char *pkt;
+
+
 };

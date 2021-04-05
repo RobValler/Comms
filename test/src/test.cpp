@@ -18,28 +18,25 @@
 
 TEST(Comms, BasicTest)
 {
-    //namespace google{ namespace protobuf{ class Message; } }
-
     CComms server, client;
     test_msg in, out;
-    const std::string out_str = "moose!";
+    const std::string out_str = "flap jacks";
     const int out_int = 21345;
 
     // set test data
     out.set_test_int(out_int);
     out.set_test_string(out_str);
 
-
-    EXPECT_EQ(client.connect(), true);
     std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+    EXPECT_EQ(client.connect(), true);
 
     // write and read
     client.write(out);
-    //comms.read(in);
+    server.read(in);
 
     std::this_thread::sleep_for( std::chrono::seconds(2) );
 
     // check return values
-//    EXPECT_EQ(in.test_int(), out_int);
-//    EXPECT_EQ(in.test_string(), out_str);
+    EXPECT_EQ(in.test_int(), out_int);
+    EXPECT_EQ(in.test_string(), out_str);
 }

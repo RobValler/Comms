@@ -23,8 +23,8 @@ public:
     bool server_connect() override;
     bool client_connect() override;
     bool disconnect() override;
-    bool recieve() override;
-    bool transmit() override;
+    bool recieve(char** data, int& size) override;
+    bool transmit(const char *data, const int size) override;
 
 private:
     void threadfunc_server();
@@ -36,6 +36,7 @@ private:
 
     int m_serverSocket;
     int m_clientSocket;
+    int m_server_fd;
 
-
+    char m_buffer[1024] = {0};
 };

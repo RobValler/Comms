@@ -35,47 +35,46 @@ CTCPIP::CTCPIP()
 CTCPIP::~CTCPIP()
 {
     m_shutdownrequest = true;
+    shutdown(m_server_fd, SHUT_RDWR); // aborts any blocking calls
     t_server.join();
     //t_client.join();
 }
 
 bool CTCPIP::server_connect()
 {
-    int server_fd, valread;
-    struct sockaddr_in address;
+    int valread;
     int opt = 1;
+    struct sockaddr_in address;    
     int addrlen = sizeof(address);
 
-    char buffer[1024] = {0};
-
-
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    if ((m_server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
         return false;
 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+    if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
         return false;
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons( 8080 );
 
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
+    if (bind(m_server_fd, (struct sockaddr *)&address, sizeof(address))<0)
         return false;
 
-    if (listen(server_fd, 10) < 0)
+    if (listen(m_server_fd, 10) < 0)
         return false;
 
 //    if(fcntl(server_fd, F_SETFL, fcntl(server_fd, F_GETFL) | O_NONBLOCK) < 0)
 //        return false;
 
-    if ((m_serverSocket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+    if ((m_serverSocket = accept(m_server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
         return false;
 
     std::cout << "server_connect good" << std::endl;
 
     //valread = recv( m_serverSocket , buffer, 1024, 0);
-    valread = read( m_serverSocket , buffer, 1024);
-    std::cout << "message received = " << buffer << std::endl;
+    valread = read(m_serverSocket , m_buffer, 1024);
+
+    std::cout << "message recieved = " << m_buffer << std::endl;
 
     return true;
 }
@@ -98,8 +97,6 @@ bool CTCPIP::client_connect()
 
     std::cout << "client_connect good" << std::endl;
 
-    //transmit();
-
     return true;
 }
 
@@ -108,22 +105,20 @@ bool CTCPIP::disconnect()
     return false;
 }
 
-bool CTCPIP::recieve()
+bool CTCPIP::recieve(char** data, int& size)
 {
-
+    *data = &m_buffer[0];
+    size = sizeof(m_buffer);
     return false;
 }
 
-bool CTCPIP::transmit()
+bool CTCPIP::transmit(const char *data, const int size)
 {
-    char *hello = "Hello from server";
-
-    ssize_t result = send(m_clientSocket , hello , strlen(hello) , 0 );
+    ssize_t result = send(m_clientSocket , data , size , 0 );
     if(result > 0)
         return true;
     else
         return false;
-
 }
 
 void CTCPIP::threadfunc_server()
