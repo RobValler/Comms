@@ -20,16 +20,14 @@
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 
-struct SMessageHeader {
-    int size;
-
-};
-
 CComms::CComms()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     m_pProtocol = std::make_shared<CTCPIP>();
+//    m_pProtocol = std::make_shared<CPOSIX>();
+//    m_pProtocol = std::make_shared<CCAN>();
+
 }
 
 CComms::~CComms()
@@ -43,46 +41,54 @@ bool CComms::connect()
     return m_pProtocol->client_connect();
 }
 
-void CComms::read(::google::protobuf::Message& message)
+bool CComms::read(::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
 
     int siz;
-    char *pkt = NULL;
+    char *pkt = nullptr;
 
     //fetch data
-    m_pProtocol->recieve(&pkt, siz);
+    if(!m_pProtocol->recieve(&pkt, siz))
+        return false;
 
-    google::protobuf::io::ArrayInputStream ais(pkt, siz+4);
+
+
+    google::protobuf::io::ArrayInputStream ais(pkt, siz);
     CodedInputStream coded_input(&ais);
     std::uint32_t s = static_cast<std::uint32_t>(siz);
+//    if(!coded_input.ReadVarint32(&s))
+//        return false;
     coded_input.ReadVarint32(&s);
+
     google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(siz);
-    message.ParseFromCodedStream(&coded_input);
+    if(!message.ParseFromCodedStream(&coded_input))
+        return false;
+
     coded_input.PopLimit(msgLimit);
+
+    return true;
 }
 
-void CComms::write(const ::google::protobuf::Message& message)
+bool CComms::write(const ::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
-    std::cout << "size of test "<< sizeof(message) << std::endl;
-    std::cout << "size after serilizing is "<< message.ByteSizeLong() << std::endl;
+//    std::cout << "size of test "<< sizeof(message) << std::endl;
+//    std::cout << "size after serilizing is "<< message.ByteSizeLong() << std::endl;
 
     // serialise data
-    std::uint32_t siz = message.ByteSizeLong()+4;
-    char *pkt = new char [siz];
-    google::protobuf::io::ArrayOutputStream aos(pkt, siz);
-    CodedOutputStream *coded_output = new CodedOutputStream(&aos);
+    std::uint32_t siz = message.ByteSizeLong();
+    siz += CodedOutputStream::VarintSize32(siz);
+    char pkt[siz]; // note: allowed in Linx, not windows
+    google::protobuf::io::ArrayOutputStream aos(&pkt, siz);
+    std::unique_ptr<CodedOutputStream> coded_output = std::make_unique<CodedOutputStream>(&aos);
     coded_output->WriteVarint32(message.ByteSizeLong());
-    message.SerializeToCodedStream(coded_output);
-
-    // add the header
-
-
+    if(!message.SerializeToCodedStream(coded_output.get()))
+        return false;
 
     // send data
-    m_pProtocol->transmit(pkt, siz);
+    if(!m_pProtocol->transmit(pkt, siz))
+        return false;
 
-    delete coded_output;
-    delete[] pkt;
+    return true;
 }

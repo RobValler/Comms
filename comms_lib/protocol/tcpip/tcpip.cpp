@@ -19,10 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <cstring>
 
 
 
+struct SMessageHeader {
+    std::uint32_t size;
 
+};
 
 
 CTCPIP::CTCPIP()
@@ -69,12 +73,11 @@ bool CTCPIP::server_connect()
     if ((m_serverSocket = accept(m_server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
         return false;
 
-    std::cout << "server_connect good" << std::endl;
+    std::cout << "server connected" << std::endl;
 
     //valread = recv( m_serverSocket , buffer, 1024, 0);
     valread = read(m_serverSocket , m_buffer, 1024);
-
-    std::cout << "message recieved = " << m_buffer << std::endl;
+    std::cout << "message recieved = " << valread << " bytes" << std::endl;
 
     return true;
 }
@@ -95,7 +98,7 @@ bool CTCPIP::client_connect()
     if (connect(m_clientSocket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
         return false;
 
-    std::cout << "client_connect good" << std::endl;
+    std::cout << "client connected" << std::endl;
 
     return true;
 }
@@ -107,14 +110,26 @@ bool CTCPIP::disconnect()
 
 bool CTCPIP::recieve(char** data, int& size)
 {
-    *data = &m_buffer[0];
-    size = sizeof(m_buffer);
-    return false;
+    SMessageHeader head;
+    std::memcpy(&head, &m_buffer[0], sizeof(SMessageHeader));
+    *data = &m_buffer[sizeof(SMessageHeader)];
+    size = head.size;
+
+    if(size <= 0)
+        return false;
+
+    return true;
 }
 
 bool CTCPIP::transmit(const char *data, const int size)
 {
-    ssize_t result = send(m_clientSocket , data , size , 0 );
+    SMessageHeader head;
+    head.size = size;
+    char package[size + sizeof(SMessageHeader)];
+    std::memcpy(&package[0], &head, sizeof(SMessageHeader));
+    std::memcpy(&package[sizeof(SMessageHeader)], data, size);
+
+    ssize_t result = send(m_clientSocket , package , sizeof(package) , 0 );
     if(result > 0)
         return true;
     else

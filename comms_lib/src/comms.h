@@ -24,8 +24,8 @@ public:
     ~CComms();
 
     bool connect();
-    void read(::google::protobuf::Message& message);
-    void write(const ::google::protobuf::Message& message);
+    bool read(::google::protobuf::Message& message);
+    bool write(const ::google::protobuf::Message& message);
 
 private:
     std::shared_ptr<IProtocol> m_pProtocol;

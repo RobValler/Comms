@@ -15,13 +15,14 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 TEST(Comms, BasicTest)
 {
     CComms server, client;
     test_msg in, out;
     const std::string out_str = "flap jacks";
-    const int out_int = 21345;
+    const std::int32_t out_int = 21345;
 
     // set test data
     out.set_test_int(out_int);
@@ -31,12 +32,14 @@ TEST(Comms, BasicTest)
     EXPECT_EQ(client.connect(), true);
 
     // write and read
-    client.write(out);
-    server.read(in);
+    EXPECT_EQ(client.write(out), true);
+    std::this_thread::sleep_for( std::chrono::milliseconds(300) );
+    EXPECT_EQ(server.read(in), true);
 
-    std::this_thread::sleep_for( std::chrono::seconds(2) );
+//    std::cout << "out = " << out_int << ", in = " << in.test_int() << std::endl;
+//    std::cout << "out = " << out_str << ", in = " << in.test_string() << std::endl;
 
     // check return values
-    EXPECT_EQ(in.test_int(), out_int);
-    EXPECT_EQ(in.test_string(), out_str);
+    EXPECT_EQ(out_int, in.test_int());
+    EXPECT_EQ(out_str, in.test_string());
 }
