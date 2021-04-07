@@ -33,7 +33,7 @@ TEST(Comms, BasicTest)
 
     // write and read
     EXPECT_EQ(client.write(out), true);
-    std::this_thread::sleep_for( std::chrono::milliseconds(300) );
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
     EXPECT_EQ(server.read(in), true);
 
     // check return values

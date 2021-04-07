@@ -13,6 +13,8 @@
 #include <string>
 #include <iostream>
 
+#include "Logger.h"
+
 #include <google/protobuf/message.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -23,6 +25,8 @@
 CComms::CComms()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+    CLogger::GetInstance();
 
     m_pProtocol = std::make_shared<CTCPIP>();
 //    m_pProtocol = std::make_shared<CPOSIX>();
@@ -49,10 +53,10 @@ bool CComms::read(::google::protobuf::Message& message)
     char *pkt = nullptr;
 
     //fetch data
-    if(!m_pProtocol->recieve(&pkt, siz))
+    if(!m_pProtocol->recieve(&pkt, siz)) {
+        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned error");
         return false;
-
-
+    }
 
     google::protobuf::io::ArrayInputStream ais(pkt, siz);
     CodedInputStream coded_input(&ais);
