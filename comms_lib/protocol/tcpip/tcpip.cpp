@@ -67,6 +67,7 @@ bool CTCPIP::server_connect()
     if (listen(m_server_fd, 10) < 0)
         return false;
 
+    //set non blocking
 //    if(fcntl(server_fd, F_SETFL, fcntl(server_fd, F_GETFL) | O_NONBLOCK) < 0)
 //        return false;
 

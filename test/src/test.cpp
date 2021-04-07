@@ -36,9 +36,6 @@ TEST(Comms, BasicTest)
     std::this_thread::sleep_for( std::chrono::milliseconds(300) );
     EXPECT_EQ(server.read(in), true);
 
-//    std::cout << "out = " << out_int << ", in = " << in.test_int() << std::endl;
-//    std::cout << "out = " << out_str << ", in = " << in.test_string() << std::endl;
-
     // check return values
     EXPECT_EQ(out_int, in.test_int());
     EXPECT_EQ(out_str, in.test_string());
