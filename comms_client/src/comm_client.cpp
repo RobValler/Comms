@@ -7,8 +7,8 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#include "comms.h"
-#include "tcpip.h"
+#include "comm_client.h"
+#include "tcpip_client.h"
 
 #include <string>
 #include <iostream>
@@ -22,30 +22,30 @@
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 
-CComms::CComms()
+CCommClient::CCommClient()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     CLogger::GetInstance();
 
-    m_pProtocol = std::make_shared<CTCPIP>();
+    m_pProtocolClient = std::make_shared<CTCPIPClient>();
 //    m_pProtocol = std::make_shared<CPOSIX>();
 //    m_pProtocol = std::make_shared<CCAN>();
 
 }
 
-CComms::~CComms()
+CCommClient::~CCommClient()
 {
-    m_pProtocol->disconnect();
+    m_pProtocolClient->client_disconnect();
     google::protobuf::ShutdownProtobufLibrary();
 }
 
-bool CComms::connect()
+bool CCommClient::connect()
 {
-    return m_pProtocol->client_connect();
+    return m_pProtocolClient->client_connect();
 }
 
-bool CComms::read(::google::protobuf::Message& message)
+bool CCommClient::read(::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
 
@@ -53,7 +53,7 @@ bool CComms::read(::google::protobuf::Message& message)
     char *pkt = nullptr;
 
     //fetch data
-    if(!m_pProtocol->recieve(&pkt, siz)) {
+    if(!m_pProtocolClient->recieve(&pkt, siz)) {
         CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned error");
         return false;
     }
@@ -74,7 +74,7 @@ bool CComms::read(::google::protobuf::Message& message)
     return true;
 }
 
-bool CComms::write(const ::google::protobuf::Message& message)
+bool CCommClient::write(const ::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
 //    std::cout << "size of test "<< sizeof(message) << std::endl;
@@ -91,7 +91,7 @@ bool CComms::write(const ::google::protobuf::Message& message)
         return false;
 
     // send data
-    if(!m_pProtocol->transmit(pkt, siz))
+    if(!m_pProtocolClient->transmit(pkt, siz))
         return false;
 
     return true;

@@ -7,7 +7,7 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#include "tcpip.h"
+#include "tcpip_server.h"
 
 #include "Logger.h"
 
@@ -35,24 +35,28 @@ struct SMessageHeader {
     std::uint8_t type;
 };
 
-CTCPIP::CTCPIP()
+CTCPIPServer::CTCPIPServer()
     : m_shutdownrequest(false)
+    , m_serverSocket(0)
+    , m_server_fd(0)
+    , m_size(0)
 {
-    t_server = std::thread(&CTCPIP::threadfunc_server, this);
-    //t_client = std::thread(&CTCPIP::threadfunc_client, this);
+    t_server = std::thread(&CTCPIPServer::threadfunc_server, this);
 }
 
-CTCPIP::~CTCPIP()
+CTCPIPServer::~CTCPIPServer()
 {
     m_shutdownrequest = true;
-    shutdown(m_server_fd, SHUT_RDWR); // aborts any blocking calls
-    t_server.join();
-    //t_client.join();
+    shutdown(m_server_fd, SHUT_RDWR); // aborts any blocking calls on the server
+
+    if(t_server.joinable())
+        t_server.join();
+    else
+        CLogger::Print(LOGLEV_RUN, "~CTCPIPServer()", "server join issue");
 }
 
-bool CTCPIP::server_connect()
+bool CTCPIPServer::server_connect()
 {
-    int valread;
     int opt = 1;
     struct sockaddr_in address;    
     int addrlen = sizeof(address);
@@ -114,77 +118,12 @@ bool CTCPIP::server_connect()
         return false;
     }
 
-    // loop read
-//    while(!m_shutdownrequest)
-//    {
-//        valread = recv( m_serverSocket , m_buffer, 1024, 0);
-        //valread = read(m_serverSocket , m_buffer, 1024);
-//        CLogger::Print(LOGLEV_RUN, "message recieved of ", valread, " bytes");
-//    }
-
     return true;
 }
 
-bool CTCPIP::client_connect()
+bool CTCPIPServer::recieve(char** data, int& size)
 {
-    char confirmMsgBuff[48] = {0};
-    struct sockaddr_in serv_addr;
-
-    if ((m_clientSocket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        CLogger::Print(LOGLEV_RUN, "client_connect", "socket");
-        return false;
-    }
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(8080);
-
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
-        return false;
-
-    if (connect(m_clientSocket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        CLogger::Print(LOGLEV_RUN, "client_connect", "connect");
-        return false;
-    }
-
-    CLogger::Print(LOGLEV_RUN, "client connected");
-
-    SMessageHeader head;
-    if( read(m_clientSocket , confirmMsgBuff, 1024) <= 0) {
-        CLogger::Print(LOGLEV_RUN, "client_connect", "socket");
-        return false;
-    }
-
-    std::memcpy(&head, &confirmMsgBuff[0], sizeof(SMessageHeader));
-    if(EMsgTypCtrl != head.type) {
-        CLogger::Print(LOGLEV_RUN, "client_connect", "wrong type");
-        return false;
-    }
-
-    CLogger::Print(LOGLEV_RUN, "client connection confirmed");
-
-    return true;
-}
-
-bool CTCPIP::disconnect()
-{
-    return false;
-}
-
-bool CTCPIP::recieve(char** data, int& size)
-{
-    SMessageHeader head;
-
-//    int numOfBytesRead = recv( m_serverSocket , m_buffer, 1024, 0);
-    int numOfBytesRead = read(m_serverSocket , m_buffer, 1024);
-    CLogger::Print(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
-
-    std::memcpy(&head, &m_buffer[0], sizeof(SMessageHeader));
-    if(EMsgTypData != head.type) {
-        CLogger::Print(LOGLEV_RUN, "recieve() ", "wrong type");
-        return false;
-    }
-
-    size = head.size;
+    size = m_size;
     *data = &m_buffer[sizeof(SMessageHeader)];
 
     if(size <= 0)
@@ -193,28 +132,65 @@ bool CTCPIP::recieve(char** data, int& size)
     return true;
 }
 
-bool CTCPIP::transmit(const char *data, const int size)
+bool CTCPIPServer::transmit(const char *data, const int size)
 {
     SMessageHeader head;
     head.size = size;
     head.type = EMsgTypData;
-    char package[size + sizeof(SMessageHeader)];
+    char package[size + sizeof(SMessageHeader)]; // todo: change to dynamic array
     std::memcpy(&package[0], &head, sizeof(SMessageHeader));
     std::memcpy(&package[sizeof(SMessageHeader)], data, size);
 
-    ssize_t result = send(m_clientSocket , package , sizeof(package) , 0 );
+    ssize_t result = send(m_serverSocket , package , sizeof(package) , 0 );
     if(result > 0)
         return true;
     else
         return false;
 }
 
-void CTCPIP::threadfunc_server()
+void CTCPIPServer::threadfunc_server()
 {
-    server_connect();
+    bool result = false;
+    result = server_connect();
+    if(result)
+        listenForData();
+    else
+        CLogger::Print(LOGLEV_RUN, "threadfunc_server: ", "server_connect() failed");
+
 }
 
-void CTCPIP::threadfunc_client()
+bool CTCPIPServer::listenForData()
 {
+    SMessageHeader peekHeader;
+    int numOfBytesRead;
+    int sizeOfHeader = sizeof(peekHeader);
+    int peekFlags = 0;
+    peekFlags |= MSG_PEEK;
 
+    // Check the contents of the header
+    numOfBytesRead = recv( m_serverSocket , &peekHeader, sizeOfHeader, peekFlags);
+    CLogger::Print(LOGLEV_RUN, "recieve: ", "header read failed");
+    if(numOfBytesRead <= 0) {
+        CLogger::Print(LOGLEV_RUN, "recieve: ", "numOfBytesRead = ", numOfBytesRead);
+        return false;
+    }
+
+    // check the data type
+    if(EMsgTypData != peekHeader.type) {
+        CLogger::Print(LOGLEV_RUN, "recieve() ", "wrong type");
+        return false;
+    }
+
+    // store the actual data
+    int numOfBytesThatShouldBeRead = peekHeader.size + sizeOfHeader;
+    numOfBytesRead = read(m_serverSocket , m_buffer, numOfBytesThatShouldBeRead);
+    if(numOfBytesRead != numOfBytesThatShouldBeRead) {
+        CLogger::Print(LOGLEV_RUN, "recieve: ", "read size did not match");
+        return false;
+    } else {
+        m_size = numOfBytesRead;
+        CLogger::Print(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
+    }
+
+    return true;
 }

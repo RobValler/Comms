@@ -8,7 +8,8 @@ set(ProtobufIncludePath ${CMAKE_CURRENT_BINARY_DIR}/../messages)
 
 include_directories(${GTEST_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_lib/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_server/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_client/src)
 include_directories(${ProtobufIncludePath})
 
 file(GLOB_RECURSE SOURCES
@@ -21,4 +22,4 @@ file(GLOB_RECURSE HEADERS
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} gtest_main gtest comms_lib )
+target_link_libraries(${PROJECT_NAME} gtest_main gtest comms_client comms_server)

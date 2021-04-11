@@ -9,7 +9,8 @@
 
 #include <gtest/gtest.h>
 
-#include "comms.h"
+#include "comm_server.h"
+#include "comm_client.h"
 #include "example.pb.h"
 
 #include <string>
@@ -19,7 +20,8 @@
 
 TEST(Comms, BasicTest)
 {
-    CComms server, client;
+    CCommServer server;
+    CCommClient client;
     test_msg in, out;
     const std::string out_str = "flap jacks";
     const std::int32_t out_int = 21345;
@@ -30,6 +32,9 @@ TEST(Comms, BasicTest)
 
     std::this_thread::sleep_for( std::chrono::milliseconds(200) );
     EXPECT_EQ(client.connect(), true);
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+
 
     // write and read
     EXPECT_EQ(client.write(out), true);

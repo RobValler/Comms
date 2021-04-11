@@ -9,5 +9,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread ")
 add_compile_options( -Wall -Wextra -pedantic)
 
 add_subdirectory(messages)
-add_subdirectory(comms_lib)
+add_subdirectory(comms_server)
+add_subdirectory(comms_client)
 add_subdirectory(test)

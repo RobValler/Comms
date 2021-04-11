@@ -9,27 +9,23 @@
 
 #pragma once
 
-//#include "iprotocol.h"
-
 #include <memory>
 
 
 namespace google{ namespace protobuf{ class Message; } }
-class IProtocol;
+class IProtocolClient;
 
-class CComms
+class CCommClient
 {
 public:
-    CComms();
-    ~CComms();
+    CCommClient();
+    ~CCommClient();
 
     bool connect();
     bool read(::google::protobuf::Message& message);
     bool write(const ::google::protobuf::Message& message);
 
 private:
-    std::shared_ptr<IProtocol> m_pProtocol;
-
-
+    std::shared_ptr<IProtocolClient> m_pProtocolClient;
 
 };

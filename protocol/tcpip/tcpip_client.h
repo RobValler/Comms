@@ -9,34 +9,36 @@
 
 #pragma once
 
-#include "iprotocol.h"
+#include "iprotocol_client.h"
 
 #include <thread>
 #include <atomic>
+#include <vector>
 
-class CTCPIP : public IProtocol
+class CTCPIPClient : public IProtocolClient
 {
 public:
-    CTCPIP();
-    ~CTCPIP();
+    CTCPIPClient();
+    ~CTCPIPClient();
 
-    bool server_connect() override;
     bool client_connect() override;
-    bool disconnect() override;
+    bool client_disconnect() override;
     bool recieve(char** data, int& size) override;
     bool transmit(const char *data, const int size) override;
 
 private:
-    void threadfunc_server();
     void threadfunc_client();
+    bool listenForData();
 
     std::atomic<bool> m_shutdownrequest;
-    std::thread t_server;
     std::thread t_client;
 
-    int m_serverSocket;
-    int m_clientSocket;
-    int m_server_fd;
+    int m_client_fd;
 
-    char m_buffer[1024] = {0};
+    char m_buffer[1024] = {0}; //todo: replace with dynamic array
+
+    int m_size;
+
+    std::vector<char> m_input_data_entry;
+    std::vector<std::vector<char>> m_input_data_buffer;
 };
