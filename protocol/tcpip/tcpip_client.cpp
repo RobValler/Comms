@@ -11,13 +11,12 @@
 
 #include "Logger.h"
 
+// tcp socket stuff
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-
-#include <string.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +39,7 @@ CTCPIPClient::CTCPIPClient()
     , m_client_fd(0)
     , m_size(0)
 {
-
+    m_sizeOfHeader = sizeof(SMessageHeader);
 }
 
 CTCPIPClient::~CTCPIPClient()
@@ -83,7 +82,7 @@ bool CTCPIPClient::client_connect()
         return false;
     }
 
-    std::memcpy(&head, &confirmMsgBuff[0], sizeof(SMessageHeader));
+    std::memcpy(&head, &confirmMsgBuff[0], m_sizeOfHeader);
     if(EMsgTypCtrl != head.type) {
         CLogger::Print(LOGLEV_RUN, "client_connect: ", "wrong msg type");
         return false;
@@ -105,7 +104,7 @@ bool CTCPIPClient::client_disconnect()
 bool CTCPIPClient::recieve(char** data, int& size)
 {
     size = m_size;
-    *data = &m_buffer[sizeof(SMessageHeader)];
+    *data = &m_buffer[m_sizeOfHeader];
 
     if(size <= 0)
         return false;
@@ -118,11 +117,13 @@ bool CTCPIPClient::transmit(const char *data, const int size)
     SMessageHeader head;
     head.size = size;
     head.type = EMsgTypData;
-    char package[size + sizeof(SMessageHeader)]; // todo: change to dynamic array
-    std::memcpy(&package[0], &head, sizeof(SMessageHeader));
-    std::memcpy(&package[sizeof(SMessageHeader)], data, size);
 
-    ssize_t result = send(m_client_fd , package , sizeof(package) , 0 );
+    std::vector<char> package;
+    package.resize(size + m_sizeOfHeader);
+    std::memcpy(&package[0], &head, m_sizeOfHeader);
+    std::memcpy(&package[m_sizeOfHeader], data, size);
+
+    ssize_t result = send(m_client_fd , &package[0], package.size() , 0 );
     if(result > 0)
         return true;
     else
@@ -145,7 +146,7 @@ bool CTCPIPClient::listenForData()
 {
     SMessageHeader peekHeader;
     int numOfBytesRead;
-    int sizeOfHeader = sizeof(peekHeader);
+    int sizeOfHeader = m_sizeOfHeader;
     int peekFlags = 0;
     peekFlags |= MSG_PEEK;
 

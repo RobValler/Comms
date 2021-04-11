@@ -32,8 +32,8 @@ private:
 
     std::atomic<bool> m_shutdownrequest;
     std::thread t_client;
-
     int m_client_fd;
+    int m_sizeOfHeader;
 
     char m_buffer[1024] = {0}; //todo: replace with dynamic array
 

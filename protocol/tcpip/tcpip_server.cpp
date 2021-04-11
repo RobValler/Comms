@@ -41,6 +41,7 @@ CTCPIPServer::CTCPIPServer()
     , m_server_fd(0)
     , m_size(0)
 {
+    m_sizeOfHeader = sizeof(SMessageHeader);
     t_server = std::thread(&CTCPIPServer::threadfunc_server, this);
 }
 
@@ -109,10 +110,12 @@ bool CTCPIPServer::server_connect()
     SMessageHeader head;
     head.size = 1;
     head.type = EMsgTypCtrl;
-    char package[1 + sizeof(SMessageHeader)];
-    std::memcpy(&package[0], &head, sizeof(SMessageHeader));
-    std::memcpy(&package[sizeof(SMessageHeader)], &confirmMsgBuff, 1);
-    ssize_t result = send(m_serverSocket , package , sizeof(package) , 0 );
+
+    std::vector<char> package;
+    package.resize(1 + m_sizeOfHeader);
+    std::memcpy(&package[0], &head, m_sizeOfHeader);
+    std::memcpy(&package[m_sizeOfHeader], &confirmMsgBuff, 1);
+    ssize_t result = send(m_serverSocket , &package[0] , package.size() , 0 );
     if(result <= 0) {
         CLogger::Print(LOGLEV_RUN, "server_connect", "send");
         return false;
@@ -124,7 +127,7 @@ bool CTCPIPServer::server_connect()
 bool CTCPIPServer::recieve(char** data, int& size)
 {
     size = m_size;
-    *data = &m_buffer[sizeof(SMessageHeader)];
+    *data = &m_buffer[m_sizeOfHeader];
 
     if(size <= 0)
         return false;
@@ -137,11 +140,13 @@ bool CTCPIPServer::transmit(const char *data, const int size)
     SMessageHeader head;
     head.size = size;
     head.type = EMsgTypData;
-    char package[size + sizeof(SMessageHeader)]; // todo: change to dynamic array
-    std::memcpy(&package[0], &head, sizeof(SMessageHeader));
-    std::memcpy(&package[sizeof(SMessageHeader)], data, size);
 
-    ssize_t result = send(m_serverSocket , package , sizeof(package) , 0 );
+    std::vector<char> package;
+    package.resize(size + m_sizeOfHeader);
+    std::memcpy(&package[0], &head, m_sizeOfHeader);
+    std::memcpy(&package[m_sizeOfHeader], data, size);
+
+    ssize_t result = send(m_serverSocket , &package[0], package.size() , 0 );
     if(result > 0)
         return true;
     else
@@ -163,7 +168,7 @@ bool CTCPIPServer::listenForData()
 {
     SMessageHeader peekHeader;
     int numOfBytesRead;
-    int sizeOfHeader = sizeof(peekHeader);
+    int sizeOfHeader = m_sizeOfHeader;
     int peekFlags = 0;
     peekFlags |= MSG_PEEK;
 

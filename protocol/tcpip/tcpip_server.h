@@ -34,6 +34,7 @@ private:
 
     int m_serverSocket;
     int m_server_fd;
+    int m_sizeOfHeader;
 
     char m_buffer[1024] = {0}; //todo: replace with dynamic array
 

@@ -72,21 +72,20 @@ bool CCommServer::read(::google::protobuf::Message& message)
 bool CCommServer::write(const ::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
-//    std::cout << "size of test "<< sizeof(message) << std::endl;
-//    std::cout << "size after serilizing is "<< message.ByteSizeLong() << std::endl;
+    std::vector<char> pkt;
 
     // serialise data
     std::uint32_t siz = message.ByteSizeLong();
     siz += CodedOutputStream::VarintSize32(siz);
-    char pkt[siz]; // note: allowed in Linx, not windows
-    google::protobuf::io::ArrayOutputStream aos(&pkt, siz);
+    pkt.resize(siz);
+    google::protobuf::io::ArrayOutputStream aos(&pkt[0], siz);
     std::unique_ptr<CodedOutputStream> coded_output = std::make_unique<CodedOutputStream>(&aos);
     coded_output->WriteVarint32(message.ByteSizeLong());
     if(!message.SerializeToCodedStream(coded_output.get()))
         return false;
 
     // send data
-    if(!m_pProtocolServer->transmit(pkt, siz))
+    if(!m_pProtocolServer->transmit(&pkt[0], siz))
         return false;
 
     return true;
