@@ -10,7 +10,7 @@
 #pragma once
 
 #include <memory>
-
+#include <string>
 
 namespace google{ namespace protobuf{ class Message; } }
 class IProtocolClient;
@@ -21,7 +21,7 @@ public:
     CCommClient();
     ~CCommClient();
 
-    bool connect();
+    bool connect(std::string server_address);
     bool read(::google::protobuf::Message& message);
     bool write(const ::google::protobuf::Message& message);
 

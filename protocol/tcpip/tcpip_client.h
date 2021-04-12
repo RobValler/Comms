@@ -14,6 +14,7 @@
 #include <thread>
 #include <atomic>
 #include <vector>
+#include <string>
 
 class CTCPIPClient : public IProtocolClient
 {
@@ -21,7 +22,7 @@ public:
     CTCPIPClient();
     ~CTCPIPClient();
 
-    bool client_connect() override;
+    bool client_connect(std::string ip_address) override;
     bool client_disconnect() override;
     bool recieve(char** data, int& size) override;
     bool transmit(const char *data, const int size) override;

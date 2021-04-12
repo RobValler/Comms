@@ -40,9 +40,9 @@ CCommClient::~CCommClient()
     google::protobuf::ShutdownProtobufLibrary();
 }
 
-bool CCommClient::connect()
+bool CCommClient::connect(std::string server_address)
 {
-    return m_pProtocolClient->client_connect();
+    return m_pProtocolClient->client_connect(server_address);
 }
 
 bool CCommClient::read(::google::protobuf::Message& message)
@@ -54,7 +54,7 @@ bool CCommClient::read(::google::protobuf::Message& message)
 
     //fetch data
     if(!m_pProtocolClient->recieve(&pkt, siz)) {
-        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned error");
+        CLOG(LOGLEV_RUN, "protocol recieve returned error");
         return false;
     }
 

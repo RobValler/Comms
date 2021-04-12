@@ -53,7 +53,7 @@ CTCPIPServer::~CTCPIPServer()
     if(t_server.joinable())
         t_server.join();
     else
-        CLogger::Print(LOGLEV_RUN, "~CTCPIPServer()", "server join issue");
+        CLOG(LOGLEV_RUN, "server join issue");
 }
 
 bool CTCPIPServer::server_connect()
@@ -63,12 +63,12 @@ bool CTCPIPServer::server_connect()
     int addrlen = sizeof(address);
 
     if ((m_server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        CLogger::Print(LOGLEV_RUN, "server_connect", "socket");
+        CLOG(LOGLEV_RUN, "socket returned an error");
         return false;
     }
 
     if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        CLogger::Print(LOGLEV_RUN, "server_connect", "setsockopt");
+        CLOG(LOGLEV_RUN, "setsockopt failed");
         return false;
     }
 
@@ -77,18 +77,18 @@ bool CTCPIPServer::server_connect()
     address.sin_port = htons( 8080 );
 
     if (bind(m_server_fd, (struct sockaddr *)&address, sizeof(address))<0) {
-        CLogger::Print(LOGLEV_RUN, "server_connect", "bind");
+        CLOG(LOGLEV_RUN, "bind failed");
         return false;
     }
 
     if (listen(m_server_fd, 10) < 0) {
-        CLogger::Print(LOGLEV_RUN, "server_connect", "listen");
+        CLOG(LOGLEV_RUN, "listen failed");
         return false;
     }
 
     //set non blocking
 //    if(fcntl(m_server_fd, F_SETFL, fcntl(m_server_fd, F_GETFL) | O_NONBLOCK) < 0) {
-//        CLogger::Print(LOGLEV_RUN, "server_connect", " fcntl failed");
+//        CLOG(LOGLEV_RUN, " fcntl failed");
 //        return false;
 //    }
 
@@ -96,14 +96,14 @@ bool CTCPIPServer::server_connect()
     m_serverSocket = accept(m_server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
     if ( m_serverSocket < 0) {
         if(!m_shutdownrequest){
-            CLogger::Print(LOGLEV_RUN, "server_connect", " accept failed = ", m_serverSocket);
+            CLOG(LOGLEV_RUN, "accept failed = ", m_serverSocket);
             return false;
         } else {
             return true;
         }
     }
 
-    CLogger::Print(LOGLEV_RUN, "server connected");
+    CLOG(LOGLEV_RUN, "server connected");
 
     // send the confirmation message
     char confirmMsgBuff;
@@ -117,7 +117,7 @@ bool CTCPIPServer::server_connect()
     std::memcpy(&package[m_sizeOfHeader], &confirmMsgBuff, 1);
     ssize_t result = send(m_serverSocket , &package[0] , package.size() , 0 );
     if(result <= 0) {
-        CLogger::Print(LOGLEV_RUN, "server_connect", "send");
+        CLOG(LOGLEV_RUN, "send fail");
         return false;
     }
 
@@ -160,7 +160,7 @@ void CTCPIPServer::threadfunc_server()
     if(result)
         listenForData();
     else
-        CLogger::Print(LOGLEV_RUN, "threadfunc_server: ", "server_connect() failed");
+        CLOG(LOGLEV_RUN, "server_connect failed");
 
 }
 
@@ -174,15 +174,15 @@ bool CTCPIPServer::listenForData()
 
     // Check the contents of the header
     numOfBytesRead = recv( m_serverSocket , &peekHeader, sizeOfHeader, peekFlags);
-    CLogger::Print(LOGLEV_RUN, "recieve: ", "header read failed");
+    CLOG(LOGLEV_RUN, "header read failed");
     if(numOfBytesRead <= 0) {
-        CLogger::Print(LOGLEV_RUN, "recieve: ", "numOfBytesRead = ", numOfBytesRead);
+        CLOG(LOGLEV_RUN, "numOfBytesRead = ", numOfBytesRead);
         return false;
     }
 
     // check the data type
     if(EMsgTypData != peekHeader.type) {
-        CLogger::Print(LOGLEV_RUN, "recieve() ", "wrong type");
+        CLOG(LOGLEV_RUN, "wrong type");
         return false;
     }
 
@@ -190,11 +190,11 @@ bool CTCPIPServer::listenForData()
     int numOfBytesThatShouldBeRead = peekHeader.size + sizeOfHeader;
     numOfBytesRead = read(m_serverSocket , m_buffer, numOfBytesThatShouldBeRead);
     if(numOfBytesRead != numOfBytesThatShouldBeRead) {
-        CLogger::Print(LOGLEV_RUN, "recieve: ", "read size did not match");
+        CLOG(LOGLEV_RUN, "read size did not match");
         return false;
     } else {
         m_size = numOfBytesRead;
-        CLogger::Print(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
+        CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
     }
 
     return true;

@@ -9,11 +9,12 @@
 
 #pragma once
 
+#include <string>
 class IProtocolClient
 {
 public:
     virtual ~IProtocolClient(){}
-    virtual bool client_connect()=0;
+    virtual bool client_connect(std::string)=0;
     virtual bool client_disconnect()=0;
     virtual bool recieve(char**, int&) =0;
     virtual bool transmit(const char*, const int) =0;
