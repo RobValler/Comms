@@ -18,13 +18,16 @@
 #include <thread>
 #include <iostream>
 
-TEST(Comms, BasicTest)
+namespace  {
+    const std::string out_str = "flap jacks";
+    const std::int32_t out_int = 21345;
+}
+
+TEST(Comms, BasicTest_TCPIP)
 {
     CCommServer server;
     CCommClient client;
     test_msg in, out;
-    const std::string out_str = "flap jacks";
-    const std::int32_t out_int = 21345;
     bool result;
 
     // set test data
@@ -49,3 +52,24 @@ TEST(Comms, BasicTest)
     EXPECT_EQ(out_int, in.test_int());
     EXPECT_EQ(out_str, in.test_string());
 }
+
+TEST(Comms, BasicTest_POSIXMQ)
+{
+    CCommServer server;
+
+    test_msg in, out;
+    bool result;
+
+
+
+    // set test data
+    out.set_test_int(out_int);
+    out.set_test_string(out_str);
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+
+
+
+
+}
+

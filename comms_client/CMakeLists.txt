@@ -28,4 +28,5 @@ add_library(${PROJECT_NAME} STATIC
 
 target_link_libraries(${PROJECT_NAME}
     ${PROTOBUF_LIBRARY}
+    rt
     )

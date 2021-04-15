@@ -8,8 +8,12 @@
  *****************************************************************/
 
 #include "comm_server.h"
-#include "tcpip_server.h"
 #include "iprotocol_server.h"
+
+// todo: make dynamic ... shared lib loader?
+#include "tcpip_server.h"
+#include "posix_mq_server.h"
+
 
 #include <string>
 #include <iostream>
@@ -23,15 +27,32 @@
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 
+enum EProtocolType {
+    ENone = 0,
+    ETCTPIP,
+    EPOSIX_MQ
+};
+
 CCommServer::CCommServer()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     CLogger::GetInstance();
 
-    m_pProtocolServer = std::make_shared<CTCPIPServer>();
-//    m_pProtocol = std::make_shared<CPOSIX>();
-//    m_pProtocol = std::make_shared<CCAN>();
+
+    EProtocolType type = EPOSIX_MQ;
+    switch(type)
+    {
+    case ENone:
+
+        break;
+    case ETCTPIP:
+        m_pProtocolServer = std::make_shared<CTCPIPServer>();
+        break;
+    case EPOSIX_MQ:
+        m_pProtocolServer = std::make_shared<CPOSIXMQServer>();
+        break;
+    }
 
 }
 
