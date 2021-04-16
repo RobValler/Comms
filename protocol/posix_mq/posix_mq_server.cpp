@@ -17,10 +17,11 @@
 #include <thread>
 
 namespace  {
-    const char l_channel_name[] = "POSIX_TEST_Q";
+    const char l_channel_name[] = "/posix_test_mq";
+    const int l_max_num_of_connect_attempts = 5;
 }
 
-
+// todo: move to common section
 enum EMessageType : std::uint8_t
 {
     EMsgTypNone = 0,
@@ -28,6 +29,7 @@ enum EMessageType : std::uint8_t
     EMsgTypData
 };
 
+// todo: move to common section
 struct SMessageHeader {
     std::uint32_t size;
     std::uint8_t type;
@@ -35,10 +37,11 @@ struct SMessageHeader {
 
 CPOSIXMQServer::CPOSIXMQServer()
     : m_shutdownrequest(false)
-    , msgQueue(-1)
+    , m_msgQueue(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
-   // t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
+//    t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
+//    t_client = std::thread(&CPOSIXMQServer::threadfunc_server, this);
 
     server_connect();
 }
@@ -46,7 +49,8 @@ CPOSIXMQServer::CPOSIXMQServer()
 CPOSIXMQServer::~CPOSIXMQServer()
 {
     m_shutdownrequest = true;
-    //t_server.join();
+//    t_server.join();
+//    t_client.join();
 
 }
 
@@ -54,27 +58,40 @@ bool CPOSIXMQServer::server_connect()
 {
     // create the posix mq channel
     // will attempt several times
-    const int o_flag = O_RDWR | O_CREAT;
-    for(int retry_index = 0; retry_index < 10; retry_index++)
+
+    //disabled mq_attr because using it causes access permission errors
+//    mq_attr attrib;
+//    attrib.mq_flags = 0;
+//    attrib.mq_maxmsg = 16;
+//    attrib.mq_msgsize = 1024;
+//    attrib.mq_curmsgs = 0;
+
+    mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
+    int o_flag = O_CREAT | O_RDWR /* | O_NONBLOCK */;
+
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
-        CLOG(LOGLEV_RUN, "cannel create attempt = ", retry_index + 1);
-        if(10 == retry_index + 1) {
+        CLOG(LOGLEV_RUN, "channel create attempt = ", retry_index + 1);
+        if(l_max_num_of_connect_attempts == retry_index + 1) {
             CLOG(LOGLEV_RUN, "max channel create attempts reached");
             return false;
         }
 
-        msgQueue = mq_open(l_channel_name, o_flag);
-        if(msgQueue >= 0) {
+        m_msgQueue = mq_open(l_channel_name,  o_flag, mode, NULL);
+        if(-1 != m_msgQueue) {
+            // no issues, this loop can be exited
             break;
+        } else {
+            CLOG(LOGLEV_RUN, "open failed = ", errno, " = ", strerror(errno));
         }
 
+        // pause before the next attempt
         std::this_thread::sleep_for( std::chrono::milliseconds(200) );
     }
 
     CLOG(LOGLEV_RUN, "channel created");
 
-
-    // send the confirmation message
+    // The channel is open, send the confirmation message
     char confirmMsgBuff;
     SMessageHeader head;
     head.size = 1;
@@ -96,19 +113,18 @@ bool CPOSIXMQServer::server_connect()
 bool CPOSIXMQServer::recieve(char** data, int& size)
 {
     unsigned int priority = 1;
-    int result = mq_receive(msgQueue, (char*)data, size, &priority);
-    if(1 == result)
+    int result = mq_receive(m_msgQueue, (char*)data, size, &priority);
+    if(result < 0)
         return false;
     else
         return true;
 }
 
-
 bool CPOSIXMQServer::transmit(const char *data, const int size)
 {
     unsigned int priority = 1;
-    int result = mq_send(msgQueue, (char*)data, size, priority);
-    if(size != result)
+    int result = mq_send(m_msgQueue, (char*)data, size, priority);
+    if(result < 0)
         return false;
     else
         return true;

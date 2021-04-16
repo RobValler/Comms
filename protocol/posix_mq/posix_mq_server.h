@@ -31,11 +31,9 @@ private:
     void threadfunc_server();
     bool listenForData();
 
-    mqd_t msgQueue;
+    std::atomic<bool> m_shutdownrequest;
+    mqd_t m_msgQueue;
     int m_sizeOfHeader;
 
-
-    std::atomic<bool> m_shutdownrequest;
     std::thread t_server;
-
 };
