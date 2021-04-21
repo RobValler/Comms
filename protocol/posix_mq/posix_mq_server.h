@@ -16,6 +16,9 @@
 
 #include <mqueue.h>
 
+namespace comms {
+namespace posix {
+namespace server {
 
 class CPOSIXMQServer : public IProtocolServer
 {
@@ -37,3 +40,7 @@ private:
 
     std::thread t_server;
 };
+
+} // comms
+} // posix
+} // client

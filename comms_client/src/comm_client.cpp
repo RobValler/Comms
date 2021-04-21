@@ -9,6 +9,8 @@
 
 #include "comm_client.h"
 #include "tcpip_client.h"
+#include "posix_mq_client.h"
+#include "common.h"
 
 #include <string>
 #include <iostream>
@@ -21,16 +23,24 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
-
-CCommClient::CCommClient()
+CCommClient::CCommClient(EProtocolType type)
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     CLogger::GetInstance();
 
-    m_pProtocolClient = std::make_shared<CTCPIPClient>();
-//    m_pProtocol = std::make_shared<CPOSIX>();
-//    m_pProtocol = std::make_shared<CCAN>();
+    switch(type)
+    {
+    case ENone:
+
+        break;
+    case ETCTPIP:
+        m_pProtocolClient = std::make_shared<CTCPIPClient>();
+        break;
+    case EPOSIX_MQ:
+        m_pProtocolClient = std::make_shared<comms::posix::client::CPOSIXMQClient>();
+        break;
+    }
 
 }
 

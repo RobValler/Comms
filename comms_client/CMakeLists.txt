@@ -1,23 +1,20 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(comms_client)
 
-FIND_PACKAGE(Protobuf REQUIRED)
-
-include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../protocol)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../DevFramework/Logger)
 
 file(GLOB SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/tcpip_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.cpp
     )
 
 file(GLOB HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../common/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/iprotocol_client.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/tcpip_client.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../DevFramework/Logger/Logger.h
     )
 

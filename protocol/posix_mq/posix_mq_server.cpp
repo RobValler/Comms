@@ -16,8 +16,12 @@
 #include <chrono>
 #include <thread>
 
+namespace comms {
+namespace posix {
+namespace server {
+
 namespace  {
-    const char l_channel_name[] = "/posix_test_mq";
+    const char l_channel_name[] = "/posix_test_mq"; // todo: replace with parameter
     const int l_max_num_of_connect_attempts = 5;
 }
 
@@ -40,16 +44,18 @@ CPOSIXMQServer::CPOSIXMQServer()
     , m_msgQueue(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
-//    t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
+    t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
 //    t_client = std::thread(&CPOSIXMQServer::threadfunc_server, this);
 
-    server_connect();
 }
 
 CPOSIXMQServer::~CPOSIXMQServer()
 {
     m_shutdownrequest = true;
-//    t_server.join();
+
+    mq_close(m_msgQueue);
+
+    t_server.join();
 //    t_client.join();
 
 }
@@ -67,7 +73,7 @@ bool CPOSIXMQServer::server_connect()
 //    attrib.mq_curmsgs = 0;
 
     mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
-    int o_flag = O_CREAT | O_RDWR /* | O_NONBLOCK */;
+    int o_flag = O_CREAT | O_WRONLY  | O_NONBLOCK ;
 
     for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
@@ -89,8 +95,9 @@ bool CPOSIXMQServer::server_connect()
         std::this_thread::sleep_for( std::chrono::milliseconds(200) );
     }
 
-    CLOG(LOGLEV_RUN, "channel created");
+    CLOG(LOGLEV_RUN, "channel ", l_channel_name, " created");
 
+#if 0
     // The channel is open, send the confirmation message
     char confirmMsgBuff;
     SMessageHeader head;
@@ -106,7 +113,7 @@ bool CPOSIXMQServer::server_connect()
         CLOG(LOGLEV_RUN, "send fail");
         return false;
     }
-
+#endif
     return true;
 }
 
@@ -122,8 +129,10 @@ bool CPOSIXMQServer::recieve(char** data, int& size)
 
 bool CPOSIXMQServer::transmit(const char *data, const int size)
 {
+    (void)size;
+
     unsigned int priority = 1;
-    int result = mq_send(m_msgQueue, (char*)data, size, priority);
+    int result = mq_send(m_msgQueue, (char*)data, 1024, priority);
     if(result < 0)
         return false;
     else
@@ -145,3 +154,7 @@ bool CPOSIXMQServer::listenForData()
 
     return true;
 }
+
+} // comms
+} // posix
+} // client

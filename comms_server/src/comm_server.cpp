@@ -26,21 +26,20 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
-
-enum EProtocolType {
+enum EProtocolType : unsigned int
+{
     ENone = 0,
     ETCTPIP,
     EPOSIX_MQ
 };
 
-CCommServer::CCommServer()
+
+CCommServer::CCommServer(EProtocolType type)
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     CLogger::GetInstance();
 
-
-    EProtocolType type = EPOSIX_MQ;
     switch(type)
     {
     case ENone:
@@ -50,10 +49,9 @@ CCommServer::CCommServer()
         m_pProtocolServer = std::make_shared<CTCPIPServer>();
         break;
     case EPOSIX_MQ:
-        m_pProtocolServer = std::make_shared<CPOSIXMQServer>();
+        m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
         break;
     }
-
 }
 
 CCommServer::~CCommServer()

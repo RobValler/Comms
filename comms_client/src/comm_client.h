@@ -12,13 +12,16 @@
 #include <memory>
 #include <string>
 
+enum EProtocolType : unsigned int;
 namespace google{ namespace protobuf{ class Message; } }
+
+
 class IProtocolClient;
 
 class CCommClient
 {
 public:
-    CCommClient();
+    CCommClient(EProtocolType type);
     ~CCommClient();
 
     bool connect(std::string server_address);

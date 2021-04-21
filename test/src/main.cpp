@@ -12,6 +12,7 @@
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    ::testing::GTEST_FLAG(filter) = "*POSIX*";
+//    ::testing::GTEST_FLAG(filter) = "*TCPIP*";
+        ::testing::GTEST_FLAG(filter) = "*POSIX*";
     return RUN_ALL_TESTS();
 }

@@ -17,6 +17,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_compile_options( -Wall -Wextra -pedantic)
 
+FIND_PACKAGE(Protobuf REQUIRED)
+
+include_directories(${PROTOBUF_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../DevFramework/Logger)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/protocol)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/protocol/tcpip)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/protocol/posix_mq)
+
 add_subdirectory(messages)
 add_subdirectory(comms_server)
 add_subdirectory(comms_client)

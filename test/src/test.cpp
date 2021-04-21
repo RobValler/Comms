@@ -12,6 +12,7 @@
 #include "comm_server.h"
 #include "comm_client.h"
 #include "example.pb.h"
+#include "common.h"
 
 #include <string>
 #include <chrono>
@@ -25,8 +26,8 @@ namespace  {
 
 TEST(Comms, BasicTest_TCPIP)
 {
-    CCommServer server;
-    CCommClient client;
+    CCommServer server(ETCTPIP);
+    CCommClient client(ETCTPIP);
     test_msg in, out;
     bool result;
 
@@ -42,7 +43,6 @@ TEST(Comms, BasicTest_TCPIP)
 
     std::this_thread::sleep_for( std::chrono::milliseconds(200) );
 
-
     // write and read
     EXPECT_EQ(client.write(out), true);
     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
@@ -55,21 +55,34 @@ TEST(Comms, BasicTest_TCPIP)
 
 TEST(Comms, BasicTest_POSIXMQ)
 {
-    CCommServer server;
+    CCommServer server(EPOSIX_MQ);
+    CCommClient client(EPOSIX_MQ);
 
     test_msg in, out;
     bool result;
 
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+
+    result = client.connect("/posix_test_mq");
+    EXPECT_EQ(result, true);
+    if(!result)
+        return;
 
 
     // set test data
     out.set_test_int(out_int);
     out.set_test_string(out_str);
 
+
+
+    // write and read
+    EXPECT_EQ(server.write(out), true);
     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+    EXPECT_EQ(client.read(in), true);
 
-
-
+    // check return values
+//    EXPECT_EQ(out_int, in.test_int());
+//    EXPECT_EQ(out_str, in.test_string());
 
 }
 

@@ -9,18 +9,17 @@
 
 #pragma once
 
-//#include "iprotocol.h"
-
 #include <memory>
 
-
+enum EProtocolType : unsigned int;
 namespace google{ namespace protobuf{ class Message; } }
+
 class IProtocolServer;
 
 class CCommServer
 {
 public:
-    CCommServer();
+    CCommServer(EProtocolType type);
     ~CCommServer();
 
     bool read(::google::protobuf::Message& message);
