@@ -35,7 +35,7 @@ CCommClient::CCommClient(EProtocolType type)
 
         break;
     case ETCTPIP:
-        m_pProtocolClient = std::make_shared<CTCPIPClient>();
+        m_pProtocolClient = std::make_shared<comms::tcpip::client::CTCPIPClient>();
         break;
     case EPOSIX_MQ:
         m_pProtocolClient = std::make_shared<comms::posix::client::CPOSIXMQClient>();

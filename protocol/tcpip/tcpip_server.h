@@ -15,6 +15,10 @@
 #include <atomic>
 #include <vector>
 
+namespace comms {
+namespace tcpip {
+namespace server {
+
 class CTCPIPServer : public IProtocolServer
 {
 public:
@@ -43,3 +47,7 @@ private:
     std::vector<char> m_input_data_entry;
     std::vector<std::vector<char>> m_input_data_buffer;
 };
+
+} // comms
+} // tcpip
+} // server

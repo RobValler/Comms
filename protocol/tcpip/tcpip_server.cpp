@@ -23,6 +23,10 @@
 #include <stdlib.h>
 #include <cstring>
 
+namespace comms {
+namespace tcpip {
+namespace server {
+
 enum EMessageType : std::uint8_t
 {
     EMsgTypNone = 0,
@@ -199,3 +203,7 @@ bool CTCPIPServer::listenForData()
 
     return true;
 }
+
+} // comms
+} // tcpip
+} // server

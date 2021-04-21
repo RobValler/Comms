@@ -24,6 +24,10 @@
 
 #include <chrono>
 
+namespace comms {
+namespace tcpip {
+namespace client {
+
 namespace {
     const int l_numOfConnectAttempts = 10;
 }
@@ -201,3 +205,7 @@ bool CTCPIPClient::listenForData()
 
     return true;
 }
+
+} // comms
+} // posix
+} // client

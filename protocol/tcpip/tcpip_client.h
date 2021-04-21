@@ -16,6 +16,10 @@
 #include <vector>
 #include <string>
 
+namespace comms {
+namespace tcpip {
+namespace client {
+
 class CTCPIPClient : public IProtocolClient
 {
 public:
@@ -43,3 +47,7 @@ private:
     std::vector<char> m_input_data_entry;
     std::vector<std::vector<char>> m_input_data_buffer;
 };
+
+} // comms
+} // posix
+} // client
