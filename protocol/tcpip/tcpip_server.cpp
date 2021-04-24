@@ -60,7 +60,7 @@ CTCPIPServer::~CTCPIPServer()
         CLOG(LOGLEV_RUN, "server join issue");
 }
 
-bool CTCPIPServer::server_connect()
+bool CTCPIPServer::channel_create()
 {
     int opt = 1;
     struct sockaddr_in address;    
@@ -160,7 +160,7 @@ bool CTCPIPServer::transmit(const char *data, const int size)
 void CTCPIPServer::threadfunc_server()
 {
     bool result = false;
-    result = server_connect();
+    result = channel_create();
     if(result)
         listenForData();
     else

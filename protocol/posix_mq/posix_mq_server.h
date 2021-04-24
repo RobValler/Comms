@@ -26,7 +26,7 @@ public:
     CPOSIXMQServer();
     ~CPOSIXMQServer();
 
-    bool server_connect() override;
+    bool channel_create() override;
     bool recieve(char** data, int& size) override;
     bool transmit(const char *data, const int size) override;
 

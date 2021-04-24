@@ -76,9 +76,9 @@ TEST(Comms, BasicTest_POSIXMQ)
 
 
     // write and read
-    EXPECT_EQ(server.write(out), true);
+    EXPECT_EQ(client.write(out), true);
     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
-    EXPECT_EQ(client.read(in), true);
+    EXPECT_EQ(server.read(in), true);
 
     // check return values
 //    EXPECT_EQ(out_int, in.test_int());

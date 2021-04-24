@@ -60,7 +60,7 @@ CPOSIXMQServer::~CPOSIXMQServer()
 
 }
 
-bool CPOSIXMQServer::server_connect()
+bool CPOSIXMQServer::channel_create()
 {
     // create the posix mq channel
     // will attempt several times
@@ -120,7 +120,8 @@ bool CPOSIXMQServer::server_connect()
 bool CPOSIXMQServer::recieve(char** data, int& size)
 {
     unsigned int priority = 1;
-    int result = mq_receive(m_msgQueue, (char*)data, size, &priority);
+
+    int result = mq_receive(m_msgQueue, (char*)data, m_sizeOfHeader, &priority);
     if(result < 0)
         return false;
     else
@@ -142,16 +143,28 @@ bool CPOSIXMQServer::transmit(const char *data, const int size)
 void CPOSIXMQServer::threadfunc_server()
 {
     bool result = false;
-    result = server_connect();
+    result = channel_create();
     if(result)
+        return;
+    while(!m_shutdownrequest)
+    {
         listenForData();
-    else
-        CLOG(LOGLEV_RUN, "server_connect failed");
+    }
+   // else
+     //   CLOG(LOGLEV_RUN, "server_connect failed");
 }
 
 bool CPOSIXMQServer::listenForData()
 {
+    // read the header first
+    SMessageHeader header;
+    unsigned int priority = 1;
 
+    int result = mq_receive(m_msgQueue, (char*)&header, m_sizeOfHeader, &priority);
+    if(result < 0)
+        return false;
+    else
+        return true;
     return true;
 }
 

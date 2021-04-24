@@ -20,7 +20,7 @@ namespace comms {
 namespace posix {
 namespace client {
 
-
+//
 namespace  {
     const int l_max_num_of_connect_attempts = 5;
 }
@@ -44,8 +44,7 @@ CPOSIXMQClient::CPOSIXMQClient()
     , m_msgQueue(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
-//    t_server = std::thread(&CPOSIXMQClient::threadfunc_server, this);
-
+//    t_client = std::thread(&CPOSIXMQClient::threadfunc_client, this);
 }
 
 CPOSIXMQClient::~CPOSIXMQClient()
@@ -131,10 +130,12 @@ bool CPOSIXMQClient::transmit(const char *data, const int size)
 {
     unsigned int priority = 1;
     int result = mq_send(m_msgQueue, (char*)data, size, priority);
-    if(result < 0)
+    if(result < 0) {
+        CLOG(LOGLEV_RUN, "send failed = ", errno, " = ", strerror(errno));
         return false;
-    else
+    } else {
         return true;
+    }
 }
 
 void CPOSIXMQClient::threadfunc_client()

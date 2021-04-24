@@ -13,7 +13,7 @@ class IProtocolServer
 {
 public:
     virtual ~IProtocolServer(){}
-    virtual bool server_connect()=0;
+    virtual bool channel_create()=0;
     virtual bool recieve(char**, int&) =0;
     virtual bool transmit(const char*, const int) =0;
 };
