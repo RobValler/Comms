@@ -10,6 +10,7 @@
 #pragma once
 
 #include "iprotocol_server.h"
+#include "tcpip_common.h"
 
 #include <thread>
 #include <atomic>
@@ -19,30 +20,36 @@ namespace comms {
 namespace tcpip {
 namespace server {
 
-class CTCPIPServer : public IProtocolServer
+class CTCPIPServer
+        : public IProtocolServer
+        , public common::CTCPIP_Common
 {
 public:
     CTCPIPServer();
     ~CTCPIPServer();
 
     bool channel_create() override;
-    bool recieve(char** data, int& size) override;
-    bool transmit(const char *data, const int size) override;
+    bool recieve(char** data, int& size) override{
+        return crecieve(data, size);
+    }
+    bool transmit(const char *data, const int size) override{
+        ctransmit(data, size);
+    }
 
 private:
     void threadfunc_server();
-    bool listenForData();
+    //bool listenForData();
 
     std::atomic<bool> m_shutdownrequest;
     std::thread t_server;
 
-    int m_serverSocket;
-    int m_server_fd;
-    int m_sizeOfHeader;
+//    int m_serverSocket;
+//    int m_server_fd;
+//    int m_sizeOfHeader;
 
-    char m_buffer[1024] = {0}; //todo: replace with dynamic array
+//    char m_buffer[1024] = {0}; //todo: replace with dynamic array
 
-    int m_size;
+//    int m_size;
 
     std::vector<char> m_input_data_entry;
     std::vector<std::vector<char>> m_input_data_buffer;

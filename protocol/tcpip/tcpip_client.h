@@ -10,6 +10,7 @@
 #pragma once
 
 #include "iprotocol_client.h"
+#include "tcpip_common.h"
 
 #include <thread>
 #include <atomic>
@@ -20,7 +21,9 @@ namespace comms {
 namespace tcpip {
 namespace client {
 
-class CTCPIPClient : public IProtocolClient
+class CTCPIPClient
+        : public IProtocolClient
+        , public common::CTCPIP_Common
 {
 public:
     CTCPIPClient();
@@ -28,21 +31,25 @@ public:
 
     bool client_connect(std::string ip_address) override;
     bool client_disconnect() override;
-    bool recieve(char** data, int& size) override;
-    bool transmit(const char *data, const int size) override;
+    bool recieve(char** data, int& size) override{
+        return crecieve(data, size);
+    }
+    bool transmit(const char *data, const int size) override{
+        return ctransmit(data, size);
+    }
 
 private:
     void threadfunc_client();
-    bool listenForData();
+    //bool listenForData();
 
     std::atomic<bool> m_shutdownrequest;
     std::thread t_client;
-    int m_client_fd;
-    int m_sizeOfHeader;
+    //int m_client_fd;
+    //int m_sizeOfHeader;
 
-    char m_buffer[1024] = {0}; //todo: replace with dynamic array
+    //char m_buffer[1024] = {0}; //todo: replace with dynamic array
 
-    int m_size;
+    //int m_size;
 
     std::vector<char> m_input_data_entry;
     std::vector<std::vector<char>> m_input_data_buffer;

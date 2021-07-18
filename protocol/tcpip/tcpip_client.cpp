@@ -32,30 +32,22 @@ namespace {
     const int l_numOfConnectAttempts = 10;
 }
 
-enum EMessageType : std::uint8_t
-{
-    EMsgTypNone = 0,
-    EMsgTypCtrl,
-    EMsgTypData
-};
 
-struct SMessageHeader {
-    std::uint32_t size;
-    std::uint8_t type;
-};
+//struct SMessageHeader {
+//    std::uint32_t size;
+//    std::uint8_t type;
+//};
 
 CTCPIPClient::CTCPIPClient()
     : m_shutdownrequest(false)
-    , m_client_fd(0)
-    , m_size(0)
 {
-    m_sizeOfHeader = sizeof(SMessageHeader);
+
 }
 
 CTCPIPClient::~CTCPIPClient()
 {
     m_shutdownrequest = true;
-    shutdown(m_client_fd, SHUT_RDWR); // aborts any blocking calls on the client
+    shutdown(m_connection_fd, SHUT_RDWR); // aborts any blocking calls on the client
 
     if(t_client.joinable())
         t_client.join();
@@ -69,7 +61,7 @@ bool CTCPIPClient::client_connect(std::string ip_address)
     char confirmMsgBuff[48] = {0};
     struct sockaddr_in serv_addr;
 
-    if ((m_client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((m_connection_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         CLOG(LOGLEV_RUN, "socket failure");
         return false;
     }
@@ -81,7 +73,7 @@ bool CTCPIPClient::client_connect(std::string ip_address)
         return false;
 
     socket_args |= O_NONBLOCK;
-    if( fcntl(m_client_fd, F_SETFL, socket_args) < 0) {
+    if( fcntl(m_connection_fd, F_SETFL, socket_args) < 0) {
         CLOG(LOGLEV_RUN, "set socket arguments failed");
        return false;
     }
@@ -94,7 +86,7 @@ bool CTCPIPClient::client_connect(std::string ip_address)
             return false;
         } else {
             CLOG(LOGLEV_RUN, "Attempt number = ", retry_index + 1);
-            if (connect(m_client_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+            if (connect(m_connection_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
                 CLOG(LOGLEV_RUN, "connection failed");
             } else {
                 CLOG(LOGLEV_RUN, "client connected");
@@ -104,14 +96,14 @@ bool CTCPIPClient::client_connect(std::string ip_address)
         std::this_thread::sleep_for( std::chrono::milliseconds(200) );
     }
 
-    SMessageHeader head;
-    if( read(m_client_fd , confirmMsgBuff, 1024) <= 0) {
+    common::SMessageHeader head;
+    if( read(m_connection_fd , confirmMsgBuff, 1024) <= 0) {
         CLOG(LOGLEV_RUN, "confirm message read failed");
         return false;
     }
 
     std::memcpy(&head, &confirmMsgBuff[0], m_sizeOfHeader);
-    if(EMsgTypCtrl != head.type) {
+    if(common::EMsgTypCtrl != head.type) {
         CLOG(LOGLEV_RUN, "wrong msg type");
         return false;
     }
@@ -129,34 +121,34 @@ bool CTCPIPClient::client_disconnect()
     return false;
 }
 
-bool CTCPIPClient::recieve(char** data, int& size)
-{
-    size = m_size;
-    *data = &m_buffer[m_sizeOfHeader];
+//bool CTCPIPClient::recieve(char** data, int& size)
+//{
+//    size = m_size;
+//    *data = &m_buffer[m_sizeOfHeader];
 
-    if(size <= 0)
-        return false;
+//    if(size <= 0)
+//        return false;
 
-    return true;
-}
+//    return true;
+//}
 
-bool CTCPIPClient::transmit(const char *data, const int size)
-{
-    SMessageHeader head;
-    head.size = size;
-    head.type = EMsgTypData;
+//bool CTCPIPClient::transmit(const char *data, const int size)
+//{
+//    SMessageHeader head;
+//    head.size = size;
+//    head.type = EMsgTypData;
 
-    std::vector<char> package;
-    package.resize(size + m_sizeOfHeader);
-    std::memcpy(&package[0], &head, m_sizeOfHeader);
-    std::memcpy(&package[m_sizeOfHeader], data, size);
+//    std::vector<char> package;
+//    package.resize(size + m_sizeOfHeader);
+//    std::memcpy(&package[0], &head, m_sizeOfHeader);
+//    std::memcpy(&package[m_sizeOfHeader], data, size);
 
-    ssize_t result = send(m_client_fd , &package[0], package.size() , 0 );
-    if(result > 0)
-        return true;
-    else
-        return false;
-}
+//    ssize_t result = send(m_client_fd , &package[0], package.size() , 0 );
+//    if(result > 0)
+//        return true;
+//    else
+//        return false;
+//}
 
 void CTCPIPClient::threadfunc_client()
 {
@@ -170,41 +162,41 @@ void CTCPIPClient::threadfunc_client()
     }
 }
 
-bool CTCPIPClient::listenForData()
-{
-    SMessageHeader peekHeader;
-    int numOfBytesRead;
-    int sizeOfHeader = m_sizeOfHeader;
-    int peekFlags = 0;
-    peekFlags |= MSG_PEEK;
+//bool CTCPIPClient::listenForData()
+//{
+//    SMessageHeader peekHeader;
+//    int numOfBytesRead;
+//    int sizeOfHeader = m_sizeOfHeader;
+//    int peekFlags = 0;
+//    peekFlags |= MSG_PEEK;
 
-    // Check the contents of the header
-    numOfBytesRead = recv( m_client_fd , &peekHeader, sizeOfHeader, peekFlags);
-    CLOG(LOGLEV_RUN, "header read failed");
-    if(numOfBytesRead <= 0) {
-        CLOG(LOGLEV_RUN, "numOfBytesRead = ", numOfBytesRead);
-        return false;
-    }
+//    // Check the contents of the header
+//    numOfBytesRead = recv( m_socket_fd , &peekHeader, sizeOfHeader, peekFlags);
+//    CLOG(LOGLEV_RUN, "header read failed");
+//    if(numOfBytesRead <= 0) {
+//        CLOG(LOGLEV_RUN, "numOfBytesRead = ", numOfBytesRead);
+//        return false;
+//    }
 
-    // check the data type
-    if(EMsgTypData != peekHeader.type) {
-        CLOG(LOGLEV_RUN, "wrong type");
-        return false;
-    }
+//    // check the data type
+//    if(EMsgTypData != peekHeader.type) {
+//        CLOG(LOGLEV_RUN, "wrong type");
+//        return false;
+//    }
 
-    // store the actual data
-    int numOfBytesThatShouldBeRead = peekHeader.size + sizeOfHeader;
-    numOfBytesRead = read(m_client_fd , m_buffer, numOfBytesThatShouldBeRead);
-    if(numOfBytesRead != numOfBytesThatShouldBeRead) {
-        CLOG(LOGLEV_RUN, "read size did not match");
-        return false;
-    } else {
-        m_size = numOfBytesRead;
-        CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
-    }
+//    // store the actual data
+//    int numOfBytesThatShouldBeRead = peekHeader.size + sizeOfHeader;
+//    numOfBytesRead = read(m_socket_fd , m_buffer, numOfBytesThatShouldBeRead);
+//    if(numOfBytesRead != numOfBytesThatShouldBeRead) {
+//        CLOG(LOGLEV_RUN, "read size did not match");
+//        return false;
+//    } else {
+//        m_size = numOfBytesRead;
+//        CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
+//    }
 
-    return true;
-}
+//    return true;
+//}
 
 } // comms
 } // posix
