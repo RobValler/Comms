@@ -46,6 +46,15 @@ CTCPIPServer::CTCPIPServer()
 //    , m_size(0)
 {
  //   m_sizeOfHeader = sizeof(SMessageHeader);
+
+    if(m_blocking){
+        m_socket_type = SOCK_STREAM;
+    }
+    else
+    {
+        m_socket_type = SOCK_STREAM | SOCK_NONBLOCK;
+    }
+
     t_server = std::thread(&CTCPIPServer::threadfunc_server, this);
 }
 
@@ -66,7 +75,7 @@ bool CTCPIPServer::channel_create()
     struct sockaddr_in address;    
     int addrlen = sizeof(address);
 
-    if ((m_connection_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+    if ((m_connection_fd = socket(AF_INET, m_socket_type, 0)) == 0) {
         CLOG(LOGLEV_RUN, "socket returned an error");
         return false;
     }
@@ -85,18 +94,19 @@ bool CTCPIPServer::channel_create()
         return false;
     }
 
+    // listen out for any external connections.
     if (listen(m_connection_fd, 10) < 0) {
         CLOG(LOGLEV_RUN, "listen failed");
         return false;
     }
 
     //set non blocking
-//    if(fcntl(m_server_fd, F_SETFL, fcntl(m_server_fd, F_GETFL) | O_NONBLOCK) < 0) {
+//    if(fcntl(m_connection_fd, F_SETFL, fcntl(m_connection_fd, F_GETFL) | O_NONBLOCK) < 0) {
 //        CLOG(LOGLEV_RUN, " fcntl failed");
 //        return false;
 //    }
 
-
+    // accept the connection.
     m_connection_socket = accept(m_connection_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
     if ( m_connection_socket < 0) {
         if(!m_shutdownrequest){
@@ -107,7 +117,7 @@ bool CTCPIPServer::channel_create()
         }
     }
 
-    CLOG(LOGLEV_RUN, "server connected");
+    CLOG(LOGLEV_RUN, "server has connected to a client");
 
     // send the confirmation message
     char confirmMsgBuff;
@@ -162,7 +172,7 @@ void CTCPIPServer::threadfunc_server()
     bool result = false;
     result = channel_create();
     if(result)
-        listenForData();
+        listenForData(m_connection_socket);
     else
         CLOG(LOGLEV_RUN, "server_connect failed");
 

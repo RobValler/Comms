@@ -29,11 +29,11 @@ public:
     ~CTCPIPServer();
 
     bool channel_create() override;
-    bool recieve(char** data, int& size) override{
+    bool recieve(std::vector<char>& data, int& size) override{
         return crecieve(data, size);
     }
     bool transmit(const char *data, const int size) override{
-        ctransmit(data, size);
+        return ctransmit(m_connection_socket, data, size);
     }
 
 private:
@@ -42,6 +42,9 @@ private:
 
     std::atomic<bool> m_shutdownrequest;
     std::thread t_server;
+
+    int m_connection_fd{0};
+    int m_connection_socket{0};
 
 //    int m_serverSocket;
 //    int m_server_fd;

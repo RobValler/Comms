@@ -28,7 +28,7 @@ public:
 
     bool client_connect(std::string channel) override;
     bool client_disconnect() override;
-    bool recieve(char** data, int& size) override;
+    bool recieve(std::vector<char>&, int& size) override;
     bool transmit(const char *data, const int size) override;
 
 private:

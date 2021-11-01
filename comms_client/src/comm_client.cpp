@@ -61,14 +61,15 @@ bool CCommClient::read(::google::protobuf::Message& message)
 
     int siz;
     char *pkt = nullptr;
+    std::vector<char> tmp;
 
     //fetch data
-    if(!m_pProtocolClient->recieve(&pkt, siz)) {
+    if(!m_pProtocolClient->recieve(tmp, siz)) {
         CLOG(LOGLEV_RUN, "protocol recieve returned error");
         return false;
     }
 
-    google::protobuf::io::ArrayInputStream ais(pkt, siz);
+    google::protobuf::io::ArrayInputStream ais(&tmp, siz);
     CodedInputStream coded_input(&ais);
     std::uint32_t s = static_cast<std::uint32_t>(siz);
 //    if(!coded_input.ReadVarint32(&s))

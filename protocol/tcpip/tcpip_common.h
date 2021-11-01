@@ -11,6 +11,8 @@
 
 #include <cstdint>
 #include <vector>
+#include <queue>
+#include <mutex>
 
 namespace comms {
 namespace tcpip {
@@ -28,6 +30,10 @@ enum EMessageType : std::uint8_t
     EMsgTypData
 };
 
+struct SReadBufferQ
+{
+    std::vector<char> data;
+};
 
 class CTCPIP_Common
 {
@@ -35,16 +41,23 @@ public:
     CTCPIP_Common();
     ~CTCPIP_Common()=default;
 
-    bool listenForData();
-    bool crecieve(char** data, int& size);
-    bool ctransmit(const char *data, const int size);
+    bool listenForData(const int fd);
+    bool crecieve(std::vector<char>& data, int& size);
+    bool ctransmit(const int fd, const char *data, const int size);
 
 protected:
+    std::queue<SReadBufferQ> m_read_queue{};
     char m_buffer[1024] = {0}; //todo: replace with dynamic array
+    SReadBufferQ m_buff;
     int m_sizeOfHeader{0};
-    int m_connection_fd{0};
-    int m_connection_socket{0};
+
+    std::mutex m_recProtect;
+
+//    int m_connection_fd{0};
+//    int m_connection_socket{0};
     int m_size{0};
+    int m_socket_type{0};
+    bool m_blocking{true};
 };
 
 } // comms

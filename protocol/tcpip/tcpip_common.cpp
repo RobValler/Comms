@@ -26,10 +26,19 @@ CTCPIP_Common::CTCPIP_Common()
 }
 
 
-bool CTCPIP_Common::crecieve(char** data, int& size)
+bool CTCPIP_Common::crecieve(std::vector<char>& data, int& size)
 {
-    size = m_size;
-    *data = &m_buffer[m_sizeOfHeader];
+    //size = m_size;
+    //*data = &m_buffer[0];
+
+    SReadBufferQ tmp;
+    m_recProtect.lock();
+    tmp = m_read_queue.back();
+    m_read_queue.pop();
+    m_recProtect.unlock();
+    data = tmp.data;
+    size = tmp.data.size();
+
 
     if(size <= 0)
         return false;
@@ -37,7 +46,7 @@ bool CTCPIP_Common::crecieve(char** data, int& size)
     return true;
 }
 
-bool CTCPIP_Common::ctransmit(const char *data, const int size)
+bool CTCPIP_Common::ctransmit(const int fd, const char *data, const int size)
 {
     SMessageHeader head;
     head.size = size;
@@ -48,14 +57,14 @@ bool CTCPIP_Common::ctransmit(const char *data, const int size)
     std::memcpy(&package[0], &head, m_sizeOfHeader);
     std::memcpy(&package[m_sizeOfHeader], data, size);
 
-    ssize_t result = send(m_connection_fd , &package[0], package.size() , 0 );
+    ssize_t result = send(fd , &package[0], package.size() , 0 );
     if(result > 0)
         return true;
     else
         return false;
 }
 
-bool CTCPIP_Common::listenForData()
+bool CTCPIP_Common::listenForData(const int fd)
 {
     SMessageHeader peekHeader;
     int numOfBytesRead;
@@ -64,27 +73,32 @@ bool CTCPIP_Common::listenForData()
     peekFlags |= MSG_PEEK;
 
     // Check the contents of the header
-    numOfBytesRead = recv( m_connection_fd , &peekHeader, sizeOfHeader, peekFlags);
-    CLOG(LOGLEV_RUN, "header read failed");
+    //numOfBytesRead = recv( m_connection_fd , &peekHeader, sizeOfHeader, peekFlags);
+    numOfBytesRead = read( fd , &peekHeader, sizeOfHeader);
     if(numOfBytesRead <= 0) {
-        CLOG(LOGLEV_RUN, "numOfBytesRead = ", numOfBytesRead);
+        CLOG(LOGLEV_RUN, "Header read failed, numOfBytesRead = ", numOfBytesRead);
         return false;
     }
 
     // check the data type
     if(EMsgTypData != peekHeader.type) {
-        CLOG(LOGLEV_RUN, "wrong type");
+        CLOG(LOGLEV_RUN, "wrong header type");
         return false;
     }
 
     // store the actual data
-    int numOfBytesThatShouldBeRead = peekHeader.size + sizeOfHeader;
-    numOfBytesRead = read(m_connection_fd , m_buffer, numOfBytesThatShouldBeRead);
+    int numOfBytesThatShouldBeRead = peekHeader.size;
+    numOfBytesRead = read(fd , m_buffer, numOfBytesThatShouldBeRead);
     if(numOfBytesRead != numOfBytesThatShouldBeRead) {
         CLOG(LOGLEV_RUN, "read size did not match");
         return false;
     } else {
         m_size = numOfBytesRead;
+        SReadBufferQ tmp;
+        tmp.data.assign(m_buffer, m_buffer+m_size);
+        m_recProtect.lock();
+        m_read_queue.push(tmp);
+        m_recProtect.unlock();
         CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
     }
 

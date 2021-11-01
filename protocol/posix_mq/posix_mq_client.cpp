@@ -112,11 +112,11 @@ bool CPOSIXMQClient::client_disconnect()
     return false;
 }
 
-bool CPOSIXMQClient::recieve(char** data, int& size)
+bool CPOSIXMQClient::recieve(std::vector<char>& data, int& size)
 {
     unsigned int priority;
     int bytesRead = 0;
-    bytesRead = mq_receive(m_msgQueue, (char*)data, 1024, &priority); // todo: size needs fixing
+    //bytesRead = mq_receive(m_msgQueue, (char*)data, 1024, &priority); // todo: size needs fixing
 
 
     size = bytesRead;
@@ -140,9 +140,9 @@ bool CPOSIXMQClient::transmit(const char *data, const int size)
 
 void CPOSIXMQClient::threadfunc_client()
 {
-    char* data;
+    std::vector<char> data;
     int size;
-    bool result = recieve(&data, size);
+    bool result = recieve(data, size);
 
 }
 

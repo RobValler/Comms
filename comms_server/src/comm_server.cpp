@@ -14,11 +14,11 @@
 #include "tcpip_server.h"
 #include "posix_mq_server.h"
 
+#include "Logger.h"
 
 #include <string>
-#include <iostream>
+#include <vector>
 
-#include "Logger.h"
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/descriptor.h>
@@ -64,19 +64,21 @@ bool CCommServer::read(::google::protobuf::Message& message)
     using namespace google::protobuf::io;
 
     int siz;
-    char *pkt = nullptr;
+    //char *pkt = nullptr;
+
+    std::vector<char> tmp;
 
     //fetch data
-    if(!m_pProtocolServer->recieve(&pkt, siz)) {
+    if(!m_pProtocolServer->recieve(tmp, siz)) {
         CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned error");
         return false;
     }
 
-    google::protobuf::io::ArrayInputStream ais(pkt, siz);
+    google::protobuf::io::ArrayInputStream ais(&tmp, siz);
     CodedInputStream coded_input(&ais);
     std::uint32_t s = static_cast<std::uint32_t>(siz);
-//    if(!coded_input.ReadVarint32(&s))
-//        return false;
+    if(!coded_input.ReadVarint32(&s))
+        return false;
     coded_input.ReadVarint32(&s);
 
     google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(siz);

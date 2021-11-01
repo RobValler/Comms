@@ -117,14 +117,14 @@ bool CPOSIXMQServer::channel_create()
     return true;
 }
 
-bool CPOSIXMQServer::recieve(char** data, int& size)
+bool CPOSIXMQServer::recieve(std::vector<char>& data, int& size)
 {
     unsigned int priority = 1;
 
-    int result = mq_receive(m_msgQueue, (char*)data, m_sizeOfHeader, &priority);
-    if(result < 0)
-        return false;
-    else
+//    int result = mq_receive(m_msgQueue, (char*)data, m_sizeOfHeader, &priority);
+//    if(result < 0)
+//        return false;
+//    else
         return true;
 }
 

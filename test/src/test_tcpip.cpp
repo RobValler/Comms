@@ -21,11 +21,33 @@
 
 namespace  {
     const std::string out_str = "flap jacks";
-    const std::int32_t out_int = 21345;
+    const std::int32_t out_int = 21345U;
 }
 
 TEST(Comms_TCPIP, ReadWrite)
 {
+
+#if 0
+
+    test_msg in, out;
+    bool result;
+
+    // set test data
+    out.set_test_int(out_int);
+    out.set_test_int_2(out_int + 1);
+    out.set_test_string(out_str);
+
+    CCommServer server(ETCTPIP);
+    CCommClient client(ETCTPIP);
+
+    result = client.connect("127.0.0.1");
+    EXPECT_EQ(result, true);
+    if(!result)
+        return;
+
+    EXPECT_EQ(client.write(out), true);
+
+#else
     CCommServer server(ETCTPIP);
     CCommClient client(ETCTPIP);
     test_msg in, out;
@@ -42,12 +64,13 @@ TEST(Comms_TCPIP, ReadWrite)
     if(!result)
         return;
 
-    std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+    //std::this_thread::sleep_for( std::chrono::milliseconds(200) );
 
     // client write and server read
-    EXPECT_EQ(client.write(out), true);
+    EXPECT_EQ(server.write(out), true);
     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
-    EXPECT_EQ(server.read(in), true);
+    EXPECT_EQ(client.read(in), true);
+    std::this_thread::sleep_for( std::chrono::milliseconds(200) );
 
     EXPECT_EQ(out_int, in.test_int());
     EXPECT_EQ(out_int+1, in.test_int_2());
@@ -65,7 +88,7 @@ TEST(Comms_TCPIP, ReadWrite)
 //    EXPECT_EQ(out_int, in.test_int());
 //    EXPECT_EQ(out_int+1, in.test_int_2());
 //    EXPECT_EQ(out_str, in.test_string());
-
+#endif
 }
 
 

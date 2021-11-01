@@ -27,7 +27,7 @@ public:
     ~CPOSIXMQServer();
 
     bool channel_create() override;
-    bool recieve(char** data, int& size) override;
+    bool recieve(std::vector<char>&, int& size) override;
     bool transmit(const char *data, const int size) override;
 
 private:

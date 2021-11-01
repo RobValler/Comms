@@ -8,12 +8,12 @@
  *****************************************************************/
 
 #pragma once
-
+#include <vector>
 class IProtocolServer
 {
 public:
     virtual ~IProtocolServer(){}
     virtual bool channel_create()=0;
-    virtual bool recieve(char**, int&) =0;
+    virtual bool recieve(std::vector<char>&, int&) =0;
     virtual bool transmit(const char*, const int) =0;
 };
