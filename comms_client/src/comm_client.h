@@ -29,6 +29,6 @@ public:
     bool write(const ::google::protobuf::Message& message);
 
 private:
-    std::shared_ptr<IProtocolClient> m_pProtocolClient;
+    std::unique_ptr<IProtocolClient> m_pProtocolClient;
 
 };

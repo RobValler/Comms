@@ -26,32 +26,9 @@ namespace  {
 
 TEST(Comms_TCPIP, ReadWrite)
 {
-
-#if 0
-
-    test_msg in, out;
-    bool result;
-
-    // set test data
-    out.set_test_int(out_int);
-    out.set_test_int_2(out_int + 1);
-    out.set_test_string(out_str);
-
-    CCommServer server(ETCTPIP);
-    CCommClient client(ETCTPIP);
-
-    result = client.connect("127.0.0.1");
-    EXPECT_EQ(result, true);
-    if(!result)
-        return;
-
-    EXPECT_EQ(client.write(out), true);
-
-#else
     CCommServer server(ETCTPIP);
     CCommClient client(ETCTPIP);
     test_msg in, out;
-    bool result;
 
     // set test data
     out.set_test_int(out_int);
@@ -59,12 +36,7 @@ TEST(Comms_TCPIP, ReadWrite)
     out.set_test_string(out_str);
 
     std::this_thread::sleep_for( std::chrono::milliseconds(100) );
-    result = client.connect("127.0.0.1");
-    EXPECT_EQ(result, true);
-    if(!result)
-        return;
-
-    //std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+    ASSERT_EQ(client.connect("127.0.0.1"), true);
 
     // client write and server read
     EXPECT_EQ(server.write(out), true);
@@ -76,19 +48,15 @@ TEST(Comms_TCPIP, ReadWrite)
     EXPECT_EQ(out_int+1, in.test_int_2());
     EXPECT_EQ(out_str, in.test_string());
 
+    // server write and client
+    in.Clear();
+    EXPECT_EQ(server.write(out), true);
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+    EXPECT_EQ(client.read(in), true);
 
-
-
-    // client read and server write
-//    in.Clear();
-//    EXPECT_EQ(server.write(out), true);
-//    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
-//    EXPECT_EQ(client.read(in), true);
-
-//    EXPECT_EQ(out_int, in.test_int());
-//    EXPECT_EQ(out_int+1, in.test_int_2());
-//    EXPECT_EQ(out_str, in.test_string());
-#endif
+    EXPECT_EQ(out_int, in.test_int());
+    EXPECT_EQ(out_int+1, in.test_int_2());
+    EXPECT_EQ(out_str, in.test_string());
 }
 
 

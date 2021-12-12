@@ -63,28 +63,24 @@ bool CCommServer::read(::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
 
-    int siz;
-    //char *pkt = nullptr;
-
-    std::vector<char> tmp;
+    int size_of_message;
+    std::vector<char> buffer;
 
     //fetch data
-    if(!m_pProtocolServer->recieve(tmp, siz)) {
+    if(!m_pProtocolServer->recieve(buffer, size_of_message))
+    {
         CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned error");
         return false;
     }
 
-    google::protobuf::io::ArrayInputStream ais(&tmp, siz);
+    // convert from serialised char array to protobuf message class
+    google::protobuf::io::ArrayInputStream ais(&buffer[0], size_of_message);
     CodedInputStream coded_input(&ais);
-    std::uint32_t s = static_cast<std::uint32_t>(siz);
-    if(!coded_input.ReadVarint32(&s))
-        return false;
-    coded_input.ReadVarint32(&s);
-
-    google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(siz);
-    if(!message.ParseFromCodedStream(&coded_input))
-        return false;
-
+    std::uint32_t size = static_cast<std::uint32_t>(size_of_message);
+    coded_input.ReadVarint32(&size);
+    google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(size);
+    message.ParseFromCodedStream(&coded_input);
+    coded_input.ConsumedEntireMessage();
     coded_input.PopLimit(msgLimit);
 
     return true;
@@ -93,20 +89,20 @@ bool CCommServer::read(::google::protobuf::Message& message)
 bool CCommServer::write(const ::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
-    std::vector<char> pkt;
 
     // serialise data
-    std::uint32_t siz = message.ByteSizeLong();
-    siz += CodedOutputStream::VarintSize32(siz);
-    pkt.resize(siz);
-    google::protobuf::io::ArrayOutputStream aos(&pkt[0], siz);
-    std::unique_ptr<CodedOutputStream> coded_output = std::make_unique<CodedOutputStream>(&aos);
-    coded_output->WriteVarint32(message.ByteSizeLong());
-    if(!message.SerializeToCodedStream(coded_output.get()))
+    std::uint32_t size = message.ByteSizeLong();
+    size += CodedOutputStream::VarintSize32(size);
+    std::vector<char> pkt(size);
+    google::protobuf::io::ArrayOutputStream aos(&pkt[0], size);
+    CodedOutputStream coded_output(&aos);
+    coded_output.WriteVarint32(message.ByteSizeLong());
+
+    if(!message.SerializeToCodedStream(&coded_output))
         return false;
 
     // send data
-    if(!m_pProtocolServer->transmit(&pkt[0], siz))
+    if(!m_pProtocolServer->transmit(&pkt[0], size))
         return false;
 
     return true;

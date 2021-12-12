@@ -35,10 +35,10 @@ CCommClient::CCommClient(EProtocolType type)
 
         break;
     case ETCTPIP:
-        m_pProtocolClient = std::make_shared<comms::tcpip::client::CTCPIPClient>();
+        m_pProtocolClient = std::make_unique<comms::tcpip::client::CTCPIPClient>();
         break;
     case EPOSIX_MQ:
-        m_pProtocolClient = std::make_shared<comms::posix::client::CPOSIXMQClient>();
+        m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
         break;
     }
 
@@ -59,27 +59,23 @@ bool CCommClient::read(::google::protobuf::Message& message)
 {
     using namespace google::protobuf::io;
 
-    int siz;
-    char *pkt = nullptr;
-    std::vector<char> tmp;
+    int size_of_message;
+    std::vector<char> buffer;
 
-    //fetch data
-    if(!m_pProtocolClient->recieve(tmp, siz)) {
+    //fetch data from the network protocol
+    if(!m_pProtocolClient->recieve(buffer, size_of_message)){
         CLOG(LOGLEV_RUN, "protocol recieve returned error");
         return false;
     }
 
-    google::protobuf::io::ArrayInputStream ais(&tmp, siz);
+    // convert from serialised char array to protobuf message class
+    google::protobuf::io::ArrayInputStream ais(&buffer[0], size_of_message);
     CodedInputStream coded_input(&ais);
-    std::uint32_t s = static_cast<std::uint32_t>(siz);
-//    if(!coded_input.ReadVarint32(&s))
-//        return false;
-    coded_input.ReadVarint32(&s);
-
-    google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(siz);
-    if(!message.ParseFromCodedStream(&coded_input))
-        return false;
-
+    std::uint32_t size = static_cast<std::uint32_t>(size_of_message);
+    coded_input.ReadVarint32(&size);
+    google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(size);
+    message.ParseFromCodedStream(&coded_input);
+    coded_input.ConsumedEntireMessage();
     coded_input.PopLimit(msgLimit);
 
     return true;
