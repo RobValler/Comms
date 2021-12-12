@@ -9,7 +9,7 @@
 
 #include "comm_client.h"
 #include "tcpip_client.h"
-#include "posix_mq_client.h"
+//#include "posix_mq_client.h"
 #include "common.h"
 
 #include <string>
@@ -38,7 +38,7 @@ CCommClient::CCommClient(EProtocolType type)
         m_pProtocolClient = std::make_unique<comms::tcpip::client::CTCPIPClient>();
         break;
     case EPOSIX_MQ:
-        m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
+ //       m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
         break;
     }
 

@@ -12,7 +12,7 @@
 
 // todo: make dynamic ... shared lib loader?
 #include "tcpip_server.h"
-#include "posix_mq_server.h"
+//#include "posix_mq_server.h"
 
 #include "Logger.h"
 
@@ -49,7 +49,7 @@ CCommServer::CCommServer(EProtocolType type)
         m_pProtocolServer = std::make_shared<comms::tcpip::server::CTCPIPServer>();
         break;
     case EPOSIX_MQ:
-        m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
+        //m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
         break;
     }
 }

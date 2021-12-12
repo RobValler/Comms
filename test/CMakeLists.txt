@@ -22,4 +22,4 @@ file(GLOB_RECURSE HEADERS
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} gtest_main gtest comms_client comms_server)
+target_link_libraries(${PROJECT_NAME} gtest_main gtest comms_client comms_server comms_messages)

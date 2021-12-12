@@ -7,7 +7,7 @@ file(GLOB SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/tcpip_client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/tcpip_common.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.cpp
     )
 
 file(GLOB HEADERS
@@ -16,7 +16,7 @@ file(GLOB HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/iprotocol_client.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/tcpip_client.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/tcpip/tcpip_common.hs
-    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../DevFramework/Logger/Logger.h
     )
 
