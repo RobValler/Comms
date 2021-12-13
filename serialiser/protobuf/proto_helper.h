@@ -15,12 +15,12 @@ namespace comms {
 namespace serial {
 namespace protobuf {
 
-class CSerialiser
+class CSerialiserHelper
         : public ISerialiser
 {
 public:
-    CSerialiser();
-    ~CSerialiser();
+    CSerialiserHelper();
+    ~CSerialiserHelper();
 
     bool serialise(std::vector<char>& buffer, int& size_of_message, void* incomming_data) override;
     bool deserialise(std::vector<char> buffer, int size_of_message, void* outgoing_data) override;

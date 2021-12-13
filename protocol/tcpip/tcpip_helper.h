@@ -35,11 +35,11 @@ struct SReadBufferQ
     std::vector<char> data;
 };
 
-class CTCPIP_Common
+class CTCPIPHelper
 {
 public:
-    CTCPIP_Common();
-    ~CTCPIP_Common()=default;
+    CTCPIPHelper();
+    ~CTCPIPHelper()=default;
 
     bool listenForData(const int fd);
     bool crecieve(std::vector<char>& data, int& size);
@@ -53,8 +53,6 @@ protected:
 
     std::mutex m_recProtect;
 
-//    int m_connection_fd{0};
-//    int m_connection_socket{0};
     int m_size{0};
     int m_socket_type{0};
     bool m_blocking{true};

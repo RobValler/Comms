@@ -34,7 +34,7 @@ CCommClient::CCommClient(EProtocolType type)
         break;
     case ETCTPIP:
         m_pProtocolClient = std::make_unique<comms::tcpip::client::CTCPIPClient>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiser>();
+        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
     case EPOSIX_MQ:
  //       m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();

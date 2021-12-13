@@ -10,7 +10,7 @@
 #pragma once
 
 #include "iprotocol_server.h"
-#include "tcpip_common.h"
+#include "tcpip_helper.h"
 
 #include <thread>
 #include <atomic>
@@ -22,7 +22,7 @@ namespace server {
 
 class CTCPIPServer
         : public IProtocolServer
-        , public common::CTCPIP_Common
+        , public common::CTCPIPHelper
 {
 public:
     CTCPIPServer();

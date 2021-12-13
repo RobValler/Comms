@@ -10,7 +10,7 @@
 #pragma once
 
 #include "iprotocol_client.h"
-#include "tcpip_common.h"
+#include "tcpip_helper.h"
 
 #include <thread>
 #include <atomic>
@@ -23,7 +23,7 @@ namespace client {
 
 class CTCPIPClient
         : public IProtocolClient
-        , public common::CTCPIP_Common
+        , public common::CTCPIPHelper
 {
 public:
     CTCPIPClient();

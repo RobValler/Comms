@@ -1,5 +1,5 @@
 
-#include "tcpip_common.h"
+#include "tcpip_helper.h"
 
 #include "Logger.h"
 
@@ -20,13 +20,13 @@ namespace comms {
 namespace tcpip {
 namespace common {
 
-CTCPIP_Common::CTCPIP_Common()
+CTCPIPHelper::CTCPIPHelper()
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
 }
 
 
-bool CTCPIP_Common::crecieve(std::vector<char>& data, int& size)
+bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 {
     //size = m_size;
     //*data = &m_buffer[0];
@@ -46,7 +46,7 @@ bool CTCPIP_Common::crecieve(std::vector<char>& data, int& size)
     return true;
 }
 
-bool CTCPIP_Common::ctransmit(const int fd, const char *data, const int size)
+bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 {
     SMessageHeader head;
     head.size = size;
@@ -64,7 +64,7 @@ bool CTCPIP_Common::ctransmit(const int fd, const char *data, const int size)
         return false;
 }
 
-bool CTCPIP_Common::listenForData(const int fd)
+bool CTCPIPHelper::listenForData(const int fd)
 {
     SMessageHeader peekHeader;
     int numOfBytesRead;

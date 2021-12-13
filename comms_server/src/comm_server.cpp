@@ -41,7 +41,7 @@ CCommServer::CCommServer(EProtocolType type)
         break;
     case ETCTPIP:
         m_pProtocolServer = std::make_shared<comms::tcpip::server::CTCPIPServer>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiser>();
+        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
 
         break;
     case EPOSIX_MQ:
