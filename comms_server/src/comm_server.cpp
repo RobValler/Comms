@@ -11,7 +11,6 @@
 
 #include "iprotocol_server.h"
 #include "tcpip_server.h"
-
 #include "iserialiser.h"
 #include "proto_helper.h"
 
@@ -85,7 +84,7 @@ bool CCommServer::write(::google::protobuf::Message& message)
         return false;
     }
 
-    // transmit the data
+    // transmit the output stream
     if(!m_pProtocolServer->transmit(&buffer[0], size_of_message))
         return false;
 

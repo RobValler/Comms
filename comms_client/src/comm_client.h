@@ -14,9 +14,8 @@
 
 enum EProtocolType : unsigned int;
 namespace google{ namespace protobuf{ class Message; } }
-
-
 class IProtocolClient;
+class ISerialiser;
 
 class CCommClient
 {
@@ -26,9 +25,9 @@ public:
 
     bool connect(std::string server_address);
     bool read(::google::protobuf::Message& message);
-    bool write(const ::google::protobuf::Message& message);
+    bool write(::google::protobuf::Message& message);
 
 private:
     std::unique_ptr<IProtocolClient> m_pProtocolClient;
-
+    std::shared_ptr<ISerialiser> m_pSerialiser;
 };
