@@ -38,21 +38,12 @@ public:
 
 private:
     void threadfunc_server();
-    //bool listenForData();
 
     std::atomic<bool> m_shutdownrequest;
     std::thread t_server;
 
     int m_connection_fd{0};
     int m_connection_socket{0};
-
-//    int m_serverSocket;
-//    int m_server_fd;
-//    int m_sizeOfHeader;
-
-//    char m_buffer[1024] = {0}; //todo: replace with dynamic array
-
-//    int m_size;
 
     std::vector<char> m_input_data_entry;
     std::vector<std::vector<char>> m_input_data_buffer;

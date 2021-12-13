@@ -15,17 +15,18 @@ enum EProtocolType : unsigned int;
 namespace google{ namespace protobuf{ class Message; } }
 
 class IProtocolServer;
+class ISerialiser;
 
 class CCommServer
 {
 public:
     CCommServer(EProtocolType type);
-    ~CCommServer();
+    ~CCommServer()=default;
 
     bool read(::google::protobuf::Message& message);
-    bool write(const ::google::protobuf::Message& message);
+    bool write(::google::protobuf::Message& message);
 
 private:
     std::shared_ptr<IProtocolServer> m_pProtocolServer;
-
+    std::shared_ptr<ISerialiser> m_pSerialiser;
 };

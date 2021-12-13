@@ -24,6 +24,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../DevFramework/Logger)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/protocol)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/protocol/tcpip)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/serialiser)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/serialiser/protobuf)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/protocol/posix_mq)
 
 add_subdirectory(messages)

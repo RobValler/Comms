@@ -8,23 +8,20 @@
  *****************************************************************/
 
 #include "comm_server.h"
-#include "iprotocol_server.h"
 
-// todo: make dynamic ... shared lib loader?
+#include "iprotocol_server.h"
 #include "tcpip_server.h"
+
+#include "iserialiser.h"
+#include "proto_helper.h"
+
 //#include "posix_mq_server.h"
 
 #include "Logger.h"
 
 #include <string>
 #include <vector>
-
-
 #include <google/protobuf/message.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 enum EProtocolType : unsigned int
 {
@@ -36,8 +33,6 @@ enum EProtocolType : unsigned int
 
 CCommServer::CCommServer(EProtocolType type)
 {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-
     CLogger::GetInstance();
 
     switch(type)
@@ -47,6 +42,8 @@ CCommServer::CCommServer(EProtocolType type)
         break;
     case ETCTPIP:
         m_pProtocolServer = std::make_shared<comms::tcpip::server::CTCPIPServer>();
+        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiser>();
+
         break;
     case EPOSIX_MQ:
         //m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
@@ -54,55 +51,42 @@ CCommServer::CCommServer(EProtocolType type)
     }
 }
 
-CCommServer::~CCommServer()
-{
-    google::protobuf::ShutdownProtobufLibrary();
-}
-
 bool CCommServer::read(::google::protobuf::Message& message)
 {
-    using namespace google::protobuf::io;
-
     int size_of_message;
     std::vector<char> buffer;
 
-    //fetch data
+    // fetch the intput stream
     if(!m_pProtocolServer->recieve(buffer, size_of_message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned error");
+        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned an error");
         return false;
     }
 
-    // convert from serialised char array to protobuf message class
-    google::protobuf::io::ArrayInputStream ais(&buffer[0], size_of_message);
-    CodedInputStream coded_input(&ais);
-    std::uint32_t size = static_cast<std::uint32_t>(size_of_message);
-    coded_input.ReadVarint32(&size);
-    google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(size);
-    message.ParseFromCodedStream(&coded_input);
-    coded_input.ConsumedEntireMessage();
-    coded_input.PopLimit(msgLimit);
+    // deserialise the input stream
+    if(!m_pSerialiser->deserialise(buffer, size_of_message, &message))
+    {
+        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
+        return false;
+    }
 
     return true;
 }
 
-bool CCommServer::write(const ::google::protobuf::Message& message)
+bool CCommServer::write(::google::protobuf::Message& message)
 {
-    using namespace google::protobuf::io;
+    int size_of_message = 0;
+    std::vector<char> buffer(size_of_message);
 
-    // serialise data
-    std::uint32_t size = message.ByteSizeLong();
-    size += CodedOutputStream::VarintSize32(size);
-    std::vector<char> pkt(size);
-    google::protobuf::io::ArrayOutputStream aos(&pkt[0], size);
-    CodedOutputStream coded_output(&aos);
-    coded_output.WriteVarint32(message.ByteSizeLong());
-
-    if(!message.SerializeToCodedStream(&coded_output))
+    // serialise the output stream
+    if(!m_pSerialiser->serialise(buffer, size_of_message, &message))
+    {
+        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
         return false;
+    }
 
-    // send data
-    if(!m_pProtocolServer->transmit(&pkt[0], size))
+    // transmit the data
+    if(!m_pProtocolServer->transmit(&buffer[0], size_of_message))
         return false;
 
     return true;
