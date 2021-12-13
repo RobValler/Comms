@@ -27,26 +27,9 @@ namespace comms {
 namespace tcpip {
 namespace server {
 
-//enum EMessageType : std::uint8_t
-//{
-//    EMsgTypNone = 0,
-//    EMsgTypCtrl,
-//    EMsgTypData
-//};
-
-//struct SMessageHeader {
-//    std::uint32_t size;
-//    std::uint8_t type;
-//};
-
 CTCPIPServer::CTCPIPServer()
     : m_shutdownrequest(false)
-//    , m_serverSocket(0)
-//    , m_server_fd(0)
-//    , m_size(0)
 {
- //   m_sizeOfHeader = sizeof(SMessageHeader);
-
     if(m_blocking){
         m_socket_type = SOCK_STREAM;
     }
@@ -138,81 +121,25 @@ bool CTCPIPServer::channel_create()
     return true;
 }
 
-//bool CTCPIPServer::recieve(char** data, int& size)
-//{
-//    size = m_size;
-//    *data = &m_buffer[m_sizeOfHeader];
-
-//    if(size <= 0)
-//        return false;
-
-//    return true;
-//}
-
-//bool CTCPIPServer::transmit(const char *data, const int size)
-//{
-//    SMessageHeader head;
-//    head.size = size;
-//    head.type = EMsgTypData;
-
-//    std::vector<char> package;
-//    package.resize(size + m_sizeOfHeader);
-//    std::memcpy(&package[0], &head, m_sizeOfHeader);
-//    std::memcpy(&package[m_sizeOfHeader], data, size);
-
-//    ssize_t result = send(m_serverSocket , &package[0], package.size() , 0 );
-//    if(result > 0)
-//        return true;
-//    else
-//        return false;
-//}
-
 void CTCPIPServer::threadfunc_server()
 {
-    bool result = false;
-    result = channel_create();
+    bool result = channel_create();
     if(result)
-        listenForData(m_connection_socket);
+    {
+        while(!m_shutdownrequest)
+        {
+            // listenForData() is a blocking read so we dont need a thread throttle
+            if(!listenForData(m_connection_socket)) {
+                CLOG(LOGLEV_RUN, "error on listen");
+                break;
+            }
+        }
+    }
     else
+    {
         CLOG(LOGLEV_RUN, "server_connect failed");
-
+    }
 }
-
-//bool CTCPIPServer::listenForData()
-//{
-//    SMessageHeader peekHeader;
-//    int numOfBytesRead;
-//    int sizeOfHeader = m_sizeOfHeader;
-//    int peekFlags = 0;
-//    peekFlags |= MSG_PEEK;
-
-//    // Check the contents of the header
-//    numOfBytesRead = recv( m_serverSocket , &peekHeader, sizeOfHeader, peekFlags);
-//    CLOG(LOGLEV_RUN, "header read failed");
-//    if(numOfBytesRead <= 0) {
-//        CLOG(LOGLEV_RUN, "numOfBytesRead = ", numOfBytesRead);
-//        return false;
-//    }
-
-//    // check the data type
-//    if(EMsgTypData != peekHeader.type) {
-//        CLOG(LOGLEV_RUN, "wrong type");
-//        return false;
-//    }
-
-//    // store the actual data
-//    int numOfBytesThatShouldBeRead = peekHeader.size + sizeOfHeader;
-//    numOfBytesRead = read(m_serverSocket , m_buffer, numOfBytesThatShouldBeRead);
-//    if(numOfBytesRead != numOfBytesThatShouldBeRead) {
-//        CLOG(LOGLEV_RUN, "read size did not match");
-//        return false;
-//    } else {
-//        m_size = numOfBytesRead;
-//        CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
-//    }
-
-//    return true;
-//}
 
 } // comms
 } // tcpip

@@ -15,6 +15,7 @@
 #include <cstring>
 
 #include <chrono>
+#include <thread>
 
 namespace comms {
 namespace tcpip {
@@ -25,11 +26,29 @@ CTCPIPHelper::CTCPIPHelper()
     m_sizeOfHeader = sizeof(SMessageHeader);
 }
 
-
 bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 {
-    //size = m_size;
-    //*data = &m_buffer[0];
+    // spin counter
+    const int max_spin_count = 15;
+    for(int index=0; index < max_spin_count; index++)
+    {
+        if(m_read_queue.size() == 0)
+        {
+            if(index < max_spin_count - 2)
+            {
+                std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                continue;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
 
     SReadBufferQ tmp;
     m_recProtect.lock();
@@ -38,7 +57,6 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
     m_recProtect.unlock();
     data = tmp.data;
     size = tmp.data.size();
-
 
     if(size <= 0)
         return false;
@@ -99,7 +117,7 @@ bool CTCPIPHelper::listenForData(const int fd)
         m_recProtect.lock();
         m_read_queue.push(tmp);
         m_recProtect.unlock();
-        CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
+        //CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
     }
 
     return true;

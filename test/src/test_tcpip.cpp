@@ -43,30 +43,28 @@ TEST(Comms_TCPIP, ReadWrite)
     out.set_test_int_2(out_int + 1);
     out.set_test_string(out_str);
 
-    std::this_thread::sleep_for( std::chrono::milliseconds(100) );
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 
-    // client write and server read
-    in.Clear();
-    EXPECT_EQ(client.write(out), true);
-    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
-    EXPECT_EQ(server.read(in), true);
-    std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+    for(int index=0; index < 1000; index++)
+    {
+       // std::cout << "----> Text iteration index = " << index +1 << std::endl;
 
-    EXPECT_EQ(out_int, in.test_int());
-    EXPECT_EQ(out_int+1, in.test_int_2());
-    EXPECT_EQ(out_str, in.test_string());
+        // client write and server read
+        in.Clear();
+        EXPECT_EQ(client.write(out), true);
+        EXPECT_EQ(server.read(in), true);
 
-    // server write and client read
-    in.Clear();
-    EXPECT_EQ(server.write(out), true);
-    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
-    EXPECT_EQ(client.read(in), true);
+        EXPECT_EQ(out_int, in.test_int());
+        EXPECT_EQ(out_int+1, in.test_int_2());
+        EXPECT_EQ(out_str, in.test_string());
 
-    EXPECT_EQ(out_int, in.test_int());
-    EXPECT_EQ(out_int+1, in.test_int_2());
-    EXPECT_EQ(out_str, in.test_string());
+        // server write and client read
+        in.Clear();
+        EXPECT_EQ(server.write(out), true);
+        EXPECT_EQ(client.read(in), true);
+
+        EXPECT_EQ(out_int, in.test_int());
+        EXPECT_EQ(out_int+1, in.test_int_2());
+        EXPECT_EQ(out_str, in.test_string());
+    }
 }
-
-
-
