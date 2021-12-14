@@ -32,7 +32,7 @@ enum EMessageType : std::uint8_t
 
 struct SReadBufferQ
 {
-    std::vector<char> data;
+    std::vector<char> payload;
 };
 
 class CTCPIPHelper
@@ -44,12 +44,12 @@ public:
     bool listenForData(const int fd);
     bool crecieve(std::vector<char>& data, int& size);
     bool ctransmit(const int fd, const char *data, const int size);
+    int csizeOfReadBuffer();
 
 protected:
     std::mutex m_recProtect;
     std::queue<SReadBufferQ> m_read_queue{};
-    std::vector<char> m_buffer;                 // read buffer
-    SReadBufferQ m_buff;
+
     int m_sizeOfHeader{0};
     int m_socket_type{0};
     bool m_blocking{true};

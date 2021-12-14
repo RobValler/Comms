@@ -16,4 +16,5 @@ public:
     virtual bool channel_create()=0;
     virtual bool recieve(std::vector<char>&, int&) =0;
     virtual bool transmit(const char*, const int) =0;
+    virtual int sizeOfReadBuffer() =0;
 };

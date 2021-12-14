@@ -35,6 +35,9 @@ public:
     bool transmit(const char *data, const int size) override{
         return ctransmit(m_connection_socket, data, size);
     }
+    int sizeOfReadBuffer() override{
+        return csizeOfReadBuffer();
+    }
 
 private:
     void threadfunc_server();

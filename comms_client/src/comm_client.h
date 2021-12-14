@@ -26,6 +26,7 @@ public:
     bool connect(std::string server_address);
     bool read(::google::protobuf::Message& message);
     bool write(::google::protobuf::Message& message);
+    int numOfMessages();
 
 private:
     std::unique_ptr<IProtocolClient> m_pProtocolClient;

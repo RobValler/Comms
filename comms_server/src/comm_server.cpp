@@ -90,3 +90,8 @@ bool CCommServer::write(::google::protobuf::Message& message)
 
     return true;
 }
+
+int CCommServer::sizeOfReadBuffer()
+{
+    return m_pProtocolServer->sizeOfReadBuffer();
+}

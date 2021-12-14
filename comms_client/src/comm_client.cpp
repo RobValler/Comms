@@ -91,3 +91,12 @@ bool CCommClient::write(::google::protobuf::Message& message)
 
     return true;
 }
+
+int CCommClient::numOfMessages()
+{
+    int number = 0;
+
+
+
+    return number;
+}

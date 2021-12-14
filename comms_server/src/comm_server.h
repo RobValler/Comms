@@ -25,6 +25,7 @@ public:
 
     bool read(::google::protobuf::Message& message);
     bool write(::google::protobuf::Message& message);
+    int sizeOfReadBuffer();
 
 private:
     std::shared_ptr<IProtocolServer> m_pProtocolServer;

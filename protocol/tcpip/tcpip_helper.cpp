@@ -52,11 +52,11 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 
     SReadBufferQ tmp;
     m_recProtect.lock();
-    tmp = m_read_queue.back();
+    tmp = m_read_queue.front();
     m_read_queue.pop();
     m_recProtect.unlock();
-    data = tmp.data;
-    size = tmp.data.size();
+    data = tmp.payload;
+    size = tmp.payload.size();
 
     if(size <= 0)
         return false;
@@ -85,14 +85,12 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 bool CTCPIPHelper::listenForData(const int fd)
 {
     SMessageHeader peekHeader;
-    int numOfBytesRead;
-    int sizeOfHeader = m_sizeOfHeader;
-    int peekFlags = 0;
-    peekFlags |= MSG_PEEK;
+    std::uint32_t numOfBytesRead;
+    //int peekFlags = MSG_PEEK;
 
     // Check the contents of the header
-    //numOfBytesRead = recv( m_connection_fd , &peekHeader, sizeOfHeader, peekFlags);
-    numOfBytesRead = read( fd , &peekHeader, sizeOfHeader);
+    //numOfBytesRead = recv( fd , &peekHeader, m_sizeOfHeader, peekFlags);
+    numOfBytesRead = read( fd , &peekHeader, m_sizeOfHeader);
     if(numOfBytesRead <= 0) {
         CLOG(LOGLEV_RUN, "Header read failed, numOfBytesRead = ", numOfBytesRead);
         return false;
@@ -105,26 +103,28 @@ bool CTCPIPHelper::listenForData(const int fd)
     }
 
     // store the actual data
-    int numOfBytesThatShouldBeRead = peekHeader.size;
-    m_buffer.resize(numOfBytesThatShouldBeRead);
-    numOfBytesRead = read(fd, m_buffer.data(), m_buffer.size());
-    if(numOfBytesRead != numOfBytesThatShouldBeRead)
+    SReadBufferQ localReadBuffer;
+    localReadBuffer.payload.resize(peekHeader.size);
+    numOfBytesRead = read(fd, localReadBuffer.payload.data(), localReadBuffer.payload.size());
+    if(numOfBytesRead != peekHeader.size)
     {
         CLOG(LOGLEV_RUN, "read size did not match");
         return false;
     }
     else
     {
-        SReadBufferQ tmp;
-        tmp.data.resize(numOfBytesThatShouldBeRead);
-        tmp.data = m_buffer;
         m_recProtect.lock();
-        m_read_queue.push(tmp);
+        m_read_queue.push(localReadBuffer);
         m_recProtect.unlock();
         //CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
     }
 
     return true;
+}
+
+int CTCPIPHelper::csizeOfReadBuffer()
+{
+    return m_read_queue.size();
 }
 
 } // comms
