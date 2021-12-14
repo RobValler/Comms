@@ -46,14 +46,11 @@ public:
     bool ctransmit(const int fd, const char *data, const int size);
 
 protected:
+    std::mutex m_recProtect;
     std::queue<SReadBufferQ> m_read_queue{};
-    char m_buffer[1024] = {0}; //todo: replace with dynamic array
+    std::vector<char> m_buffer;                 // read buffer
     SReadBufferQ m_buff;
     int m_sizeOfHeader{0};
-
-    std::mutex m_recProtect;
-
-    int m_size{0};
     int m_socket_type{0};
     bool m_blocking{true};
 };

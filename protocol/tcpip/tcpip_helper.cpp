@@ -106,14 +106,18 @@ bool CTCPIPHelper::listenForData(const int fd)
 
     // store the actual data
     int numOfBytesThatShouldBeRead = peekHeader.size;
-    numOfBytesRead = read(fd , m_buffer, numOfBytesThatShouldBeRead);
-    if(numOfBytesRead != numOfBytesThatShouldBeRead) {
+    m_buffer.resize(numOfBytesThatShouldBeRead);
+    numOfBytesRead = read(fd, m_buffer.data(), m_buffer.size());
+    if(numOfBytesRead != numOfBytesThatShouldBeRead)
+    {
         CLOG(LOGLEV_RUN, "read size did not match");
         return false;
-    } else {
-        m_size = numOfBytesRead;
+    }
+    else
+    {
         SReadBufferQ tmp;
-        tmp.data.assign(m_buffer, m_buffer+m_size);
+        tmp.data.resize(numOfBytesThatShouldBeRead);
+        tmp.data = m_buffer;
         m_recProtect.lock();
         m_read_queue.push(tmp);
         m_recProtect.unlock();
