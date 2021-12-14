@@ -1,3 +1,11 @@
+/*****************************************************************
+ * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
+ *
+ * This file is part of the project: StarterApp
+ *
+ * This project can not be copied and/or distributed
+ * without the express permission of the copyright holder
+ *****************************************************************/
 
 #include "tcpip_helper.h"
 
@@ -36,7 +44,7 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
         {
             if(index < max_spin_count - 2)
             {
-                std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                std::this_thread::sleep_for(std::chrono::nanoseconds(10));
                 continue;
             }
             else
@@ -70,13 +78,11 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
     head.size = size;
     head.type = EMsgTypData;
 
-    std::vector<char> package;
-    package.resize(size + m_sizeOfHeader);
-    std::memcpy(&package[0], &head, m_sizeOfHeader);
-    std::memcpy(&package[m_sizeOfHeader], data, size);
+    m_transmitPackage.resize(size + m_sizeOfHeader);
+    std::memcpy(&m_transmitPackage[0], &head, m_sizeOfHeader);
+    std::memcpy(&m_transmitPackage[m_sizeOfHeader], data, size);
 
-    ssize_t result = send(fd , &package[0], package.size() , 0 );
-    if(result > 0)
+    if(0 < send(fd, &m_transmitPackage[0], m_transmitPackage.size() , 0 ))
         return true;
     else
         return false;

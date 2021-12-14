@@ -8,12 +8,9 @@
  *****************************************************************/
 
 #pragma once
-
 #include <memory>
 
 enum EProtocolType : unsigned int;
-namespace google{ namespace protobuf{ class Message; } }
-
 class IProtocolServer;
 class ISerialiser;
 
@@ -23,8 +20,8 @@ public:
     CCommServer(EProtocolType type);
     ~CCommServer()=default;
 
-    bool read(::google::protobuf::Message& message);
-    bool write(::google::protobuf::Message& message);
+    bool read(void* message);
+    bool write(void* message);
     int sizeOfReadBuffer();
 
 private:

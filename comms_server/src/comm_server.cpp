@@ -20,7 +20,6 @@
 
 #include <string>
 #include <vector>
-#include <google/protobuf/message.h>
 
 enum EProtocolType : unsigned int
 {
@@ -28,7 +27,6 @@ enum EProtocolType : unsigned int
     ETCTPIP,
     EPOSIX_MQ
 };
-
 
 CCommServer::CCommServer(EProtocolType type)
 {
@@ -50,7 +48,7 @@ CCommServer::CCommServer(EProtocolType type)
     }
 }
 
-bool CCommServer::read(::google::protobuf::Message& message)
+bool CCommServer::read(void* message)
 {
     int size_of_message;
     std::vector<char> buffer;
@@ -58,27 +56,27 @@ bool CCommServer::read(::google::protobuf::Message& message)
     // fetch the intput stream
     if(!m_pProtocolServer->recieve(buffer, size_of_message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned an error");
+        CLOG(LOGLEV_RUN, "protocol recieve returned an error");
         return false;
     }
 
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(buffer, size_of_message, &message))
+    if(!m_pSerialiser->deserialise(buffer, size_of_message, message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
+        CLOG(LOGLEV_RUN, "serialiser returned an error");
         return false;
     }
 
     return true;
 }
 
-bool CCommServer::write(::google::protobuf::Message& message)
+bool CCommServer::write(void* message)
 {
     int size_of_message = 0;
     std::vector<char> buffer(size_of_message);
 
     // serialise the output stream
-    if(!m_pSerialiser->serialise(buffer, size_of_message, &message))
+    if(!m_pSerialiser->serialise(buffer, size_of_message, message))
     {
         CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
         return false;

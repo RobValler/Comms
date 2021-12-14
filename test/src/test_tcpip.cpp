@@ -47,12 +47,10 @@ TEST(Comms_TCPIP, ReadThenWrite)
 
     for(int index=0; index < 1000; index++)
     {
-       // std::cout << "----> Text iteration index = " << index +1 << std::endl;
-
         // client write and server read
         in.Clear();
-        EXPECT_EQ(client.write(out), true);
-        EXPECT_EQ(server.read(in), true);
+        EXPECT_EQ(client.write(&out), true);
+        EXPECT_EQ(server.read(&in), true);
 
         EXPECT_EQ(out_int, in.test_int());
         EXPECT_EQ(out_int+1, in.test_int_2());
@@ -60,8 +58,8 @@ TEST(Comms_TCPIP, ReadThenWrite)
 
         // server write and client read
         in.Clear();
-        EXPECT_EQ(server.write(out), true);
-        EXPECT_EQ(client.read(in), true);
+        EXPECT_EQ(server.write(&out), true);
+        EXPECT_EQ(client.read(&in), true);
 
         EXPECT_EQ(out_int, in.test_int());
         EXPECT_EQ(out_int+1, in.test_int_2());
@@ -77,14 +75,14 @@ TEST(Comms_TCPIP, WriteOneReadMany)
 
     out.set_test_int(out_int);
     ASSERT_EQ(client.connect("127.0.0.1"), true);
-    EXPECT_EQ(client.write(out), true);
+    EXPECT_EQ(client.write(&out), true);
     for(int index=0; index < 20; index++)
     {
         in.Clear();
         if(0 == index)
-            EXPECT_EQ(server.read(in), true);
+            EXPECT_EQ(server.read(&in), true);
         else
-            EXPECT_EQ(server.read(in), false);
+            EXPECT_EQ(server.read(&in), false);
     }
 }
 
@@ -101,7 +99,7 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
     for(int index=0; index < numberOfWrites; ++index)
     {
         out.set_test_int(index);
-        EXPECT_EQ(client.write(out), true);
+        EXPECT_EQ(client.write(&out), true);
 
         ///\ todo get rid of this delay
         std::this_thread::sleep_for( std::chrono::microseconds(10) );
@@ -113,7 +111,7 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
     for(int index=0; index < numberOfWrites; ++index)
     {
         in.Clear();
-        EXPECT_EQ(server.read(in), true);
+        EXPECT_EQ(server.read(&in), true);
         EXPECT_EQ(index, in.test_int());
     }
 }

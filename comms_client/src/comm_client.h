@@ -8,12 +8,9 @@
  *****************************************************************/
 
 #pragma once
-
 #include <memory>
-#include <string>
 
 enum EProtocolType : unsigned int;
-namespace google{ namespace protobuf{ class Message; } }
 class IProtocolClient;
 class ISerialiser;
 
@@ -24,8 +21,8 @@ public:
     ~CCommClient();
 
     bool connect(std::string server_address);
-    bool read(::google::protobuf::Message& message);
-    bool write(::google::protobuf::Message& message);
+    bool read(void* message);
+    bool write(void* message);
     int numOfMessages();
 
 private:

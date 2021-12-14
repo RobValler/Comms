@@ -20,9 +20,6 @@
 
 #include "Logger.h"
 
-#include <google/protobuf/message.h>
-
-
 CCommClient::CCommClient(EProtocolType type)
 {
     CLogger::GetInstance();
@@ -51,7 +48,7 @@ bool CCommClient::connect(std::string server_address)
 {
     return m_pProtocolClient->client_connect(server_address);
 }
-bool CCommClient::read(::google::protobuf::Message& message)
+bool CCommClient::read(void* message)
 {
     int size_of_message;
     std::vector<char> buffer;
@@ -64,7 +61,7 @@ bool CCommClient::read(::google::protobuf::Message& message)
     }
 
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(buffer, size_of_message, &message))
+    if(!m_pSerialiser->deserialise(buffer, size_of_message, message))
     {
         CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
         return false;
@@ -73,13 +70,13 @@ bool CCommClient::read(::google::protobuf::Message& message)
     return true;
 }
 
-bool CCommClient::write(::google::protobuf::Message& message)
+bool CCommClient::write(void* message)
 {
     int size_of_message = 0;
     std::vector<char> buffer(size_of_message);
 
     // serialise the output stream
-    if(!m_pSerialiser->serialise(buffer, size_of_message, &message))
+    if(!m_pSerialiser->serialise(buffer, size_of_message, message))
     {
         CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
         return false;

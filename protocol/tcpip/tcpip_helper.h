@@ -8,7 +8,6 @@
  *****************************************************************/
 
 #pragma once
-
 #include <cstdint>
 #include <vector>
 #include <queue>
@@ -53,6 +52,8 @@ protected:
     int m_sizeOfHeader{0};
     int m_socket_type{0};
     bool m_blocking{true};
+
+    std::vector<char> m_transmitPackage;
 };
 
 } // comms
