@@ -102,7 +102,7 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
         EXPECT_EQ(client.write(&out), true);
 
         ///\ todo get rid of this delay
-        std::this_thread::sleep_for( std::chrono::microseconds(10) );
+        std::this_thread::sleep_for( std::chrono::microseconds(50) );
     }
 
     EXPECT_EQ(server.sizeOfReadBuffer(), numberOfWrites);

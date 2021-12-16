@@ -47,7 +47,7 @@ CTCPIPServer::~CTCPIPServer()
     shutdown(m_connection_fd, SHUT_RDWR); // aborts any blocking calls on the server
 
     if(t_server.joinable())
-        t_server.join();
+        t_server.detach(); ///\todo re-evaluate!
     else
         CLOG(LOGLEV_RUN, "server join issue");
 }
