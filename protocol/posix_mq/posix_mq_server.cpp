@@ -11,6 +11,8 @@
 
 #include "Logger.h"
 
+#include "common.h"
+
 #include <vector>
 #include <cstring>
 #include <chrono>
@@ -25,23 +27,9 @@ namespace  {
     const int l_max_num_of_connect_attempts = 5;
 }
 
-// todo: move to common section
-enum EMessageType : std::uint8_t
-{
-    EMsgTypNone = 0,
-    EMsgTypCtrl,
-    EMsgTypData
-};
-
-// todo: move to common section
-struct SMessageHeader {
-    std::uint32_t size;
-    std::uint8_t type;
-};
-
 CPOSIXMQServer::CPOSIXMQServer()
     : m_shutdownrequest(false)
-    , m_msgQueue(-1)
+    , m_mqdes_server(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
     t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
@@ -66,12 +54,12 @@ bool CPOSIXMQServer::channel_create()
     //disabled mq_attr because using it causes access permission errors
 //    mq_attr attrib;
 //    attrib.mq_flags = 0;
-//    attrib.mq_maxmsg = 16;
-//    attrib.mq_msgsize = 1024;
+//    attrib.mq_maxmsg = 10;
+//    attrib.mq_msgsize = 71680;
 //    attrib.mq_curmsgs = 0;
 
-    mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
-    int o_flag = O_CREAT | O_WRONLY  | O_NONBLOCK ;
+    //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
+    int o_flag = O_CREAT | O_RDWR  ;//| O_NONBLOCK ;
 
     for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
@@ -81,8 +69,10 @@ bool CPOSIXMQServer::channel_create()
             return false;
         }
 
-        m_msgQueue = mq_open(l_channel_name,  o_flag, mode, NULL);
-        if(-1 != m_msgQueue) {
+        //m_mqdes = mq_open(l_channel_name,  o_flag, mode, NULL);
+        m_mqdes_server = mq_open(&l_channel_name[0],  o_flag, 0666, NULL);
+
+        if(-1 != m_mqdes_server) {
             // no issues, this loop can be exited
             break;
         } else {
@@ -115,57 +105,24 @@ bool CPOSIXMQServer::channel_create()
     return true;
 }
 
-bool CPOSIXMQServer::recieve(std::vector<char>& data, int& size)
-{
-    unsigned int priority = 1;
-
-    size = 10;
-
-    int result = mq_receive(m_msgQueue, data.data(), m_sizeOfHeader, &priority);
-    if(result < 0)
-        return false;
-    else
-        return true;
-}
-
-bool CPOSIXMQServer::transmit(const char *data, const int size)
-{
-    (void)size;
-
-    unsigned int priority = 1;
-    int result = mq_send(m_msgQueue, (char*)data, 1024, priority);
-    if(result < 0)
-        return false;
-    else
-        return true;
-}
-
 void CPOSIXMQServer::threadfunc_server()
 {
-    bool result = false;
-    result = channel_create();
+    bool result = channel_create();
     if(result)
-        return;
-    while(!m_shutdownrequest)
     {
-        listenForData();
+        while(!m_shutdownrequest)
+        {
+            // listenForData() is a blocking read so we dont need a thread throttle
+            if(!listenForData(m_mqdes_server)) {
+                CLOG(LOGLEV_RUN, "error on listen");
+                break;
+            }
+        }
     }
-   // else
-     //   CLOG(LOGLEV_RUN, "server_connect failed");
-}
-
-bool CPOSIXMQServer::listenForData()
-{
-    // read the header first
-    SMessageHeader header;
-    unsigned int priority = 1;
-
-    int result = mq_receive(m_msgQueue, (char*)&header, m_sizeOfHeader, &priority);
-    if(result < 0)
-        return false;
     else
-        return true;
-    return true;
+    {
+        CLOG(LOGLEV_RUN, "server_connect failed");
+    }
 }
 
 } // comms

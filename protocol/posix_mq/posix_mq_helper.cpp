@@ -7,34 +7,18 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#include "tcpip_helper.h"
+#include "posix_mq_helper.h"
 
 #include "Logger.h"
 
-// tcp socket stuff
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <cstring>
-
-#include <chrono>
 #include <thread>
 
 namespace comms {
-namespace tcpip {
+namespace posix {
 namespace helper {
 
-CTCPIPHelper::CTCPIPHelper()
-{
-    m_sizeOfHeader = sizeof(SMessageHeader);
-}
-
-bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
+bool CPOSIXMQHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter
     const int max_spin_count = 15;
@@ -72,7 +56,7 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
     return true;
 }
 
-bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
+bool CPOSIXMQHelper::ctransmit(mqd_t m_mqdes, const char *data, const int size)
 {
     SMessageHeader head;
     head.size = size;
@@ -82,21 +66,25 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
     std::memcpy(&m_transmitPackage[0], &head, m_sizeOfHeader);
     std::memcpy(&m_transmitPackage[m_sizeOfHeader], data, size);
 
-    if(0 < send(fd, &m_transmitPackage[0], m_transmitPackage.size() , 0 ))
-        return true;
-    else
+    unsigned int priority = 1;
+    //if(0 < send(fd, &m_transmitPackage[0], m_transmitPackage.size() , 0 ))
+    int result = mq_send(m_mqdes, &m_transmitPackage[0], m_transmitPackage.size(), priority);
+    if(result < 0) {
+        CLOG(LOGLEV_RUN, "send failed = ", errno, " = ", strerror(errno));
         return false;
+    } else {
+        return true;
+    }
 }
 
-bool CTCPIPHelper::listenForData(const int fd)
+bool CPOSIXMQHelper::listenForData(const mqd_t m_mqdes)
 {
     SMessageHeader peekHeader;
     std::uint32_t numOfBytesRead;
     //int peekFlags = MSG_PEEK;
 
     // Check the contents of the header
-    //numOfBytesRead = recv( fd , &peekHeader, m_sizeOfHeader, peekFlags);
-    numOfBytesRead = read( fd , &peekHeader, m_sizeOfHeader);
+    numOfBytesRead = mq_receive(m_mqdes, (char*)&peekHeader, m_sizeOfHeader, NULL);
     if(numOfBytesRead <= 0) {
         CLOG(LOGLEV_RUN, "Header read failed, numOfBytesRead = ", numOfBytesRead);
         return false;
@@ -111,7 +99,8 @@ bool CTCPIPHelper::listenForData(const int fd)
     // store the actual data
     SReadBufferQ localReadBuffer;
     localReadBuffer.payload.resize(peekHeader.size);
-    numOfBytesRead = read(fd, localReadBuffer.payload.data(), localReadBuffer.payload.size());
+    //numOfBytesRead = read(fd, localReadBuffer.payload.data(), localReadBuffer.payload.size());
+    numOfBytesRead = mq_receive(m_mqdes, (char*)&localReadBuffer, peekHeader.size, NULL);
     if(numOfBytesRead != peekHeader.size)
     {
         CLOG(LOGLEV_RUN, "read size did not match");
@@ -128,11 +117,6 @@ bool CTCPIPHelper::listenForData(const int fd)
     return true;
 }
 
-int CTCPIPHelper::csizeOfReadBuffer()
-{
-    return m_read_queue.size();
-}
-
 } // helper
-} // tcpip
+} // posix
 } // comms

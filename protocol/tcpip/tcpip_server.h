@@ -22,7 +22,7 @@ namespace server {
 
 class CTCPIPServer
         : public IProtocolServer
-        , public common::CTCPIPHelper
+        , public helper::CTCPIPHelper
 {
 public:
     CTCPIPServer();

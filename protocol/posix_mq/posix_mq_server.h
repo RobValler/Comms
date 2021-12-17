@@ -10,6 +10,7 @@
 #pragma once
 
 #include "iprotocol_server.h"
+#include "posix_mq_helper.h"
 
 #include <thread>
 #include <atomic>
@@ -20,24 +21,29 @@ namespace comms {
 namespace posix {
 namespace server {
 
-class CPOSIXMQServer : public IProtocolServer
+class CPOSIXMQServer
+        : public IProtocolServer
+        , public helper::CPOSIXMQHelper
 {
 public:
     CPOSIXMQServer();
     ~CPOSIXMQServer();
 
     bool channel_create() override;
-    bool recieve(std::vector<char>&, int& size) override;
-    bool transmit(const char *data, const int size) override;
+    bool recieve(std::vector<char>& data, int& size) override {
+        return crecieve(data, size);
+    }
+    bool transmit(const char *data, const int size) override {
+        return ctransmit(m_mqdes_server, data, size);
+    }
     int sizeOfReadBuffer() override { return 0; }
 
 
 private:
     void threadfunc_server();
-    bool listenForData();
 
     std::atomic<bool> m_shutdownrequest;
-    mqd_t m_msgQueue;
+    mqd_t m_mqdes_server;
     int m_sizeOfHeader;
 
     std::thread t_server;

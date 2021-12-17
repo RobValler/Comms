@@ -104,9 +104,9 @@ bool CTCPIPServer::channel_create()
 
     // send the confirmation message
     char confirmMsgBuff;
-    common::SMessageHeader head;
+    SMessageHeader head;
     head.size = 1;
-    head.type = common::EMsgTypCtrl;
+    head.type = EMsgTypCtrl;
 
     std::vector<char> package;
     package.resize(1 + m_sizeOfHeader);

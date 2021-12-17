@@ -8,6 +8,7 @@
  *****************************************************************/
 
 #pragma once
+#include <cstdint>
 
 enum EProtocolType : unsigned int
 {
@@ -16,3 +17,14 @@ enum EProtocolType : unsigned int
     EPOSIX_MQ
 };
 
+enum EMessageType : std::uint8_t
+{
+    EMsgTypNone = 0,
+    EMsgTypCtrl,
+    EMsgTypData
+};
+
+struct SMessageHeader {
+    std::uint32_t size;
+    std::uint8_t type;
+};

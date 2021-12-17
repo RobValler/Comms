@@ -99,14 +99,14 @@ bool CTCPIPClient::client_connect(std::string ip_address)
         std::this_thread::sleep_for( std::chrono::milliseconds(l_delayBetweenConnectAttempt_ms) );
     }
 
-    common::SMessageHeader head;
+    SMessageHeader head;
     if( read(m_connection_fd , confirmMsgBuff, 1024) <= 0) {
         CLOG(LOGLEV_RUN, "confirm message read failed");
         return false;
     }
 
     std::memcpy(&head, &confirmMsgBuff[0], m_sizeOfHeader);
-    if(common::EMsgTypCtrl != head.type) {
+    if(EMsgTypCtrl != head.type) {
         CLOG(LOGLEV_RUN, "wrong msg type");
         return false;
     }

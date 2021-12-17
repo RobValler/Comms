@@ -21,13 +21,6 @@
 #include <string>
 #include <vector>
 
-enum EProtocolType : unsigned int
-{
-    ENone = 0,
-    ETCTPIP,
-    EPOSIX_MQ
-};
-
 CCommServer::CCommServer(EProtocolType type)
 {
     CLogger::GetInstance();

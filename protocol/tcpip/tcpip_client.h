@@ -23,7 +23,7 @@ namespace client {
 
 class CTCPIPClient
         : public IProtocolClient
-        , public common::CTCPIPHelper
+        , public helper::CTCPIPHelper
 {
 public:
     CTCPIPClient();

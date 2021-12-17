@@ -13,9 +13,11 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
+//    ::testing::GTEST_FLAG(filter) = "Comms_TCPIP.*";
+
 //    ::testing::GTEST_FLAG(filter) = "-Comms_TCPIP.Connect";
-    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.Connect";
-//    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.ReadThenWrite";
+//    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.Connect";
+    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.ReadThenWrite";
 
     return RUN_ALL_TESTS();
 }

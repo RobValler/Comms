@@ -25,23 +25,9 @@ namespace  {
     const int l_max_num_of_connect_attempts = 5;
 }
 
-// todo: move to common section
-enum EMessageType : std::uint8_t
-{
-    EMsgTypNone = 0,
-    EMsgTypCtrl,
-    EMsgTypData
-};
-
-// todo: move to common section
-struct SMessageHeader {
-    std::uint32_t size;
-    std::uint8_t type;
-};
-
 CPOSIXMQClient::CPOSIXMQClient()
     : m_shutdownrequest(false)
-    , m_msgQueue(-1)
+    , m_mqdes_client(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
 //    t_client = std::thread(&CPOSIXMQClient::threadfunc_client, this);
@@ -67,8 +53,8 @@ bool CPOSIXMQClient::client_connect(std::string channel)
 //    attrib.mq_msgsize = 1024;
 //    attrib.mq_curmsgs = 0;
 
-    mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
-    int o_flag = /* O_CREAT |*/ O_RDONLY  | O_NONBLOCK ;
+    //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
+    int o_flag = /* O_CREAT |*/ O_RDWR ;// | O_NONBLOCK ;
 
     for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
@@ -78,8 +64,8 @@ bool CPOSIXMQClient::client_connect(std::string channel)
             return false;
         }
 
-        m_msgQueue = mq_open(channel.c_str(),  o_flag, mode, NULL);
-        if(-1 != m_msgQueue) {
+        m_mqdes_client = mq_open(channel.c_str(),  o_flag, 0666, NULL);
+        if(-1 != m_mqdes_client) {
             // no issues, this loop can be exited
             break;
         } else {
@@ -109,52 +95,24 @@ bool CPOSIXMQClient::client_connect(std::string channel)
 
 bool CPOSIXMQClient::client_disconnect()
 {
-    if(0 != mq_close(m_msgQueue))
+    if(0 != mq_close(m_mqdes_client))
         return false;
     else
         return true;
-}
-
-bool CPOSIXMQClient::recieve(std::vector<char>& data, int& size)
-{
-    unsigned int priority;
-    int bytesRead = 0;
-    bytesRead = mq_receive(m_msgQueue, data.data(), 1024, &priority); // todo: size needs fixing
-
-
-    size = bytesRead;
-    if(size > 0)
-        return true;
-    else
-        return false;
-}
-
-bool CPOSIXMQClient::transmit(const char *data, const int size)
-{
-    unsigned int priority = 1;
-    int result = mq_send(m_msgQueue, (char*)data, size, priority);
-    if(result < 0) {
-        CLOG(LOGLEV_RUN, "send failed = ", errno, " = ", strerror(errno));
-        return false;
-    } else {
-        return true;
-    }
 }
 
 void CPOSIXMQClient::threadfunc_client()
 {
-    std::vector<char> data;
-    int size;
-    recieve(data, size);
-
+    while(!m_shutdownrequest)
+    {
+        // listenForData() is a blocking read so we dont need a thread throttle
+        if(!listenForData(m_mqdes_client)) {
+            CLOG(LOGLEV_RUN, "error on listen");
+            break;
+        }
+    }
 }
 
-bool CPOSIXMQClient::listenForData()
-{
-
-    return true;
-}
-
-} // comms
-} // posix
 } // client
+} // posix
+} // comms
