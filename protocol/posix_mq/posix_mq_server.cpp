@@ -21,7 +21,7 @@ namespace posix {
 namespace server {
 
 namespace  {
-    const char l_channel_name[] = "/posix_test_mq"; // todo: replace with parameter
+    const char l_channel_name[] = "/posix_test_mq"; ///\ todo replace with parameter
     const int l_max_num_of_connect_attempts = 5;
 }
 
@@ -53,11 +53,9 @@ CPOSIXMQServer::~CPOSIXMQServer()
 {
     m_shutdownrequest = true;
 
-    mq_close(m_msgQueue);
+    mq_unlink(l_channel_name);
 
     t_server.join();
-//    t_client.join();
-
 }
 
 bool CPOSIXMQServer::channel_create()
@@ -121,10 +119,12 @@ bool CPOSIXMQServer::recieve(std::vector<char>& data, int& size)
 {
     unsigned int priority = 1;
 
-//    int result = mq_receive(m_msgQueue, (char*)data, m_sizeOfHeader, &priority);
-//    if(result < 0)
-//        return false;
-//    else
+    size = 10;
+
+    int result = mq_receive(m_msgQueue, data.data(), m_sizeOfHeader, &priority);
+    if(result < 0)
+        return false;
+    else
         return true;
 }
 

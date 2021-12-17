@@ -49,6 +49,7 @@ CPOSIXMQClient::CPOSIXMQClient()
 
 CPOSIXMQClient::~CPOSIXMQClient()
 {
+    static_cast<void>(client_disconnect());
     m_shutdownrequest = true;
 //    t_server.join();
 //    t_client.join();
@@ -108,15 +109,17 @@ bool CPOSIXMQClient::client_connect(std::string channel)
 
 bool CPOSIXMQClient::client_disconnect()
 {
-
-    return false;
+    if(0 != mq_close(m_msgQueue))
+        return false;
+    else
+        return true;
 }
 
 bool CPOSIXMQClient::recieve(std::vector<char>& data, int& size)
 {
     unsigned int priority;
     int bytesRead = 0;
-    //bytesRead = mq_receive(m_msgQueue, (char*)data, 1024, &priority); // todo: size needs fixing
+    bytesRead = mq_receive(m_msgQueue, data.data(), 1024, &priority); // todo: size needs fixing
 
 
     size = bytesRead;
@@ -142,7 +145,7 @@ void CPOSIXMQClient::threadfunc_client()
 {
     std::vector<char> data;
     int size;
-    bool result = recieve(data, size);
+    recieve(data, size);
 
 }
 

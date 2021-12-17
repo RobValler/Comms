@@ -9,10 +9,10 @@
 
 #include "comm_client.h"
 #include "tcpip_client.h"
+#include "posix_mq_client.h"
+
 #include "iserialiser.h"
 #include "proto_helper.h"
-
-//#include "posix_mq_client.h"
 #include "common.h"
 
 #include <string>
@@ -34,7 +34,8 @@ CCommClient::CCommClient(EProtocolType type)
         m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
     case EPOSIX_MQ:
- //       m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
+        m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
+        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
     }
 }

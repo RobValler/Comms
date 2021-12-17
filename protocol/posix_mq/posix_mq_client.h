@@ -40,6 +40,7 @@ private:
     int m_sizeOfHeader;
 
     std::thread t_client;
+
 };
 
 } // comms

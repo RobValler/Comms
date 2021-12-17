@@ -29,6 +29,8 @@ public:
     bool channel_create() override;
     bool recieve(std::vector<char>&, int& size) override;
     bool transmit(const char *data, const int size) override;
+    int sizeOfReadBuffer() override { return 0; }
+
 
 private:
     void threadfunc_server();
@@ -39,6 +41,8 @@ private:
     int m_sizeOfHeader;
 
     std::thread t_server;
+
+    std::string m_channel;
 };
 
 } // comms

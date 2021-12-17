@@ -11,10 +11,10 @@
 
 #include "iprotocol_server.h"
 #include "tcpip_server.h"
+#include "posix_mq_server.h"
+
 #include "iserialiser.h"
 #include "proto_helper.h"
-
-//#include "posix_mq_server.h"
 
 #include "Logger.h"
 
@@ -40,10 +40,10 @@ CCommServer::CCommServer(EProtocolType type)
     case ETCTPIP:
         m_pProtocolServer = std::make_shared<comms::tcpip::server::CTCPIPServer>();
         m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
-
         break;
     case EPOSIX_MQ:
-        //m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
+        m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
+        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
     }
 }
