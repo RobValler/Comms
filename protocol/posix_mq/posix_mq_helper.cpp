@@ -56,7 +56,7 @@ bool CPOSIXMQHelper::crecieve(std::vector<char>& data, int& size)
     return true;
 }
 
-bool CPOSIXMQHelper::ctransmit(mqd_t m_mqdes, const char *data, const int size)
+bool CPOSIXMQHelper::ctransmit(mqd_t, const char *data, const int size)
 {
     SMessageHeader head;
     head.size = size;
@@ -68,7 +68,9 @@ bool CPOSIXMQHelper::ctransmit(mqd_t m_mqdes, const char *data, const int size)
 
     unsigned int priority = 1;
     //if(0 < send(fd, &m_transmitPackage[0], m_transmitPackage.size() , 0 ))
-    int result = mq_send(m_mqdes, &m_transmitPackage[0], m_transmitPackage.size(), priority);
+
+    mqd_t queue = mq_open(l_channel_name, O_WRONLY);
+    int result = mq_send(queue, &m_transmitPackage[0], m_transmitPackage.size(), priority);
     if(result < 0) {
         CLOG(LOGLEV_RUN, "send failed = ", errno, " = ", strerror(errno));
         return false;
@@ -77,16 +79,28 @@ bool CPOSIXMQHelper::ctransmit(mqd_t m_mqdes, const char *data, const int size)
     }
 }
 
-bool CPOSIXMQHelper::listenForData(const mqd_t m_mqdes)
+bool CPOSIXMQHelper::listenForData(const mqd_t)
 {
-    SMessageHeader peekHeader;
+    SMessageHeader peekHeader{};
+    const int sizeOfHeader = sizeof(SMessageHeader);
     std::uint32_t numOfBytesRead;
     //int peekFlags = MSG_PEEK;
 
     // Check the contents of the header
-    numOfBytesRead = mq_receive(m_mqdes, (char*)&peekHeader, m_sizeOfHeader, NULL);
+   // numOfBytesRead = mq_receive(m_mqdes, (char*)&peekHeader, m_sizeOfHeader, NULL);
+
+    char rcvmsg[50];
+    mqd_t queue = mq_open(l_channel_name, O_RDONLY);
+    numOfBytesRead = mq_receive(queue, rcvmsg, 50, NULL);
+
+//    char rcvmsg[sizeOfHeader];
+//    numOfBytesRead = mq_receive(m_mqdes, rcvmsg, sizeOfHeader, NULL);
+
     if(numOfBytesRead <= 0) {
-        CLOG(LOGLEV_RUN, "Header read failed, numOfBytesRead = ", numOfBytesRead);
+        CLOG(LOGLEV_RUN, "Header read failed: ", errno, " - ", strerror(errno));
+        return false;
+    } else if(numOfBytesRead != static_cast<std::uint32_t>(sizeOfHeader)) {
+        CLOG(LOGLEV_RUN, "Header size mismatch: (", errno, ") ", strerror(errno));
         return false;
     }
 
@@ -100,7 +114,7 @@ bool CPOSIXMQHelper::listenForData(const mqd_t m_mqdes)
     SReadBufferQ localReadBuffer;
     localReadBuffer.payload.resize(peekHeader.size);
     //numOfBytesRead = read(fd, localReadBuffer.payload.data(), localReadBuffer.payload.size());
-    numOfBytesRead = mq_receive(m_mqdes, (char*)&localReadBuffer, peekHeader.size, NULL);
+    numOfBytesRead = mq_receive(queue, (char*)&localReadBuffer, peekHeader.size, NULL);
     if(numOfBytesRead != peekHeader.size)
     {
         CLOG(LOGLEV_RUN, "read size did not match");

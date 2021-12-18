@@ -37,7 +37,6 @@ CPOSIXMQClient::~CPOSIXMQClient()
 {
     static_cast<void>(client_disconnect());
     m_shutdownrequest = true;
-//    t_server.join();
 //    t_client.join();
 }
 
@@ -47,14 +46,14 @@ bool CPOSIXMQClient::client_connect(std::string channel)
     // will attempt several times
 
     //disabled mq_attr because using it causes access permission errors
-//    mq_attr attrib;
+//    struct mq_attr attrib;
 //    attrib.mq_flags = 0;
-//    attrib.mq_maxmsg = 16;
+//    attrib.mq_maxmsg = 10;
 //    attrib.mq_msgsize = 1024;
 //    attrib.mq_curmsgs = 0;
 
     //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
-    int o_flag = /* O_CREAT |*/ O_RDWR ;// | O_NONBLOCK ;
+    //int o_flag = /* O_CREAT |*/ O_WRONLY ;// | O_NONBLOCK ;
 
     for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
@@ -64,7 +63,8 @@ bool CPOSIXMQClient::client_connect(std::string channel)
             return false;
         }
 
-        m_mqdes_client = mq_open(channel.c_str(),  o_flag, 0666, NULL);
+        m_mqdes_client = mq_open(l_channel_name, O_WRONLY);
+
         if(-1 != m_mqdes_client) {
             // no issues, this loop can be exited
             break;

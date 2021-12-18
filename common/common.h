@@ -28,3 +28,7 @@ struct SMessageHeader {
     std::uint32_t size;
     std::uint8_t type;
 };
+
+
+const char l_channel_name[] = "/posix_test_mq"; ///\ todo replace with parameter
+

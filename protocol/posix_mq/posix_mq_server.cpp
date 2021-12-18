@@ -22,19 +22,20 @@ namespace comms {
 namespace posix {
 namespace server {
 
-namespace  {
-    const char l_channel_name[] = "/posix_test_mq"; ///\ todo replace with parameter
-    const int l_max_num_of_connect_attempts = 5;
-}
+//namespace  {
+//    const char l_channel_name[] = "/posix_test_mq"; ///\ todo replace with parameter
+//}
 
 CPOSIXMQServer::CPOSIXMQServer()
     : m_shutdownrequest(false)
     , m_mqdes_server(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
-    t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
-//    t_client = std::thread(&CPOSIXMQServer::threadfunc_server, this);
 
+    if(channel_create())
+    {
+        t_server = std::thread(&CPOSIXMQServer::threadfunc_server, this);
+    }
 }
 
 CPOSIXMQServer::~CPOSIXMQServer()
@@ -43,7 +44,8 @@ CPOSIXMQServer::~CPOSIXMQServer()
 
     mq_unlink(l_channel_name);
 
-    t_server.join();
+    if(t_server.joinable())
+        t_server.join();
 }
 
 bool CPOSIXMQServer::channel_create()
@@ -52,15 +54,29 @@ bool CPOSIXMQServer::channel_create()
     // will attempt several times
 
     //disabled mq_attr because using it causes access permission errors
-//    mq_attr attrib;
-//    attrib.mq_flags = 0;
-//    attrib.mq_maxmsg = 10;
-//    attrib.mq_msgsize = 71680;
-//    attrib.mq_curmsgs = 0;
+    struct mq_attr attr;
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 10;
+    attr.mq_msgsize = 33;//m_sizeOfHeader; // needs to be smaller than the smallest packet i.e. the header.
+    attr.mq_curmsgs = 0;
 
     //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
-    int o_flag = O_CREAT | O_RDWR  ;//| O_NONBLOCK ;
+    //int o_flag = O_CREAT | O_RDWR  ;//| O_NONBLOCK ;
 
+#if 1
+    m_mqdes_server = mq_open(&l_channel_name[0], O_CREAT|O_RDWR, 0644, &attr);
+    //mqd_t m_mqdes_server = mq_open(&l_channel_name[0], O_CREAT|O_RDWR, 0644, &attr);
+
+    if(-1 != m_mqdes_server) {
+        CLOG(LOGLEV_RUN, "channel ", l_channel_name, " created");
+
+    } else {
+        CLOG(LOGLEV_RUN, "open failed: (", errno, ") ", strerror(errno));
+        return false;
+    }
+
+
+#else
     for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
         CLOG(LOGLEV_RUN, "channel create attempt = ", retry_index + 1);
@@ -84,6 +100,7 @@ bool CPOSIXMQServer::channel_create()
     }
 
     CLOG(LOGLEV_RUN, "channel ", l_channel_name, " created");
+#endif
 
 #if 0
     // The channel is open, send the confirmation message
@@ -107,21 +124,13 @@ bool CPOSIXMQServer::channel_create()
 
 void CPOSIXMQServer::threadfunc_server()
 {
-    bool result = channel_create();
-    if(result)
+    while(!m_shutdownrequest)
     {
-        while(!m_shutdownrequest)
-        {
-            // listenForData() is a blocking read so we dont need a thread throttle
-            if(!listenForData(m_mqdes_server)) {
-                CLOG(LOGLEV_RUN, "error on listen");
-                break;
-            }
+        // listenForData() is a blocking read so we dont need a thread throttle
+        if(!listenForData(m_mqdes_server)) {
+//                CLOG(LOGLEV_RUN, "error on listen");
+            break;
         }
-    }
-    else
-    {
-        CLOG(LOGLEV_RUN, "server_connect failed");
     }
 }
 
