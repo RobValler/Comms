@@ -45,7 +45,7 @@ CPOSIXMQServer::~CPOSIXMQServer()
     mq_unlink(l_channel_name);
 
     if(t_server.joinable())
-        t_server.join();
+        t_server.detach();
 }
 
 bool CPOSIXMQServer::channel_create()
@@ -57,7 +57,7 @@ bool CPOSIXMQServer::channel_create()
     struct mq_attr attr;
     attr.mq_flags = 0;
     attr.mq_maxmsg = 10;
-    attr.mq_msgsize = 33;//m_sizeOfHeader; // needs to be smaller than the smallest packet i.e. the header.
+    attr.mq_msgsize = 33;//m_sizeOfHeader-1; // needs to be smaller than the smallest packet i.e. the header.
     attr.mq_curmsgs = 0;
 
     //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
