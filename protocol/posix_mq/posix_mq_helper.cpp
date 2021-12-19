@@ -19,6 +19,70 @@ namespace comms {
 namespace posix {
 namespace helper {
 
+bool CPOSIXMQHelper::channel_create(std::string name)
+{
+    // create the posix mq channel
+    struct mq_attr attr;
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = posix_conf::max_msg;
+    attr.mq_msgsize = posix_conf::max_size;
+    attr.mq_curmsgs = 0;
+
+    //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
+    int o_flag = O_CREAT | O_RDWR  ;//| O_NONBLOCK ;
+
+    m_provider_channel_name = l_mq_channel_name + name;
+    m_provider_channel_desc = mq_open(m_provider_channel_name.data(), o_flag, posix_conf::permission, &attr);
+
+    if(-1 != m_provider_channel_desc) {
+        CLOG(LOGLEV_RUN, "channel ", m_provider_channel_name, " created");
+
+    } else {
+        CLOG(LOGLEV_RUN, "open failed: (", errno, ") ", strerror(errno));
+        return false;
+    }
+
+    return true;
+}
+
+bool CPOSIXMQHelper::cclient_connect(std::string channel)
+{
+    // ### Connect to remote
+
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
+    {
+        CLOG(LOGLEV_RUN, "channel ", channel, " connect attempt = ", retry_index + 1);
+        if(l_max_num_of_connect_attempts == retry_index + 1) {
+            CLOG(LOGLEV_RUN, "max channel connect attempts reached");
+            return false;
+        }
+
+        // open as write only
+        m_listener_channel_desc = mq_open(channel.data(), O_WRONLY);
+
+        if(-1 != m_listener_channel_desc) {
+            // no issues, this loop can be exited
+            break;
+        } else {
+            CLOG(LOGLEV_RUN, "open failed = ", errno, " = ", strerror(errno));
+        }
+
+        // pause before the next attempt
+        std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+    }
+
+    CLOG(LOGLEV_RUN, "connected to channel ", channel);
+
+    return true;
+}
+
+bool CPOSIXMQHelper::cclient_disconnect()
+{
+    mq_close(m_listener_channel_desc);
+    mq_unlink(m_provider_channel_name.data());
+    return true;
+}
+
 bool CPOSIXMQHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter

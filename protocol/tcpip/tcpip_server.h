@@ -28,18 +28,11 @@ public:
     CTCPIPServer();
     ~CTCPIPServer();
 
-
-    bool client_connect(std::string) { return false; }
-
-    bool recieve(std::vector<char>& data, int& size) override{
-        return crecieve(data, size);
-    }
-    bool transmit(const char *data, const int size) override{
-        return ctransmit(m_connection_socket, data, size);
-    }
-    int sizeOfReadBuffer() override{
-        return csizeOfReadBuffer();
-    }
+    bool client_connect(std::string) override { return false; }
+    bool client_disconnect() override {return false; }
+    bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
+    bool transmit(const char *data, const int size) override { return ctransmit(m_connection_socket, data, size); }
+    int sizeOfReadBuffer() override { return csizeOfReadBuffer(); }
 
 private:
     void threadfunc_server();

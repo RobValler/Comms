@@ -8,13 +8,16 @@
  *****************************************************************/
 
 #pragma once
+
 #include <vector>
 #include <string>
+
 class IProtocolServer
 {
 public:
     virtual ~IProtocolServer(){}
     virtual bool client_connect(std::string) =0;
+    virtual bool client_disconnect()=0;
     virtual bool recieve(std::vector<char>&, int&) =0;
     virtual bool transmit(const char*, const int) =0;
     virtual int sizeOfReadBuffer() =0;

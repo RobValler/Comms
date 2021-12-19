@@ -15,8 +15,6 @@
 #include <thread>
 #include <atomic>
 
-#include <mqueue.h>
-
 namespace comms {
 namespace posix {
 namespace client {
@@ -29,28 +27,15 @@ public:
     CPOSIXMQClient();
     ~CPOSIXMQClient();
 
-    bool client_connect(std::string channel) override;
-    bool client_disconnect() override;
-
-    bool recieve(std::vector<char>& data, int& size) override {
-        return crecieve(data, size);
-    }
-    bool transmit(const char *data, const int size) override {
-        return ctransmit(m_listener_channel_desc, data, size);
-    }
+    bool client_connect(std::string channel) override { return cclient_connect(channel); }
+    bool client_disconnect() override { return cclient_disconnect(); }
+    bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
+    bool transmit(const char *data, const int size) override { return ctransmit(m_listener_channel_desc, data, size); }
 
 private:
     void threadfunc_client();
-    bool channel_create();
-
-    std::atomic<bool> m_shutdownrequest;
-
     std::thread t_provider_channel_thread;
-    std::string m_provider_channel_name;
-    mqd_t m_provider_channel_desc;
-
-    mqd_t m_listener_channel_desc;
-
+    std::atomic<bool> m_shutdownrequest;
 };
 
 } // comms

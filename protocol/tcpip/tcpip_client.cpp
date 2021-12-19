@@ -129,8 +129,9 @@ void CTCPIPClient::threadfunc_client()
 {
     while(!m_shutdownrequest)
     {
-        // listenForData() is a blocking read so we dont need a thread throttle
-        if(!listenForData(m_connection_fd)) {
+        // listenForData() is a blocking read
+        if(!listenForData(m_connection_fd))
+        {
             CLOG(LOGLEV_RUN, "error on listen");
             break;
         }

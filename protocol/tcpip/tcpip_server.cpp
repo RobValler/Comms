@@ -128,8 +128,9 @@ void CTCPIPServer::threadfunc_server()
     {
         while(!m_shutdownrequest)
         {
-            // listenForData() is a blocking read so we dont need a thread throttle
-            if(!listenForData(m_connection_socket)) {
+            // listenForData() is a blocking read
+            if(!listenForData(m_connection_socket))
+            {
                 CLOG(LOGLEV_RUN, "error on listen");
                 break;
             }
