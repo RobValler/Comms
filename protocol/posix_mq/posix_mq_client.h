@@ -36,16 +36,20 @@ public:
         return crecieve(data, size);
     }
     bool transmit(const char *data, const int size) override {
-        return ctransmit(m_mqdes_client, data, size);
+        return ctransmit(m_listener_channel_desc, data, size);
     }
 
 private:
     void threadfunc_client();
+    bool channel_create();
 
     std::atomic<bool> m_shutdownrequest;
-    mqd_t m_mqdes_client;
 
-    std::thread t_client;
+    std::thread t_provider_channel_thread;
+    std::string m_provider_channel_name;
+    mqd_t m_provider_channel_desc;
+
+    mqd_t m_listener_channel_desc;
 
 };
 

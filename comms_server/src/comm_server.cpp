@@ -41,6 +41,11 @@ CCommServer::CCommServer(EProtocolType type)
     }
 }
 
+bool CCommServer::connect(std::string server_address)
+{
+    return m_pProtocolServer->client_connect(server_address);
+}
+
 bool CCommServer::read(void* message)
 {
     int size_of_message;

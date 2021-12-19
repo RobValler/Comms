@@ -20,52 +20,71 @@ namespace comms {
 namespace posix {
 namespace client {
 
-//
-namespace  {
-    const int l_max_num_of_connect_attempts = 5;
-}
-
 CPOSIXMQClient::CPOSIXMQClient()
-    : m_shutdownrequest(false)
-    , m_mqdes_client(-1)
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
-//    t_client = std::thread(&CPOSIXMQClient::threadfunc_client, this);
+
+    if(channel_create())
+    {
+        t_provider_channel_thread = std::thread(&CPOSIXMQClient::threadfunc_client, this);
+    }
+
 }
 
 CPOSIXMQClient::~CPOSIXMQClient()
 {
     static_cast<void>(client_disconnect());
+
+    mq_unlink(m_provider_channel_name.data());
+
     m_shutdownrequest = true;
-//    t_client.join();
+
+    if(t_provider_channel_thread.joinable())
+        t_provider_channel_thread.detach();
+}
+
+bool CPOSIXMQClient::channel_create()
+{
+    // create the posix mq channel
+    struct mq_attr attr;
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 10;
+    attr.mq_msgsize = 33; //m_sizeOfHeader-1; // needs to be smaller than the smallest packet i.e. the header.
+    attr.mq_curmsgs = 0;
+
+    //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
+    int o_flag = O_CREAT | O_RDWR  ;//| O_NONBLOCK ;
+
+    m_provider_channel_name = l_mq_channel_name + "_client";
+    m_provider_channel_desc = mq_open(m_provider_channel_name.data(), o_flag, 0644, &attr);
+
+    if(-1 != m_provider_channel_desc) {
+        CLOG(LOGLEV_RUN, "channel ", m_provider_channel_name, " created");
+
+    } else {
+        CLOG(LOGLEV_RUN, "open failed", ERR_STR);
+        return false;
+    }
+
+    return true;
 }
 
 bool CPOSIXMQClient::client_connect(std::string channel)
 {
-    // create the posix mq channel
-    // will attempt several times
-
-    //disabled mq_attr because using it causes access permission errors
-//    struct mq_attr attrib;
-//    attrib.mq_flags = 0;
-//    attrib.mq_maxmsg = 10;
-//    attrib.mq_msgsize = 1024;
-//    attrib.mq_curmsgs = 0;
-
-    //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
-    //int o_flag = /* O_CREAT |*/ O_WRONLY ;// | O_NONBLOCK ;
+    // ### Connect to remote
 
     for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
     {
-        CLOG(LOGLEV_RUN, "channel connect attempt = ", retry_index + 1);
+        CLOG(LOGLEV_RUN, "channel ", channel, " connect attempt = ", retry_index + 1);
         if(l_max_num_of_connect_attempts == retry_index + 1) {
             CLOG(LOGLEV_RUN, "max channel connect attempts reached");
             return false;
         }
 
-        m_mqdes_client = mq_open(l_channel_name, O_WRONLY);
+        // open as write only
+        m_listener_channel_desc = mq_open(channel.data(), O_WRONLY);
 
-        if(-1 != m_mqdes_client) {
+        if(-1 != m_listener_channel_desc) {
             // no issues, this loop can be exited
             break;
         } else {
@@ -78,24 +97,12 @@ bool CPOSIXMQClient::client_connect(std::string channel)
 
     CLOG(LOGLEV_RUN, "connected to channel ", channel);
 
-//    char data[1024];
-//    int size;
-//    unsigned int priority;
-//    int bytesRead = 0;
-//    bytesRead = mq_receive(m_msgQueue, data, 1024, &priority);
-//    if(bytesRead <= 0) {
-//        CLOG(LOGLEV_RUN, "read confirm message fail (", errno, ") ", strerror(errno));
-//        return false;
-//    }
-
- //   t_client = std::thread(&CPOSIXMQClient::threadfunc_client, this);
-
     return true;
 }
 
 bool CPOSIXMQClient::client_disconnect()
 {
-    if(0 != mq_close(m_mqdes_client))
+    if(0 != mq_close(m_listener_channel_desc))
         return false;
     else
         return true;
@@ -106,7 +113,7 @@ void CPOSIXMQClient::threadfunc_client()
     while(!m_shutdownrequest)
     {
         // listenForData() is a blocking read so we dont need a thread throttle
-        if(!listenForData(m_mqdes_client)) {
+        if(!listenForData(m_provider_channel_desc)) {
             CLOG(LOGLEV_RUN, "error on listen");
             break;
         }

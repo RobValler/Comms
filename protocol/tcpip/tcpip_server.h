@@ -28,7 +28,9 @@ public:
     CTCPIPServer();
     ~CTCPIPServer();
 
-    bool channel_create() override;
+
+    bool client_connect(std::string) { return false; }
+
     bool recieve(std::vector<char>& data, int& size) override{
         return crecieve(data, size);
     }
@@ -41,6 +43,7 @@ public:
 
 private:
     void threadfunc_server();
+    bool channel_create();
 
     std::atomic<bool> m_shutdownrequest;
     std::thread t_server;

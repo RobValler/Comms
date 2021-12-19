@@ -29,26 +29,28 @@ public:
     CPOSIXMQServer();
     ~CPOSIXMQServer();
 
-    bool channel_create() override;
+    bool client_connect(std::string channel) override;
+    bool client_disconnect();
     bool recieve(std::vector<char>& data, int& size) override {
         return crecieve(data, size);
     }
     bool transmit(const char *data, const int size) override {
-        return ctransmit(m_mqdes_server, data, size);
+        return ctransmit(m_listener_channel_desc, data, size);
     }
     int sizeOfReadBuffer() override { return 0; }
 
 
 private:
     void threadfunc_server();
+    bool channel_create();
 
     std::atomic<bool> m_shutdownrequest;
-    mqd_t m_mqdes_server;
-    int m_sizeOfHeader;
 
-    std::thread t_server;
+    std::thread t_provider_channel_thread;
+    std::string m_provider_channel_name;
+    mqd_t m_provider_channel_desc;
 
-    std::string m_channel;
+    mqd_t m_listener_channel_desc;
 };
 
 } // comms

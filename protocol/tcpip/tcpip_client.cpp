@@ -10,6 +10,7 @@
 #include "tcpip_client.h"
 
 #include "Logger.h"
+#include "common.h"
 
 // tcp socket stuff
 #include <sys/socket.h>
@@ -29,7 +30,6 @@ namespace tcpip {
 namespace client {
 
 namespace {
-    const int l_numOfConnectAttempts = 10;
     const int l_delayBetweenConnectAttempt_ms = 100;
 }
 
@@ -80,9 +80,9 @@ bool CTCPIPClient::client_connect(std::string ip_address)
 //    }
 
     // attempt connect, multiple tries
-    for(int retry_index = 0; retry_index < l_numOfConnectAttempts + 1; retry_index++)
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts + 1; retry_index++)
     {
-        if(l_numOfConnectAttempts == retry_index) {
+        if(l_max_num_of_connect_attempts == retry_index) {
             CLOG(LOGLEV_RUN, "max number of connect attemps expired");
             return false;
         } else {

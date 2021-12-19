@@ -102,20 +102,24 @@ bool CPOSIXMQHelper::listenForData(const mqd_t queue)
     }
 
     // check the data type
-    if(EMsgTypData != peekHeader.type) {
-        CLOG(LOGLEV_RUN, "wrong header type");
-        return false;
-    }
-    else
+    switch(peekHeader.type)
     {
-        SReadBufferQ localReadBuffer;
-        localReadBuffer.payload.resize(peekHeader.size);
-        std::memcpy(&localReadBuffer.payload[0], &rcvmsg[sizeOfHeader], peekHeader.size);
+        case EMsgTypData:
+        {
+            SReadBufferQ localReadBuffer;
+            localReadBuffer.payload.resize(peekHeader.size);
+            std::memcpy(&localReadBuffer.payload[0], &rcvmsg[sizeOfHeader], peekHeader.size);
 
-        m_recProtect.lock();
-        m_read_queue.push(localReadBuffer);
-        m_recProtect.unlock();
-        //CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
+            m_recProtect.lock();
+            m_read_queue.push(localReadBuffer);
+            m_recProtect.unlock();
+            //CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
+            break;
+        }
+//        case EMsgTypCtrl:
+        default:
+            CLOG(LOGLEV_RUN, "wrong header type");
+            return false;
     }
 
     return true;

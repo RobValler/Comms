@@ -36,16 +36,16 @@ TEST(Comms_POSIX_MQ, ReadThenWrite)
 {
     CCommServer server(EPOSIX_MQ);
     CCommClient client(EPOSIX_MQ);
-    test_msg in, out;
+    test_msg in;
+    test_msg out;
 
     // set test data
     out.set_test_int(out_int);
     out.set_test_int_2(out_int + 1);
     out.set_test_string(out_str);
 
-
-    ASSERT_EQ(client.connect("/posix_test_mq"), true);
-    std::this_thread::sleep_for( std::chrono::microseconds(500) );
+    ASSERT_EQ(client.connect("/posix_test_mq_server"), true);
+    ASSERT_EQ(server.connect("/posix_test_mq_client"), true);
 
     for(int index=0; index < 1000; index++)
     {
@@ -59,13 +59,13 @@ TEST(Comms_POSIX_MQ, ReadThenWrite)
         EXPECT_EQ(out_str, in.test_string());
 
         // server write and client read
-//        in.Clear();
-//        EXPECT_EQ(server.write(&out), true);
-//        EXPECT_EQ(client.read(&in), true);
+        in.Clear();
+        EXPECT_EQ(server.write(&out), true);
+        EXPECT_EQ(client.read(&in), true);
 
-//        EXPECT_EQ(out_int, in.test_int());
-//        EXPECT_EQ(out_int+1, in.test_int_2());
-//        EXPECT_EQ(out_str, in.test_string());
+        EXPECT_EQ(out_int, in.test_int());
+        EXPECT_EQ(out_int+1, in.test_int_2());
+        EXPECT_EQ(out_str, in.test_string());
     }
 }
 

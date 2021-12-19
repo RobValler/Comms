@@ -20,6 +20,7 @@ public:
     CCommServer(EProtocolType type);
     ~CCommServer()=default;
 
+    bool connect(std::string server_address);
     bool read(void* message);
     bool write(void* message);
     int sizeOfReadBuffer();

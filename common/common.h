@@ -7,8 +7,11 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#pragma once
+#ifndef COMMON_H
+#define COMMON_H
+
 #include <cstdint>
+#include <string>
 
 enum EProtocolType : unsigned int
 {
@@ -29,6 +32,9 @@ struct SMessageHeader {
     std::uint8_t type;
 };
 
+const std::string l_mq_channel_name("/posix_test_mq"); ///\ todo replace with parameter
+const int l_max_num_of_connect_attempts = 5;
 
-const char l_channel_name[] = "/posix_test_mq"; ///\ todo replace with parameter
 
+
+#endif //  COMMON_H
