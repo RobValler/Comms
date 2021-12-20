@@ -9,6 +9,7 @@
 
 #pragma once
 #include <memory>
+#include <vector>
 
 enum EProtocolType : unsigned int;
 class IProtocolClient;
@@ -28,4 +29,8 @@ public:
 private:
     std::unique_ptr<IProtocolClient> m_pProtocolClient;
     std::shared_ptr<ISerialiser> m_pSerialiser;
+
+    std::vector<char> m_read_buffer;
+    std::vector<char> m_write_buffer;
+    int m_size_of_message{0};
 };

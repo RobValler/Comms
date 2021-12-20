@@ -51,18 +51,15 @@ bool CCommClient::connect(std::string server_address)
 }
 bool CCommClient::read(void* message)
 {
-    int size_of_message;
-    std::vector<char> buffer;
-
     // fetch the intput stream
-    if(!m_pProtocolClient->recieve(buffer, size_of_message))
+    if(!m_pProtocolClient->recieve(m_read_buffer, m_size_of_message))
     {
         CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned an error");
         return false;
     }
 
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(buffer, size_of_message, message))
+    if(!m_pSerialiser->deserialise(m_read_buffer, m_size_of_message, message))
     {
         CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
         return false;
@@ -73,18 +70,15 @@ bool CCommClient::read(void* message)
 
 bool CCommClient::write(void* message)
 {
-    int size_of_message = 0;
-    std::vector<char> buffer(size_of_message);
-
     // serialise the output stream
-    if(!m_pSerialiser->serialise(buffer, size_of_message, message))
+    if(!m_pSerialiser->serialise(m_write_buffer, m_size_of_message, message))
     {
         CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
         return false;
     }
 
     // transmit the output stream
-    if(!m_pProtocolClient->transmit(&buffer[0], size_of_message))
+    if(!m_pProtocolClient->transmit(m_write_buffer.data(), m_size_of_message))
         return false;
 
     return true;

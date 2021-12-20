@@ -49,7 +49,7 @@ bool CPOSIXMQHelper::cclient_connect(std::string channel)
 {
     // ### Connect to remote
 
-    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; ++retry_index)
     {
         CLOG(LOGLEV_RUN, "channel ", channel, " connect attempt = ", retry_index + 1);
         if(l_max_num_of_connect_attempts == retry_index + 1) {
@@ -87,7 +87,7 @@ bool CPOSIXMQHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter
     const int max_spin_count = 15;
-    for(int index=0; index < max_spin_count; index++)
+    for(int index=0; index < max_spin_count; ++index)
     {
         if(m_read_queue.size() == 0)
         {
@@ -108,13 +108,11 @@ bool CPOSIXMQHelper::crecieve(std::vector<char>& data, int& size)
     }
 
     // read the buffered data
-    SReadBufferQ tmp;
     m_recProtect.lock();
-    tmp = m_read_queue.front();
+    data = m_read_queue.front().payload;
     m_read_queue.pop();
     m_recProtect.unlock();
-    data = tmp.payload;
-    size = tmp.payload.size();
+    size = data.size();
 
     if(size <= 0)
         return false;
@@ -126,12 +124,10 @@ bool CPOSIXMQHelper::ctransmit(mqd_t queue, const char *data, const int size)
 {
     unsigned int priority = 1;
 
-    SMessageHeader head;
-    head.size = size;
-    head.type = EMsgTypData;
-
+    m_write_header.size = size;
+    m_write_header.type = EMsgTypData;
     m_transmitPackage.resize(size + m_sizeOfHeader);
-    std::memcpy(&m_transmitPackage[0], &head, m_sizeOfHeader);
+    std::memcpy(&m_transmitPackage[0], &m_write_header, m_sizeOfHeader);
     std::memcpy(&m_transmitPackage[m_sizeOfHeader], data, size);
 
     int result = mq_send(queue, &m_transmitPackage[0], m_transmitPackage.size(), priority);
@@ -145,46 +141,36 @@ bool CPOSIXMQHelper::ctransmit(mqd_t queue, const char *data, const int size)
 
 bool CPOSIXMQHelper::listenForData(const mqd_t queue)
 {
-    SMessageHeader peekHeader{};
-    const int sizeOfHeader = sizeof(SMessageHeader);
     std::uint32_t numOfBytesRead;
 
-    char rcvmsg[1024];
-    numOfBytesRead = mq_receive(queue, &rcvmsg[0], 1024, NULL);
+    // blocking read
+    numOfBytesRead = mq_receive(queue, &m_rcvmsg[0], 1024, NULL);
 
     if(numOfBytesRead <= 0) {
         CLOG(LOGLEV_RUN, "Header read failed: ", errno, " - ", strerror(errno));
         return false;
     }
 
-    std::memcpy(&peekHeader, &rcvmsg[0], sizeOfHeader);
-
-    if(numOfBytesRead != (peekHeader.size + sizeOfHeader))
+    SMessageHeader *pHeader = (SMessageHeader*)&m_rcvmsg[0];
+    if(numOfBytesRead != (pHeader->size + m_sizeOfHeader))
     {
         CLOG(LOGLEV_RUN, "Header size mismatch: (", errno, ") ", strerror(errno));
         return false;
     }
 
     // check the data type
-    switch(peekHeader.type)
+    if(EMsgTypData != pHeader->type)
     {
-        case EMsgTypData:
-        {
-            SReadBufferQ localReadBuffer;
-            localReadBuffer.payload.resize(peekHeader.size);
-            std::memcpy(&localReadBuffer.payload[0], &rcvmsg[sizeOfHeader], peekHeader.size);
-
-            m_recProtect.lock();
-            m_read_queue.push(localReadBuffer);
-            m_recProtect.unlock();
-            //CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
-            break;
-        }
-//        case EMsgTypCtrl:
-        default:
-            CLOG(LOGLEV_RUN, "wrong header type");
-            return false;
+        CLOG(LOGLEV_RUN, "wrong header type");
+        return false;
     }
+
+    m_read_data_buffer.payload.resize(pHeader->size);
+    std::memcpy(&m_read_data_buffer.payload[0], &m_rcvmsg[m_sizeOfHeader], pHeader->size);
+
+    m_recProtect.lock();
+    m_read_queue.push(m_read_data_buffer);
+    m_recProtect.unlock();
 
     return true;
 }

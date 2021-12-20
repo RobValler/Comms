@@ -13,6 +13,7 @@
 #include <vector>
 #include <queue>
 #include <mutex>
+#include <array>
 
 #include <mqueue.h>
 
@@ -43,6 +44,10 @@ protected:
     std::mutex m_recProtect;
     std::queue<SReadBufferQ> m_read_queue{};
     std::vector<char> m_transmitPackage;
+
+    SReadBufferQ m_read_data_buffer{};          ///<
+    std::array<char, 1024> m_rcvmsg;            ///\ todo fix
+    SMessageHeader m_write_header{};
 
     std::string m_provider_channel_name;
     mqd_t m_provider_channel_desc;

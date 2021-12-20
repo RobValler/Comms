@@ -37,13 +37,17 @@ protected:
     bool listenForData(const int fd);
 
     std::mutex m_recProtect;
-    std::queue<SReadBufferQ> m_read_queue{};
 
     int m_sizeOfHeader{0};
     int m_socket_type{0};
     bool m_blocking{true};
 
-    std::vector<char> m_transmitPackage;
+    // buffers
+    std::queue<SReadBufferQ> m_read_queue{};
+    SReadBufferQ m_read_data_buffer{};
+    std::vector<char> m_write_data_buffer{};
+    SMessageHeader m_read_header{};
+    SMessageHeader m_write_header{};
 };
 
 } // helper

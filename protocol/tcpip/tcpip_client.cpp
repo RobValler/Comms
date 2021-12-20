@@ -80,7 +80,7 @@ bool CTCPIPClient::client_connect(std::string ip_address)
 //    }
 
     // attempt connect, multiple tries
-    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts + 1; retry_index++)
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts + 1; ++retry_index)
     {
         if(l_max_num_of_connect_attempts == retry_index) {
             CLOG(LOGLEV_RUN, "max number of connect attemps expired");
