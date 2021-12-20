@@ -38,9 +38,9 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter
     const int max_spin_count = 15;
-    for(int index=0; index < max_spin_count; index++)
+    for(int index=0; index < max_spin_count; ++index)
     {
-        if(m_read_queue.size() == 0)
+        if(0 == m_read_queue.size())
         {
             if(index < max_spin_count - 2)
             {
@@ -58,13 +58,13 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
         }
     }
 
-    SReadBufferQ tmp;
+    m_fetch_buffer = {};
     m_recProtect.lock();
-    tmp = m_read_queue.front();
+    m_fetch_buffer = m_read_queue.front();
     m_read_queue.pop();
     m_recProtect.unlock();
-    data = tmp.payload;
-    size = tmp.payload.size();
+    data = m_fetch_buffer.payload;
+    size = m_fetch_buffer.payload.size();
 
     if(size <= 0)
         return false;
@@ -74,12 +74,12 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 
 bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 {
-    SMessageHeader head;
-    head.size = size;
-    head.type = EMsgTypData;
+    m_write_header.size = size;
+    m_write_header.type = EMsgTypData;
 
+    m_transmitPackage = {}; ///\ todo needed?
     m_transmitPackage.resize(size + m_sizeOfHeader);
-    std::memcpy(&m_transmitPackage[0], &head, m_sizeOfHeader);
+    std::memcpy(&m_transmitPackage[0], &m_write_header, m_sizeOfHeader);
     std::memcpy(&m_transmitPackage[m_sizeOfHeader], data, size);
 
     if(0 < send(fd, &m_transmitPackage[0], m_transmitPackage.size() , 0 ))
@@ -90,29 +90,27 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 
 bool CTCPIPHelper::listenForData(const int fd)
 {
-    SMessageHeader peekHeader;
     std::uint32_t numOfBytesRead;
-    //int peekFlags = MSG_PEEK;
 
     // Check the contents of the header
     //numOfBytesRead = recv( fd , &peekHeader, m_sizeOfHeader, peekFlags);
-    numOfBytesRead = read( fd , &peekHeader, m_sizeOfHeader);
+    numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
     if(numOfBytesRead <= 0) {
         CLOG(LOGLEV_RUN, "Header read failed, numOfBytesRead = ", numOfBytesRead);
         return false;
     }
 
     // check the data type
-    if(EMsgTypData != peekHeader.type) {
+    if(EMsgTypData != m_read_header.type) {
         CLOG(LOGLEV_RUN, "wrong header type");
         return false;
     }
 
     // store the actual data
-    SReadBufferQ localReadBuffer;
-    localReadBuffer.payload.resize(peekHeader.size);
-    numOfBytesRead = read(fd, localReadBuffer.payload.data(), localReadBuffer.payload.size());
-    if(numOfBytesRead != peekHeader.size)
+    m_read_buffer = {};
+    m_read_buffer.payload.resize(m_read_header.size);
+    numOfBytesRead = read(fd, m_read_buffer.payload.data(), m_read_buffer.payload.size());
+    if(numOfBytesRead != m_read_header.size)
     {
         CLOG(LOGLEV_RUN, "read size did not match");
         return false;
@@ -120,7 +118,7 @@ bool CTCPIPHelper::listenForData(const int fd)
     else
     {
         m_recProtect.lock();
-        m_read_queue.push(localReadBuffer);
+        m_read_queue.push(m_read_buffer);
         m_recProtect.unlock();
         //CLOG(LOGLEV_RUN, "message recieved of ", numOfBytesRead, " bytes");
     }

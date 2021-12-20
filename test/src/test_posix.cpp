@@ -47,7 +47,7 @@ TEST(Comms_POSIX_MQ, ReadThenWrite)
     ASSERT_EQ(client.connect("/posix_test_mq_server"), true);
     ASSERT_EQ(server.connect("/posix_test_mq_client"), true);
 
-    for(int index=0; index < 1000; index++)
+    for(int index=0; index < 1000; ++index)
     {
         // client write and server read
         in.Clear();
@@ -78,7 +78,7 @@ TEST(Comms_POSIX_MQ, WriteOneReadMany)
     out.set_test_int(out_int);
     ASSERT_EQ(client.connect("/posix_test_mq"), true);
     EXPECT_EQ(client.write(&out), true);
-    for(int index=0; index < 20; index++)
+    for(int index=0; index < 20; ++index)
     {
         in.Clear();
         if(0 == index)

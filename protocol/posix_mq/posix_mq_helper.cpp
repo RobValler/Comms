@@ -49,7 +49,7 @@ bool CPOSIXMQHelper::cclient_connect(std::string channel)
 {
     // ### Connect to remote
 
-    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; retry_index++)
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; ++retry_index)
     {
         CLOG(LOGLEV_RUN, "channel ", channel, " connect attempt = ", retry_index + 1);
         if(l_max_num_of_connect_attempts == retry_index + 1) {
@@ -87,7 +87,7 @@ bool CPOSIXMQHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter
     const int max_spin_count = 15;
-    for(int index=0; index < max_spin_count; index++)
+    for(int index=0; index < max_spin_count; ++index)
     {
         if(m_read_queue.size() == 0)
         {

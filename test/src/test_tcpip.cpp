@@ -45,7 +45,7 @@ TEST(Comms_TCPIP, ReadThenWrite)
 
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 
-    for(int index=0; index < 1000; index++)
+    for(int index=0; index < 1000; ++index)
     {
         // client write and server read
         in.Clear();
@@ -76,7 +76,7 @@ TEST(Comms_TCPIP, WriteOneReadMany)
     out.set_test_int(out_int);
     ASSERT_EQ(client.connect("127.0.0.1"), true);
     EXPECT_EQ(client.write(&out), true);
-    for(int index=0; index < 20; index++)
+    for(int index=0; index < 20; ++index)
     {
         in.Clear();
         if(0 == index)
