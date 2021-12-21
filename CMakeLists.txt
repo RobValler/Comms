@@ -14,7 +14,14 @@ set (Wfno-stack-protector)
 set (Winconsistent-missing-override)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
-add_compile_options( -Wall -Wextra -Werror)
+# todo: fix this.
+if(-DCMAKE_BUILD_TYPE==Debug)
+    add_compile_options( -Wall -Wextra -Werror)
+    message("Build config is DEBUG")
+else()
+    add_compile_options( -Wall -Wextra)
+    message("Build config is RELEASE")
+endif()
 
 FIND_PACKAGE(Protobuf REQUIRED)
 

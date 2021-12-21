@@ -58,8 +58,6 @@ CTCPIPClient::~CTCPIPClient()
 
 bool CTCPIPClient::client_connect(std::string ip_address)
 {
-//    long socket_args = 0;
-    char confirmMsgBuff[48] = {0};
     struct sockaddr_in serv_addr;
 
     if ((m_connection_fd = socket(AF_INET, m_socket_type, 0)) < 0) {
@@ -99,8 +97,11 @@ bool CTCPIPClient::client_connect(std::string ip_address)
         std::this_thread::sleep_for( std::chrono::milliseconds(l_delayBetweenConnectAttempt_ms) );
     }
 
+    // handshaking with connection
+    ///\ todo: optimise
+    std::vector<char> confirmMsgBuff(m_sizeOfHeader);
     SMessageHeader head;
-    if( read(m_connection_fd , confirmMsgBuff, 1024) <= 0) {
+    if( read(m_connection_fd , confirmMsgBuff.data(), m_sizeOfHeader) <= 0) {
         CLOG(LOGLEV_RUN, "confirm message read failed");
         return false;
     }

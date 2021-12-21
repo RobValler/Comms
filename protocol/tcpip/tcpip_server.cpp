@@ -103,15 +103,13 @@ bool CTCPIPServer::channel_create()
     CLOG(LOGLEV_RUN, "server has connected to a client");
 
     // send the confirmation message
-    char confirmMsgBuff;
     SMessageHeader head;
     head.size = 1;
     head.type = EMsgTypCtrl;
 
     std::vector<char> package;
-    package.resize(1 + m_sizeOfHeader);
+    package.resize(m_sizeOfHeader);
     std::memcpy(&package[0], &head, m_sizeOfHeader);
-    std::memcpy(&package[m_sizeOfHeader], &confirmMsgBuff, 1);
     ssize_t result = send(m_connection_socket , &package[0] , package.size() , 0 );
     if(result <= 0) {
         CLOG(LOGLEV_RUN, "send fail");
