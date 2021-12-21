@@ -78,8 +78,14 @@ bool CPOSIXMQHelper::cclient_connect(std::string channel)
 
 bool CPOSIXMQHelper::cclient_disconnect()
 {
-    mq_close(m_listener_channel_desc);
-    mq_unlink(m_provider_channel_name.data());
+    if(0 != mq_close(m_listener_channel_desc)){
+        CLOG(LOGLEV_RUN, "mq_close error on ", m_listener_channel_desc, ERR_STR);
+        return false;
+    }
+    if(0 != mq_unlink(m_provider_channel_name.data())) {
+        CLOG(LOGLEV_RUN, "mq_unlink error on ", m_provider_channel_name, ERR_STR);
+        return false;
+    }
     return true;
 }
 

@@ -26,6 +26,12 @@ namespace  {
     const std::string client_name("/posix_test_mq_client");
 }
 
+TEST(Comms_POSIX_MQ, Flush)
+{
+    CCommClient client(client_proto::EPOSIX_MQ);
+    CCommServer server(server_proto::EPOSIX_MQ);
+}
+
 TEST(Comms_POSIX_MQ, Connect)
 {
     CCommClient client(client_proto::EPOSIX_MQ);

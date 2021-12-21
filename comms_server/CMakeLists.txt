@@ -33,15 +33,10 @@ file(GLOB HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../../DevFramework/Logger/Logger.h
     )
 
-add_library(${PROJECT_NAME} STATIC
-    ${SOURCES}
-    ${HEADERS}
-    )
+# compile
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
+target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY} rt)
 
-target_link_libraries(${PROJECT_NAME}
-    ${PROTOBUF_LIBRARY}
-    rt
-    )
-
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/comm_server.h DESTINATION include)
+# install
+install(TARGETS ${PROJECT_NAME} DESTINATION lib/comms)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/comm_server.h DESTINATION include/comms)
