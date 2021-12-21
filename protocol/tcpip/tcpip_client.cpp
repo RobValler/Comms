@@ -48,7 +48,8 @@ CTCPIPClient::CTCPIPClient()
 CTCPIPClient::~CTCPIPClient()
 {
     m_shutdownrequest = true;
-    shutdown(m_connection_fd, SHUT_RDWR); // aborts any blocking calls on the client
+
+    static_cast<void>(client_disconnect());
 
     if(t_client.joinable())
         t_client.join();
@@ -59,6 +60,7 @@ CTCPIPClient::~CTCPIPClient()
 bool CTCPIPClient::client_connect(std::string ip_address)
 {
     struct sockaddr_in serv_addr;
+    bool result = false;
 
     if ((m_connection_fd = socket(AF_INET, m_socket_type, 0)) < 0) {
         CLOG(LOGLEV_RUN, "socket failure");
@@ -78,52 +80,67 @@ bool CTCPIPClient::client_connect(std::string ip_address)
 //    }
 
     // attempt connect, multiple tries
-    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts + 1; ++retry_index)
+    for(int retry_index = 0; retry_index < l_max_num_of_connect_attempts; ++retry_index)
     {
-        if(l_max_num_of_connect_attempts == retry_index) {
+        if(l_max_num_of_connect_attempts == retry_index)
+        {
             CLOG(LOGLEV_RUN, "max number of connect attemps expired");
-            return false;
-        } else {
-            CLOG(LOGLEV_RUN, "Attempt number = ", retry_index + 1);
-            if (connect(m_connection_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-                // if the connection failed, do nothing and try again in the next loop.
-                CLOG(LOGLEV_RUN, "connection failed");
-            } else {
-                // client is connected, exit the loop
-                CLOG(LOGLEV_RUN, "client connected");
-                break;
-            }
+            result = false;
+            break;
         }
+        else
+        {
+            CLOG(LOGLEV_RUN, "Attempt number ", retry_index + 1);
+            if (0 > connect(m_connection_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
+            {
+                // if the connection failed, do nothing and try again in the next loop.
+                CLOG(LOGLEV_RUN, "connection attempt failed");
+                continue;
+            }
+            else
+            {
+                CLOG(LOGLEV_RUN, "client connected");
+
+                // read handshaking message with server
+                m_confirmMsgBuff.resize(m_sizeOfHeader);
+                if(-1 == read(m_connection_fd , &m_confirmMsgBuff[0], m_sizeOfHeader))
+                {
+                    CLOG(LOGLEV_RUN, "confirmation message read failed");
+                    continue;
+                }
+
+                // check the handshake message
+                SMessageHeader *pHeader = (SMessageHeader*)&m_confirmMsgBuff[0];
+                if(EMsgTypCtrl != pHeader->type)
+                {
+                    CLOG(LOGLEV_RUN, "wrong msg type");
+                    continue;
+                }
+
+                CLOG(LOGLEV_RUN, "client connection confirmed");
+
+                // client is connected. Start the client data thread
+                t_client = std::thread(&CTCPIPClient::threadfunc_client, this);
+
+                result = true;
+                break;
+            } // else
+        } // if(l_max_num_of_connect_attempts
         std::this_thread::sleep_for( std::chrono::milliseconds(l_delayBetweenConnectAttempt_ms) );
-    }
+    } // for
 
-    // handshaking with connection
-    ///\ todo: optimise
-    std::vector<char> confirmMsgBuff(m_sizeOfHeader);
-    SMessageHeader head;
-    if( read(m_connection_fd , confirmMsgBuff.data(), m_sizeOfHeader) <= 0) {
-        CLOG(LOGLEV_RUN, "confirm message read failed");
-        return false;
-    }
-
-    std::memcpy(&head, &confirmMsgBuff[0], m_sizeOfHeader);
-    if(EMsgTypCtrl != head.type) {
-        CLOG(LOGLEV_RUN, "wrong msg type");
-        return false;
-    }
-
-    CLOG(LOGLEV_RUN, "client connection confirmed");
-
-    // client is connected. Start the client data thread
-    t_client = std::thread(&CTCPIPClient::threadfunc_client, this);
-
-    return true;
+    return result;
 }
 
 bool CTCPIPClient::client_disconnect()
 {
-    ///\ todo fix!
-    return false;
+     // aborts any blocking calls on the client
+    if(0 == shutdown(m_connection_fd, SHUT_RDWR)) {
+        return true;
+    } else {
+        CLOG(LOGLEV_RUN, "failed shutdown on ", m_connection_fd, ERR_STR);
+        return false;
+    }
 }
 
 void CTCPIPClient::threadfunc_client()

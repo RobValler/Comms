@@ -32,9 +32,8 @@ CPOSIXMQClient::CPOSIXMQClient()
 
 CPOSIXMQClient::~CPOSIXMQClient()
 {
-    static_cast<void>(client_disconnect());
-
     m_shutdownrequest = true;
+    static_cast<void>(client_disconnect());
 
     if(t_provider_channel_thread.joinable())
         t_provider_channel_thread.detach();

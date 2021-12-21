@@ -15,7 +15,6 @@
 #include <thread>
 #include <atomic>
 #include <vector>
-#include <string>
 
 namespace comms {
 namespace tcpip {
@@ -27,7 +26,11 @@ class CTCPIPClient
 {
 public:
     CTCPIPClient();
-    ~CTCPIPClient();
+    CTCPIPClient(const CTCPIPClient&) = delete;                // Copy constructor
+    CTCPIPClient(CTCPIPClient&&) = delete;                     // Move constructor
+    CTCPIPClient& operator=(const CTCPIPClient&) = delete;     // Copy assignment operator
+    CTCPIPClient& operator=(CTCPIPClient&&) = delete;          // Move assignment operator
+    ~CTCPIPClient();                                           // Destructor
 
     bool client_connect(std::string ip_address) override;
     bool client_disconnect() override;
@@ -40,9 +43,7 @@ private:
     std::atomic<bool> m_shutdownrequest;
     std::thread t_client;
     int m_connection_fd{0};
-
-    std::vector<char> m_input_data_entry;
-    std::vector<std::vector<char>> m_input_data_buffer;
+    std::vector<char> m_confirmMsgBuff;
 };
 
 } // comms

@@ -27,8 +27,12 @@ class CPOSIXMQServer
         , public helper::CPOSIXMQHelper
 {
 public:
-    CPOSIXMQServer();
-    ~CPOSIXMQServer();
+    CPOSIXMQServer();                                               // Constructor
+    CPOSIXMQServer(const CPOSIXMQServer&) = delete;                 // Copy constructor
+    CPOSIXMQServer(CPOSIXMQServer&&) = delete;                      // Move constructor
+    CPOSIXMQServer& operator=(const CPOSIXMQServer&) = delete;      // Copy assignment operator
+    CPOSIXMQServer& operator=(CPOSIXMQServer&&) = delete;           // Move assignment operator
+    ~CPOSIXMQServer();                                              // Destructor
 
     bool client_connect(std::string channel) override { return cclient_connect(channel); }
     bool client_disconnect() override { return cclient_disconnect(); }

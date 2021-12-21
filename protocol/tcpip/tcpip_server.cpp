@@ -16,7 +16,6 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -92,7 +91,7 @@ bool CTCPIPServer::channel_create()
     // accept the connection.
     m_connection_socket = accept(m_connection_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
     if ( m_connection_socket < 0) {
-        if(!m_shutdownrequest){
+        if(!m_shutdownrequest) {
             CLOG(LOGLEV_RUN, "accept failed = ", m_connection_socket);
             return false;
         } else {
@@ -104,15 +103,11 @@ bool CTCPIPServer::channel_create()
 
     // send the confirmation message
     SMessageHeader head;
-    head.size = 1;
+    head.size = 0;
     head.type = EMsgTypCtrl;
-
-    std::vector<char> package;
-    package.resize(m_sizeOfHeader);
-    std::memcpy(&package[0], &head, m_sizeOfHeader);
-    ssize_t result = send(m_connection_socket , &package[0] , package.size() , 0 );
-    if(result <= 0) {
-        CLOG(LOGLEV_RUN, "send fail");
+    if(0 > send(m_connection_socket, &head, m_sizeOfHeader, 0 ))
+    {
+        CLOG(LOGLEV_RUN, "confirmation send failed");
         return false;
     }
 

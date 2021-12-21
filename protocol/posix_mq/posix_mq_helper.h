@@ -29,8 +29,12 @@ struct SReadBufferQ
 class CPOSIXMQHelper
 {
 public:
-    CPOSIXMQHelper()=default;
-    ~CPOSIXMQHelper()=default;
+    CPOSIXMQHelper()=default;                                       // Constructor
+    CPOSIXMQHelper(const CPOSIXMQHelper&) = delete;                 // Copy constructor
+    CPOSIXMQHelper(CPOSIXMQHelper&&) = delete;                      // Move constructor
+    CPOSIXMQHelper& operator=(const CPOSIXMQHelper&) = delete;      // Copy assignment operator
+    CPOSIXMQHelper& operator=(CPOSIXMQHelper&&) = delete;           // Move assignment operator
+    virtual ~CPOSIXMQHelper() { }                                   // Destructor
 
 protected:
     bool channel_create(std::string name);

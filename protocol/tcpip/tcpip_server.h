@@ -44,8 +44,8 @@ private:
     int m_connection_fd{0};
     int m_connection_socket{0};
 
-    std::vector<char> m_input_data_entry;
-    std::vector<std::vector<char>> m_input_data_buffer;
+//    std::vector<char> m_input_data_entry;
+//    std::vector<std::vector<char>> m_input_data_buffer;
 };
 
 } // comms
