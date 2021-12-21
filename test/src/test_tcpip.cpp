@@ -26,16 +26,16 @@ namespace  {
 
 TEST(Comms_TCPIP, Connect)
 {
-    CCommClient client(ETCTPIP);
+    CCommClient client(client_proto::ETCTPIP);
     ASSERT_EQ(client.connect("127.0.0.1"), false);
-    CCommServer server(ETCTPIP);
+    CCommServer server(server_proto::ETCTPIP);
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 }
 
 TEST(Comms_TCPIP, ReadThenWrite)
 {
-    CCommServer server(ETCTPIP);
-    CCommClient client(ETCTPIP);
+    CCommServer server(server_proto::ETCTPIP);
+    CCommClient client(client_proto::ETCTPIP);
     test_msg in, out;
 
     // set test data
@@ -69,8 +69,8 @@ TEST(Comms_TCPIP, ReadThenWrite)
 
 TEST(Comms_TCPIP, WriteOneReadMany)
 {
-    CCommServer server(ETCTPIP);
-    CCommClient client(ETCTPIP);
+    CCommServer server(server_proto::ETCTPIP);
+    CCommClient client(client_proto::ETCTPIP);
     test_msg in, out;
 
     out.set_test_int(out_int);
@@ -88,8 +88,8 @@ TEST(Comms_TCPIP, WriteOneReadMany)
 
 TEST(Comms_TCPIP, WriteManyThenReadMany)
 {
-    CCommServer server(ETCTPIP);
-    CCommClient client(ETCTPIP);
+    CCommServer server(server_proto::ETCTPIP);
+    CCommClient client(client_proto::ETCTPIP);
     test_msg in, out;
     const int numberOfWrites = 1000;
 

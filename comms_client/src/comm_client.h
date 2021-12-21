@@ -1,5 +1,5 @@
 /*****************************************************************
- * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
+ * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
  * This file is part of the project: StarterApp
  *
@@ -11,14 +11,17 @@
 #include <memory>
 #include <vector>
 
-enum EProtocolType : unsigned int;
 class IProtocolClient;
 class ISerialiser;
+
+namespace client_proto {
+    enum EProtocolType : unsigned int { ENone = 0, ETCTPIP, EPOSIX_MQ };
+}
 
 class CCommClient
 {
 public:
-    CCommClient(EProtocolType type);
+    CCommClient(client_proto::EProtocolType type);
     ~CCommClient();
 
     bool connect(std::string server_address);

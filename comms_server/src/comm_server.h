@@ -1,5 +1,5 @@
 /*****************************************************************
- * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
+ * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
  * This file is part of the project: StarterApp
  *
@@ -11,14 +11,17 @@
 #include <memory>
 #include <vector>
 
-enum EProtocolType : unsigned int;
 class IProtocolServer;
 class ISerialiser;
 
+namespace server_proto {
+    enum EProtocolType : unsigned int { ENone = 0, ETCTPIP, EPOSIX_MQ };
+}
+
 class CCommServer
 {
-public:
-    CCommServer(EProtocolType type);
+public:    
+    CCommServer(server_proto::EProtocolType type);
     ~CCommServer()=default;
 
     bool connect(std::string server_address);
@@ -26,7 +29,7 @@ public:
     bool write(void* message);
     int sizeOfReadBuffer();
 
-private:
+private:    
     std::shared_ptr<IProtocolServer> m_pProtocolServer;
     std::shared_ptr<ISerialiser> m_pSerialiser;
 

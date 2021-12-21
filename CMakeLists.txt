@@ -1,13 +1,12 @@
 #/*****************************************************************
-# * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
+# * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
 # *
 # * This file is part of the project: StarterApp
 # *
 # * This project can not be copied and/or distributed
 # * without the express permission of the copyright holder
 # *****************************************************************/
-
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.15.0)
 project(comms)
 set (CMAKE_CXX_STANDARD 14)
 set (Wfloat-conversion)

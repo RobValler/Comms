@@ -1,5 +1,5 @@
 /*****************************************************************
- * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
+ * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
  * This file is part of the project: StarterApp
  *
@@ -20,20 +20,20 @@
 
 #include "Logger.h"
 
-CCommClient::CCommClient(EProtocolType type)
+CCommClient::CCommClient(client_proto::EProtocolType type)
 {
     CLogger::GetInstance();
 
     switch(type)
     {
-    case ENone:
+    case client_proto::ENone:
 
         break;
-    case ETCTPIP:
+    case client_proto::ETCTPIP:
         m_pProtocolClient = std::make_unique<comms::tcpip::client::CTCPIPClient>();
         m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
-    case EPOSIX_MQ:
+    case client_proto::EPOSIX_MQ:
         m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
         m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;

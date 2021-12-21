@@ -1,5 +1,5 @@
 /*****************************************************************
- * Copyright (C) 2017-2021 Robert Valler - All rights reserved.
+ * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
  * This file is part of the project: StarterApp
  *
@@ -12,13 +12,6 @@
 
 #include <cstdint>
 #include <string>
-
-enum EProtocolType : unsigned int
-{
-    ENone = 0,
-    ETCTPIP,
-    EPOSIX_MQ
-};
 
 enum EMessageType : std::uint8_t
 {
