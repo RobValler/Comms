@@ -1,0 +1,11 @@
+digraph "comms::tcpip::helper::CTCPIPHelper"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{comms::tcpip::helper\l::CTCPIPHelper\n|# m_recProtect\l# m_sizeOfHeader\l# m_socket_type\l# m_blocking\l# m_read_queue\l# m_read_data_buffer\l# m_write_data_buffer\l# m_read_header\l# m_write_header\l|+ CTCPIPHelper()\l+ CTCPIPHelper()\l+ CTCPIPHelper()\l+ operator=()\l+ operator=()\l+ ~CTCPIPHelper()\l+ crecieve()\l+ ctransmit()\l+ csizeOfReadBuffer()\l# listenForData()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",arrowtail="onormal"];
+  Node2 [label="{comms::tcpip::client\l::CTCPIPClient\n||+ CTCPIPClient()\l+ CTCPIPClient()\l+ CTCPIPClient()\l+ operator=()\l+ operator=()\l+ ~CTCPIPClient()\l+ client_connect()\l+ client_disconnect()\l+ recieve()\l+ transmit()\l}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcomms_1_1tcpip_1_1client_1_1CTCPIPClient.html",tooltip=" "];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",arrowtail="onormal"];
+  Node3 [label="{comms::tcpip::server\l::CTCPIPServer\n||+ CTCPIPServer()\l+ ~CTCPIPServer()\l+ client_connect()\l+ client_disconnect()\l+ recieve()\l+ transmit()\l+ sizeOfReadBuffer()\l}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcomms_1_1tcpip_1_1server_1_1CTCPIPServer.html",tooltip=" "];
+}

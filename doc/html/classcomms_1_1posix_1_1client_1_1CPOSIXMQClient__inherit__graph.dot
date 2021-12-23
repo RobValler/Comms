@@ -1,0 +1,11 @@
+digraph "comms::posix::client::CPOSIXMQClient"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{comms::posix::client\l::CPOSIXMQClient\n||+ CPOSIXMQClient()\l+ CPOSIXMQClient()\l+ CPOSIXMQClient()\l+ operator=()\l+ operator=()\l+ ~CPOSIXMQClient()\l+ client_connect()\l+ client_disconnect()\l+ recieve()\l+ transmit()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",arrowtail="onormal",fontname="Helvetica"];
+  Node2 [label="{IProtocolClient\n||+ ~IProtocolClient()\l+ client_connect()\l+ client_disconnect()\l+ recieve()\l+ transmit()\l}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classIProtocolClient.html",tooltip=" "];
+  Node3 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",arrowtail="onormal",fontname="Helvetica"];
+  Node3 [label="{comms::posix::helper\l::CPOSIXMQHelper\n|# m_sizeOfHeader\l# m_recProtect\l# m_read_queue\l# m_transmitPackage\l# m_read_data_buffer\l# m_rcvmsg\l# m_write_header\l# m_provider_channel_name\l# m_provider_channel_desc\l# m_listener_channel_desc\l|+ CPOSIXMQHelper()\l+ CPOSIXMQHelper()\l+ CPOSIXMQHelper()\l+ operator=()\l+ operator=()\l+ ~CPOSIXMQHelper()\l# channel_create()\l# cclient_connect()\l# cclient_disconnect()\l# crecieve()\l# ctransmit()\l# listenForData()\l}",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html",tooltip=" "];
+}

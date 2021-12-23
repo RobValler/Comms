@@ -1,3 +1,3 @@
 
-# Starter Application
-Basic starter project using cmake
+# comms_server
+Basic comss server
