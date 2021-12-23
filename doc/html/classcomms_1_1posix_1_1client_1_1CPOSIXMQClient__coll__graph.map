@@ -1,0 +1,7 @@
+<map id="comms::posix::client::CPOSIXMQClient" name="comms::posix::client::CPOSIXMQClient">
+<area shape="rect" id="node1" title=" " alt="" coords="18,565,185,789"/>
+<area shape="rect" id="node2" href="$classIProtocolClient.html" title=" " alt="" coords="5,270,165,406"/>
+<area shape="rect" id="node3" href="$classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html" title=" " alt="" coords="189,160,403,516"/>
+<area shape="rect" id="node4" href="$structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="127,5,289,97"/>
+<area shape="rect" id="node5" href="$structSMessageHeader.html" title=" " alt="" coords="317,5,451,97"/>
+</map>
