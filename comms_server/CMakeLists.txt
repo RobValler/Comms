@@ -37,6 +37,3 @@ file(GLOB HEADERS
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY} rt)
 
-# install
-install(TARGETS ${PROJECT_NAME} DESTINATION lib/comms)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/comm_server.h DESTINATION include/comms)

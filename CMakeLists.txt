@@ -7,7 +7,7 @@
 # * without the express permission of the copyright holder
 # *****************************************************************/
 cmake_minimum_required(VERSION 3.15.0)
-project(comms)
+project(Comms)
 set (CMAKE_CXX_STANDARD 14)
 set (Wfloat-conversion)
 set (Wfno-stack-protector)
@@ -38,3 +38,11 @@ add_subdirectory(messages)
 add_subdirectory(comms_server)
 add_subdirectory(comms_client)
 add_subdirectory(test)
+
+install(TARGETS comms_client DESTINATION lib/comms)
+install(TARGETS comms_server DESTINATION lib/comms)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/comms_client/src/comm_client.h DESTINATION include/comms)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/comms_server/src/comm_server.h DESTINATION include/comms)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/CommsConfig.cmake DESTINATION .)
+install(FILES ${CMAKE_BINARY_DIR}/CommsTargets.cmake DESTINATION .)
+install(FILES ${CMAKE_BINARY_DIR}/CommsConfigVersion.cmake DESTINATION .)
