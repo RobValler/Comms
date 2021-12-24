@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['tablestruct_5fexample_5f2eproto_22',['TableStruct_example_2eproto',['../structTableStruct__example__2eproto.html',1,'']]],
-  ['test_5fmsgdefaulttypeinternal_23',['test_msgDefaultTypeInternal',['../classtest__msgDefaultTypeInternal.html',1,'']]],
-  ['todo_20list_24',['Todo List',['../todo.html',1,'']]]
+  ['_7ectcpipserver_24',['~CTCPIPServer',['../classcomms_1_1tcpip_1_1server_1_1CTCPIPServer.html#a4ab14bbe5e2a7b1d95e13e09fb50a527',1,'comms::tcpip::server::CTCPIPServer']]]
 ];
