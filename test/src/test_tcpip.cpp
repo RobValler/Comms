@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2019 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -115,3 +115,26 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
         EXPECT_EQ(index, in.test_int());
     }
 }
+
+TEST(Comms_TCPIP, LargeDataWriteThenRead)
+{
+    //const int val = 460800U;
+    const int val = 65536U;
+
+    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_in(val);
+    CCommServer server(server_proto::ETCTPIP);
+    CCommClient client(client_proto::ETCTPIP);
+    test_msg in, out;
+
+    ASSERT_EQ(client.connect("127.0.0.1"), true);
+
+    *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
+    EXPECT_EQ(client.write(&out), true);
+
+//    std::this_thread::sleep_for( std::chrono::milliseconds(100) );
+
+    EXPECT_EQ(server.read(&in), true);
+
+}
+

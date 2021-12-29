@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -38,9 +38,14 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter
     const int max_spin_count = 15;
+    std::uint32_t queue_size;
     for(int index=0; index < max_spin_count; ++index)
     {
-        if(0 == m_read_queue.size())
+        m_recProtect.lock();
+        queue_size = m_read_queue.size();
+        m_recProtect.unlock();
+
+        if(0 == queue_size)
         {
             if(index < max_spin_count - 2)
             {
@@ -49,6 +54,7 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
             }
             else
             {
+                CLOG(LOGLEV_RUN, "read queue is empty");
                 return false;
             }
         }
@@ -72,6 +78,8 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 
 bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 {
+    std::int32_t numOfBytesSent;
+
     m_write_header.size = size;
     m_write_header.type = EMsgTypData;
 
@@ -80,15 +88,26 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
     std::memcpy(&m_write_data_buffer[0], &m_write_header, m_sizeOfHeader);
     std::memcpy(&m_write_data_buffer[m_sizeOfHeader], data, size);
 
-    if(0 < send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , 0 ))
-        return true;
-    else
+    numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , 0 );
+    if(numOfBytesSent < 0)
+    {
+        CLOG(LOGLEV_RUN, "error", ERR_STR);
         return false;
+    }
+    else
+    {
+        if(numOfBytesSent != static_cast<std::int32_t>(m_write_data_buffer.size()))
+        {
+            CLOG(LOGLEV_RUN, "Number of bytes sent was not expected", ERR_STR);
+            return false;
+        }
+    }
+    return true;
 }
 
 bool CTCPIPHelper::listenForData(const int fd)
 {
-    std::uint32_t numOfBytesRead;
+    std::int32_t numOfBytesRead;
 
     // Check the contents of the header
     m_read_header = {};
@@ -96,8 +115,16 @@ bool CTCPIPHelper::listenForData(const int fd)
     //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, peekFlags);
     if(numOfBytesRead <= 0)
     {
-        CLOG(LOGLEV_RUN, "Header read failed, numOfBytesRead = ", numOfBytesRead);
-        return false;
+        if(0 == numOfBytesRead)
+        {
+            CLOG(LOGLEV_RUN, "Connection closed,", ERR_STR);
+            return false;
+        }
+        else if(-1 == numOfBytesRead)
+        {
+            CLOG(LOGLEV_RUN, "Error.", ERR_STR);
+            return false;
+        }
     }
 
     // check the data type
@@ -110,9 +137,12 @@ bool CTCPIPHelper::listenForData(const int fd)
     m_read_data_buffer = {};
     m_read_data_buffer.payload.resize(m_read_header.size);
     numOfBytesRead = read(fd, m_read_data_buffer.payload.data(), m_read_data_buffer.payload.size());
-    if(numOfBytesRead != m_read_header.size)
+    if(numOfBytesRead != static_cast<std::int32_t>(m_read_header.size))
     {
-        CLOG(LOGLEV_RUN, "read size did not match");
+        if(numOfBytesRead == -1)
+            CLOG(LOGLEV_RUN, "read size did not match", ERR_STR);
+        else if(numOfBytesRead == 0)
+            CLOG(LOGLEV_RUN, "Connection closed on other side", ERR_STR);
         return false;
     }
     else

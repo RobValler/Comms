@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -43,9 +43,6 @@ private:
 
     int m_connection_fd{0};
     int m_connection_socket{0};
-
-//    std::vector<char> m_input_data_entry;
-//    std::vector<std::vector<char>> m_input_data_buffer;
 };
 
 } // comms

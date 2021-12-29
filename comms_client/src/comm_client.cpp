@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -54,14 +54,14 @@ bool CCommClient::read(void* message)
     // fetch the intput stream
     if(!m_pProtocolClient->recieve(m_read_buffer, m_size_of_message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned an error");
+        CLOG(LOGLEV_RUN, "protocol recieve returned an error");
         return false;
     }
 
     // deserialise the input stream
     if(!m_pSerialiser->deserialise(m_read_buffer, m_size_of_message, message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
+        CLOG(LOGLEV_RUN, "deserialiser returned an error");
         return false;
     }
 
@@ -73,13 +73,16 @@ bool CCommClient::write(void* message)
     // serialise the output stream
     if(!m_pSerialiser->serialise(m_write_buffer, m_size_of_message, message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
+        CLOG(LOGLEV_RUN, "serialiser returned an error");
         return false;
     }
 
     // transmit the output stream
     if(!m_pProtocolClient->transmit(m_write_buffer.data(), m_size_of_message))
+    {
+        CLOG(LOGLEV_RUN, "transmit returned an error");
         return false;
+    }
 
     return true;
 }
