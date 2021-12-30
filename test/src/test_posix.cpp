@@ -126,3 +126,26 @@ TEST(Comms_POSIX_MQ, WriteManyThenReadMany)
         EXPECT_EQ(index, in.test_int());
     }
 }
+
+TEST(Comms_POSIX_MQ, LargeDataWriteThenRead)
+{
+    //const int val = 460800U;
+    //const int val = 65536U;
+    const int val = 512;
+
+    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_in(val);
+    CCommServer server(server_proto::EPOSIX_MQ);
+    CCommClient client(client_proto::EPOSIX_MQ);
+    test_msg in, out;
+
+    ASSERT_EQ(client.connect(server_name), true);
+
+    *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
+    EXPECT_EQ(client.write(&out), true);
+
+//    std::this_thread::sleep_for( std::chrono::milliseconds(100) );
+
+    EXPECT_EQ(server.read(&in), true);
+
+}

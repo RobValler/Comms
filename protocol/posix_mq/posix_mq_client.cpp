@@ -22,8 +22,6 @@ namespace client {
 
 CPOSIXMQClient::CPOSIXMQClient()
 {
-    m_sizeOfHeader = sizeof(SMessageHeader);
-
     if(channel_create("_client"))
     {
         t_provider_channel_thread = std::thread(&CPOSIXMQClient::threadfunc_client, this);

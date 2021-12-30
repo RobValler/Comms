@@ -25,8 +25,6 @@ namespace server {
 
 CPOSIXMQServer::CPOSIXMQServer()
 {
-    m_sizeOfHeader = sizeof(SMessageHeader);
-
     if(channel_create("_server"))
     {
         t_provider_channel_thread = std::thread(&CPOSIXMQServer::threadfunc_server, this);

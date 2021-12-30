@@ -29,7 +29,7 @@ struct SReadBufferQ
 class CPOSIXMQHelper
 {
 public:
-    CPOSIXMQHelper()=default;                                       // Constructor
+    CPOSIXMQHelper();                                               // Constructor
     CPOSIXMQHelper(const CPOSIXMQHelper&) = delete;                 // Copy constructor
     CPOSIXMQHelper(CPOSIXMQHelper&&) = delete;                      // Move constructor
     CPOSIXMQHelper& operator=(const CPOSIXMQHelper&) = delete;      // Copy assignment operator

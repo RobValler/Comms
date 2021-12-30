@@ -30,7 +30,7 @@ const int l_max_num_of_connect_attempts = 5;
 
 namespace posix_conf
 {
-    constexpr std::uint32_t max_size = 33;
+    constexpr std::uint32_t msg_size = 1024;
     constexpr std::uint32_t max_msg = 10;
     constexpr std::uint32_t permission = 0644;
 }

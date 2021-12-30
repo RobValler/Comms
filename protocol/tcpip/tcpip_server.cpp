@@ -29,14 +29,6 @@ namespace server {
 CTCPIPServer::CTCPIPServer()
     : m_shutdownrequest(false)
 {
-    if(m_blocking){
-        m_socket_type = SOCK_STREAM;
-    }
-    else
-    {
-        m_socket_type = SOCK_STREAM | SOCK_NONBLOCK;
-    }
-
     t_server = std::thread(&CTCPIPServer::threadfunc_server, this);
 }
 
@@ -57,7 +49,7 @@ bool CTCPIPServer::channel_create()
     struct sockaddr_in address;    
     int addrlen = sizeof(address);
 
-    if ((m_connection_fd = socket(AF_INET, m_socket_type, 0)) == 0) {
+    if ((m_connection_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         CLOG(LOGLEV_RUN, "socket returned an error");
         return false;
     }
@@ -69,10 +61,11 @@ bool CTCPIPServer::channel_create()
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( 8080 );
+    address.sin_port = htons( 8888 );
 
-    if (bind(m_connection_fd, (struct sockaddr *)&address, sizeof(address))<0) {
-        CLOG(LOGLEV_RUN, "bind failed");
+    if (bind(m_connection_fd, (struct sockaddr *)&address, sizeof(address))<0)
+    {
+        CLOG(LOGLEV_RUN, "bind failed", ERR_STR);
         return false;
     }
 

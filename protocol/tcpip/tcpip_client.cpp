@@ -36,13 +36,7 @@ namespace {
 CTCPIPClient::CTCPIPClient()
     : m_shutdownrequest(false)
 {
-    if(m_blocking){
-        m_socket_type = SOCK_STREAM;
-    }
-    else
-    {
-        m_socket_type = SOCK_STREAM | SOCK_NONBLOCK;
-    }
+
 }
 
 CTCPIPClient::~CTCPIPClient()
@@ -57,21 +51,28 @@ CTCPIPClient::~CTCPIPClient()
         CLOG(LOGLEV_RUN, "client join issue");
 }
 
-bool CTCPIPClient::client_connect(std::string ip_address)
+bool CTCPIPClient::client_connect(std::string)
 {
     struct sockaddr_in serv_addr;
     bool result = false;
 
-    if ((m_connection_fd = socket(AF_INET, m_socket_type, 0)) < 0) {
-        CLOG(LOGLEV_RUN, "socket failure");
+    m_connection_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(-1 == m_connection_fd)
+    {
+        CLOG(LOGLEV_RUN, "socket failure", ERR_STR);
         return false;
     }
 
+    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_port = htons(8888);
 
-    if(inet_pton(AF_INET, ip_address.c_str(), &serv_addr.sin_addr) <= 0)
-        return false;
+
+//    if(inet_pton(AF_INET, ip_address.c_str(), &serv_addr.sin_addr) <= 0)
+//    {
+//        CLOG(LOGLEV_RUN, "inet_pton failed", ERR_STR);
+//        return false;
+//    }
 
 //    socket_args |= O_NONBLOCK;
 //    if( fcntl(m_connection_fd, F_SETFL, socket_args) < 0) {
@@ -94,7 +95,7 @@ bool CTCPIPClient::client_connect(std::string ip_address)
             if (0 > connect(m_connection_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
             {
                 // if the connection failed, do nothing and try again in the next loop.
-                CLOG(LOGLEV_RUN, "connection attempt failed");
+                CLOG(LOGLEV_RUN, "connection attempt failed", ERR_STR);
                 continue;
             }
             else

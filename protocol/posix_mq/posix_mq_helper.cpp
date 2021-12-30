@@ -19,13 +19,18 @@ namespace comms {
 namespace posix {
 namespace helper {
 
+CPOSIXMQHelper::CPOSIXMQHelper()
+{
+    m_sizeOfHeader = sizeof(SMessageHeader);
+}
+
 bool CPOSIXMQHelper::channel_create(std::string name)
 {
     // create the posix mq channel
     struct mq_attr attr;
     attr.mq_flags = 0;
     attr.mq_maxmsg = posix_conf::max_msg;
-    attr.mq_msgsize = posix_conf::max_size;
+    attr.mq_msgsize = posix_conf::msg_size;
     attr.mq_curmsgs = 0;
 
     //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;

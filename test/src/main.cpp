@@ -16,8 +16,9 @@ int main(int argc, char **argv)
 //    ::testing::GTEST_FLAG(filter) = "-Comms_TCPIP.Connect";
 //    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.Connect";
 
-    ::testing::GTEST_FLAG(filter) = "*.ReadThenWrite";
-//    ::testing::GTEST_FLAG(filter) = "*.LargeDataWriteThenRead";
+//    ::testing::GTEST_FLAG(filter) = "*.ReadThenWrite";
+    //::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.LargeDataWriteThenRead";
+    ::testing::GTEST_FLAG(filter) = "Comms_TCPIP.LargeDataWriteThenRead";
 
 
     return RUN_ALL_TESTS();

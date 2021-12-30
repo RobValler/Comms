@@ -118,8 +118,8 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
 
 TEST(Comms_TCPIP, LargeDataWriteThenRead)
 {
-    //const int val = 460800U;
-    const int val = 65536U;
+    const int val = 460800U;
+    //const int val = 65536U;
 
     std::vector<char> buffer_out(val);
     std::vector<char> buffer_in(val);
