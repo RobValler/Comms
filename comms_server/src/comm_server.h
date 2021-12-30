@@ -15,13 +15,14 @@ class IProtocolServer;
 class ISerialiser;
 
 namespace server_proto {
-    enum EProtocolType : unsigned int { ENone = 0, ETCTPIP, EPOSIX_MQ };
+    enum EProtocolType : unsigned int { EPT_None = 0, EPT_TCTPIP, EPT_POSIX_MQ };
+    enum ESerialType : unsigned int { EST_None = 0, EST_PROTO };
 }
 
 class CCommServer
 {
 public:    
-    CCommServer(server_proto::EProtocolType type);
+    CCommServer(server_proto::EProtocolType protocol, server_proto::ESerialType serial);
     ~CCommServer()=default;
 
     bool connect(std::string server_address);

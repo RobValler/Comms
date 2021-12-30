@@ -15,29 +15,38 @@
 
 #include "iserialiser.h"
 #include "proto_helper.h"
+#include "basic.h"
 
 #include "Logger.h"
 
 #include <string>
 #include <vector>
 
-CCommServer::CCommServer(server_proto::EProtocolType type)
+CCommServer::CCommServer(server_proto::EProtocolType protocol, server_proto::ESerialType serial)
 {
     CLogger::GetInstance();
 
-    switch(type)
+    switch(protocol)
     {
-    case server_proto::ENone:
+        case server_proto::EProtocolType::EPT_None:
+            ///\ todo add something here
+            break;
+        case server_proto::EProtocolType::EPT_TCTPIP:
+            m_pProtocolServer = std::make_shared<comms::tcpip::server::CTCPIPServer>();
+            break;
+        case server_proto::EProtocolType::EPT_POSIX_MQ:
+            m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
+            break;
+    }
 
-        break;
-    case server_proto::ETCTPIP:
-        m_pProtocolServer = std::make_shared<comms::tcpip::server::CTCPIPServer>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
-        break;
-    case server_proto::EPOSIX_MQ:
-        m_pProtocolServer = std::make_shared<comms::posix::server::CPOSIXMQServer>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
-        break;
+    switch(serial)
+    {
+        case server_proto::ESerialType::EST_None:
+            m_pSerialiser = std::make_shared<comms::serial::basic::CSerialiserBasic>();
+            break;
+        case server_proto::ESerialType::EST_PROTO:
+            m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserProto>();
+            break;
     }
 }
 

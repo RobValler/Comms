@@ -13,21 +13,25 @@
 
 namespace comms {
 namespace serial {
-namespace protobuf {
+namespace basic {
 
-class CSerialiserProto
+class CSerialiserBasic
         : public ISerialiser
 {
 public:
-    CSerialiserProto();
-    ~CSerialiserProto();
+    CSerialiserBasic()=default;                                         // Constructor
+    CSerialiserBasic(const CSerialiserBasic&) = delete;                // Copy constructor
+    CSerialiserBasic(CSerialiserBasic&&) = delete;                     // Move constructor
+    CSerialiserBasic& operator=(const CSerialiserBasic&) = delete;     // Copy assignment operator
+    CSerialiserBasic& operator=(CSerialiserBasic&&) = delete;          // Move assignment operator
+    virtual ~CSerialiserBasic()=default;                                // Destructor
 
     bool serialise(std::vector<char>& buffer, int& size_of_message, void* incomming_data) override;
     bool deserialise(const std::vector<char>& buffer, int size_of_message, void* outgoing_data) override;
 
 };
 
-} // protobuf
+} // basic
 } // serial
 } // comms
 

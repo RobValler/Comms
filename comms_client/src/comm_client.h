@@ -15,18 +15,19 @@ class IProtocolClient;
 class ISerialiser;
 
 namespace client_proto {
-    enum EProtocolType : unsigned int { ENone = 0, ETCTPIP, EPOSIX_MQ };
+    enum EProtocolType : unsigned int { EPT_None = 0, EPT_TCTPIP, EPT_POSIX_MQ };
+    enum ESerialType : unsigned int { EST_None = 0, EST_PROTO };
 }
 
 class CCommClient
 {
 public:
-    CCommClient(client_proto::EProtocolType type);
+    CCommClient(client_proto::EProtocolType protocol, client_proto::ESerialType serial);
     ~CCommClient();
 
     bool connect(std::string server_address);
     bool read(void* message);
-    bool write(void* message);
+    bool write(void* message, int size = 0);
     int numOfMessages();
 
 private:

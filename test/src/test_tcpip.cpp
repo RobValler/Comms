@@ -26,16 +26,16 @@ namespace  {
 
 TEST(Comms_TCPIP, Connect)
 {
-    CCommClient client(client_proto::ETCTPIP);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     ASSERT_EQ(client.connect("127.0.0.1"), false);
-    CCommServer server(server_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 }
 
 TEST(Comms_TCPIP, ReadThenWrite)
 {
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
 
     // set test data
@@ -69,8 +69,8 @@ TEST(Comms_TCPIP, ReadThenWrite)
 
 TEST(Comms_TCPIP, WriteOneReadMany)
 {
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
 
     out.set_test_int(out_int);
@@ -88,8 +88,8 @@ TEST(Comms_TCPIP, WriteOneReadMany)
 
 TEST(Comms_TCPIP, WriteManyThenReadMany)
 {
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
     const int numberOfWrites = 1000;
 
@@ -118,23 +118,28 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
 
 TEST(Comms_TCPIP, LargeDataWriteThenRead)
 {
-    const int val = 460800U;
-    //const int val = 65536U;
-
+    //const int val = 460800U;
+    const int val = 2048U;
     std::vector<char> buffer_out(val);
     std::vector<char> buffer_in(val);
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
-    test_msg in, out;
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_None);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_None);
+//    test_msg in, out;
 
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 
-    *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
-    EXPECT_EQ(client.write(&out), true);
+    //*out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
 
-//    std::this_thread::sleep_for( std::chrono::milliseconds(100) );
+    // write
+    std::string str = "wibble";
+    std::copy(str.begin(), str.end(), buffer_out.begin());
+    EXPECT_EQ(client.write(buffer_out.data(), buffer_out.size()), true);
 
-    EXPECT_EQ(server.read(&in), true);
+    //read
+    buffer_in={};
+    buffer_in.resize(val);
+    EXPECT_EQ(server.read(&buffer_in[0]), true);
 
+//    EXPECT_EQ(buffer_in, buffer_out);
 }
 

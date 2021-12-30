@@ -13,6 +13,7 @@
 
 #include "iserialiser.h"
 #include "proto_helper.h"
+#include "basic.h"
 #include "common.h"
 
 #include <string>
@@ -20,23 +21,31 @@
 
 #include "Logger.h"
 
-CCommClient::CCommClient(client_proto::EProtocolType type)
+CCommClient::CCommClient(client_proto::EProtocolType protocol, client_proto::ESerialType serial)
 {
     CLogger::GetInstance();
 
-    switch(type)
+    switch(protocol)
     {
-    case client_proto::ENone:
-
+    case client_proto::EProtocolType::EPT_None:
+        ///\ todo add something here
         break;
-    case client_proto::ETCTPIP:
+    case client_proto::EProtocolType::EPT_TCTPIP:
         m_pProtocolClient = std::make_unique<comms::tcpip::client::CTCPIPClient>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
-    case client_proto::EPOSIX_MQ:
+    case client_proto::EProtocolType::EPT_POSIX_MQ:
         m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
+    }
+
+    switch(serial)
+    {
+        case client_proto::ESerialType::EST_None:
+            m_pSerialiser = std::make_shared<comms::serial::basic::CSerialiserBasic>();
+            break;
+        case client_proto::ESerialType::EST_PROTO:
+            m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserProto>();
+            break;
     }
 }
 
@@ -49,6 +58,7 @@ bool CCommClient::connect(std::string server_address)
 {
     return m_pProtocolClient->client_connect(server_address);
 }
+
 bool CCommClient::read(void* message)
 {
     // fetch the intput stream
@@ -68,9 +78,10 @@ bool CCommClient::read(void* message)
     return true;
 }
 
-bool CCommClient::write(void* message)
+bool CCommClient::write(void* message, int size)
 {
     // serialise the output stream
+    m_size_of_message = size;
     if(!m_pSerialiser->serialise(m_write_buffer, m_size_of_message, message))
     {
         CLOG(LOGLEV_RUN, "serialiser returned an error");

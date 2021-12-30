@@ -19,17 +19,17 @@ namespace comms {
 namespace serial {
 namespace protobuf {
 
-CSerialiserHelper::CSerialiserHelper()
+CSerialiserProto::CSerialiserProto()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 }
 
-CSerialiserHelper::~CSerialiserHelper()
+CSerialiserProto::~CSerialiserProto()
 {
     google::protobuf::ShutdownProtobufLibrary();
 }
 
-bool CSerialiserHelper::serialise(std::vector<char>& buffer, int& size_of_message, void* incomming_data)
+bool CSerialiserProto::serialise(std::vector<char>& buffer, int& size_of_message, void* incomming_data)
 {
     using namespace google::protobuf::io;
 
@@ -52,7 +52,7 @@ bool CSerialiserHelper::serialise(std::vector<char>& buffer, int& size_of_messag
     return true;
 }
 
-bool CSerialiserHelper::deserialise(const std::vector<char>& buffer, int size_of_message, void* outgoing_data)
+bool CSerialiserProto::deserialise(const std::vector<char>& buffer, int size_of_message, void* outgoing_data)
 {
     using namespace google::protobuf::io;
 

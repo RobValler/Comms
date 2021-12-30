@@ -28,22 +28,22 @@ namespace  {
 
 TEST(Comms_POSIX_MQ, Flush)
 {
-    CCommClient client(client_proto::EPOSIX_MQ);
-    CCommServer server(server_proto::EPOSIX_MQ);
+    CCommClient client(client_proto::EPT_POSIX_MQ, client_proto::EST_PROTO);
+    CCommServer server(server_proto::EPT_POSIX_MQ, server_proto::EST_PROTO);
 }
 
 TEST(Comms_POSIX_MQ, Connect)
 {
-    CCommClient client(client_proto::EPOSIX_MQ);
+    CCommClient client(client_proto::EPT_POSIX_MQ, client_proto::EST_PROTO);
     ASSERT_EQ(client.connect(server_name), false);
-    CCommServer server(server_proto::EPOSIX_MQ);
+    CCommServer server(server_proto::EPT_POSIX_MQ, server_proto::EST_PROTO);
     ASSERT_EQ(client.connect(server_name), true);
 }
 
 TEST(Comms_POSIX_MQ, ReadThenWrite)
 {
-    CCommServer server(server_proto::EPOSIX_MQ);
-    CCommClient client(client_proto::EPOSIX_MQ);
+    CCommServer server(server_proto::EPT_POSIX_MQ, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_POSIX_MQ, client_proto::EST_PROTO);
     test_msg in;
     test_msg out;
 
@@ -79,8 +79,8 @@ TEST(Comms_POSIX_MQ, ReadThenWrite)
 
 TEST(Comms_POSIX_MQ, WriteOneReadMany)
 {
-    CCommServer server(server_proto::EPOSIX_MQ);
-    CCommClient client(client_proto::EPOSIX_MQ);
+    CCommServer server(server_proto::EPT_POSIX_MQ, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_POSIX_MQ, client_proto::EST_PROTO);
     test_msg in, out;
 
     out.set_test_int(out_int);
@@ -98,8 +98,8 @@ TEST(Comms_POSIX_MQ, WriteOneReadMany)
 
 TEST(Comms_POSIX_MQ, WriteManyThenReadMany)
 {
-    CCommServer server(server_proto::EPOSIX_MQ);
-    CCommClient client(client_proto::EPOSIX_MQ);
+    CCommServer server(server_proto::EPT_POSIX_MQ, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_POSIX_MQ, client_proto::EST_PROTO);
     test_msg in, out;
     const int numberOfWrites = 1000;
 
@@ -135,8 +135,8 @@ TEST(Comms_POSIX_MQ, LargeDataWriteThenRead)
 
     std::vector<char> buffer_out(val);
     std::vector<char> buffer_in(val);
-    CCommServer server(server_proto::EPOSIX_MQ);
-    CCommClient client(client_proto::EPOSIX_MQ);
+    CCommServer server(server_proto::EPT_POSIX_MQ, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_POSIX_MQ, client_proto::EST_PROTO);
     test_msg in, out;
 
     ASSERT_EQ(client.connect(server_name), true);
