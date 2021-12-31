@@ -8,7 +8,7 @@
  *****************************************************************/
 
 #include "tcpip_helper.h"
-
+#include "common.h"
 #include "Logger.h"
 
 // tcp socket stuff
@@ -49,6 +49,7 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
         {
             if(index < max_spin_count - 2)
             {
+                ///\ todo: possibly irrelevant under a certain duration
                 std::this_thread::sleep_for(std::chrono::nanoseconds(10));
                 continue;
             }
@@ -78,78 +79,154 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 
 bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 {
-    std::int32_t numOfBytesSent;
-
-    m_write_header.size = size;
-    m_write_header.type = EMsgTypData;
-
-    m_write_data_buffer = {}; ///\ todo needed?
-    m_write_data_buffer.resize(size + m_sizeOfHeader);
-    std::memcpy(&m_write_data_buffer[0], &m_write_header, m_sizeOfHeader);
-    std::memcpy(&m_write_data_buffer[m_sizeOfHeader], data, size);
-
-    numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , 0 );
-    if(numOfBytesSent < 0)
+    ///\ todo move multi-framer to helper class.
+    if(size > tcpip_conf::max_msg_size_allowable)
     {
-        CLOG(LOGLEV_RUN, "error", ERR_STR);
+        CLOG(LOGLEV_RUN, "This message is too large, aborted!");
         return false;
     }
-    else
+
+    std::int32_t numOfBytesSent;
+    const std::int32_t frame_size = tcpip_conf::msg_frame_size;
+    std::int32_t remaining_bytes = size;
+    std::int32_t size_of_current_frame = 0;
+    int number_of_frames = (size / frame_size) + 1;
+
+    // this loop will send large messages in manageable frames.
+    for(std::int8_t index = 0; index < number_of_frames; ++index)
     {
-        if(numOfBytesSent != static_cast<std::int32_t>(m_write_data_buffer.size()))
+        std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+
+        // calculate the size of this frame
+        if(remaining_bytes > frame_size)
         {
-            CLOG(LOGLEV_RUN, "Number of bytes sent was not expected", ERR_STR);
+            remaining_bytes -= frame_size;
+            size_of_current_frame = frame_size;
+        }
+        else
+        {
+            size_of_current_frame = remaining_bytes;
+        }
+
+        // configure the message header
+        m_write_header.instID = 0; // not used yet
+        m_write_header.frame_size = size_of_current_frame;
+        m_write_header.max_size = size;
+        m_write_header.type = EMsgTypData;
+        m_write_header.frame_no = index + 1;
+        m_write_header.max_frame_no = number_of_frames;
+
+        m_write_data_buffer = {}; ///\ todo needed?
+        m_write_data_buffer.resize(m_write_header.frame_size + m_sizeOfHeader);
+        std::memcpy(&m_write_data_buffer[0], &m_write_header, m_sizeOfHeader);
+        std::memcpy(&m_write_data_buffer[m_sizeOfHeader], data, m_write_header.frame_size);
+
+        numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , MSG_EOR|MSG_NOSIGNAL );
+        //numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , 0 );
+        if(numOfBytesSent < 0)
+        {
+            CLOG(LOGLEV_RUN, "error", ERR_STR);
             return false;
         }
-    }
+        else
+        {
+            if(numOfBytesSent != static_cast<std::int32_t>(m_write_data_buffer.size()))
+            {
+                CLOG(LOGLEV_RUN, "Number of bytes sent was not expected", ERR_STR);
+                return false;
+            }
+        }
+
+    } // for
+
     return true;
 }
 
 bool CTCPIPHelper::listenForData(const int fd)
 {
-    std::int32_t numOfBytesRead;
+    std::int32_t numOfBytesRead = 0;
+    m_read_frame_buffer={};
+    m_read_data_buffer={};
 
-    // Check the contents of the header
-    m_read_header = {};
-    numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
-    //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, peekFlags);
-    if(numOfBytesRead <= 0)
+    // loop until all frames have been read
+    while(true)
     {
-        if(0 == numOfBytesRead)
+        // Check the contents of the header
+        m_read_header = {};
+        //numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
+        numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, MSG_EOR|MSG_NOSIGNAL);
+        //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, 0);
+        if(numOfBytesRead <= 0)
         {
-            CLOG(LOGLEV_RUN, "Connection closed,", ERR_STR);
+            if(0 == numOfBytesRead)
+            {
+                CLOG(LOGLEV_RUN, "Connection closed,", ERR_STR);
+                return false;
+            }
+            else if(-1 == numOfBytesRead)
+            {
+                CLOG(LOGLEV_RUN, "Error.", ERR_STR);
+                return false;
+            }
+        }
+
+        // check the message type
+        if(EMsgTypData != m_read_header.type) {
+            CLOG(LOGLEV_RUN, "wrong header type");
             return false;
         }
-        else if(-1 == numOfBytesRead)
+
+        m_read_frame_buffer = {};
+        m_read_frame_buffer.resize(m_read_header.frame_size);
+        numOfBytesRead = read(fd, m_read_frame_buffer.data(), m_read_header.frame_size);
+        if(numOfBytesRead != static_cast<std::int32_t>(m_read_header.frame_size))
         {
-            CLOG(LOGLEV_RUN, "Error.", ERR_STR);
-            return false;
+            if(numOfBytesRead == -1)
+            {
+                CLOG(LOGLEV_RUN, "read error", ERR_STR);
+                return false;
+            }
+            else if(numOfBytesRead == 0)
+            {
+                CLOG(LOGLEV_RUN, "Connection closed on other side", ERR_STR);
+                return false;
+            }
+            else
+            {
+                CLOG(LOGLEV_RUN, "The number of bytes read (", numOfBytesRead
+                                ,") was not the expected amount (", m_read_header.frame_size, ")");
+                return false;
+            }
         }
-    }
+        else
+        {
+            if(m_read_header.frame_no < m_read_header.max_frame_no)
+            {
+                // multi frame messages
+                m_read_data_buffer.payload.insert(m_read_data_buffer.payload.end(), m_read_frame_buffer.begin(), m_read_frame_buffer.end());
+            }
+            else if(m_read_header.frame_no == m_read_header.max_frame_no)
+            {
+                // write the last part for multi-frame messages
+                // or the complete message for single frame messages
+                m_read_data_buffer.payload.insert(m_read_data_buffer.payload.end(), m_read_frame_buffer.begin(), m_read_frame_buffer.end());
 
-    // check the data type
-    if(EMsgTypData != m_read_header.type) {
-        CLOG(LOGLEV_RUN, "wrong header type");
-        return false;
-    }
+                // check the expected size
+                if(m_read_header.max_size == m_read_data_buffer.payload.size())
+                {
+                    m_recProtect.lock();
+                    m_read_queue.push(m_read_data_buffer);
+                    m_recProtect.unlock();
+                    break; // we are done! leave the loop
+                }
+                else
+                {
+                    CLOG(LOGLEV_RUN, "The assembled message size (", m_read_data_buffer.payload.size()
+                                    ,") was not the expected amount (", m_read_header.max_size, ")");
 
-    // store the actual data
-    m_read_data_buffer = {};
-    m_read_data_buffer.payload.resize(m_read_header.size);
-    numOfBytesRead = read(fd, m_read_data_buffer.payload.data(), m_read_data_buffer.payload.size());
-    if(numOfBytesRead != static_cast<std::int32_t>(m_read_header.size))
-    {
-        if(numOfBytesRead == -1)
-            CLOG(LOGLEV_RUN, "read size did not match", ERR_STR);
-        else if(numOfBytesRead == 0)
-            CLOG(LOGLEV_RUN, "Connection closed on other side", ERR_STR);
-        return false;
-    }
-    else
-    {
-        m_recProtect.lock();
-        m_read_queue.push(m_read_data_buffer);
-        m_recProtect.unlock();
+                }
+            }
+        }
     }
 
     return true;

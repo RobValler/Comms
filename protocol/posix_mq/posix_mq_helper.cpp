@@ -135,7 +135,7 @@ bool CPOSIXMQHelper::ctransmit(mqd_t queue, const char *data, const int size)
 {
     unsigned int priority = 1;
 
-    m_write_header.size = size;
+    m_write_header.max_size = size;
     m_write_header.type = EMsgTypData;
     m_transmitPackage.resize(size + m_sizeOfHeader);
     std::memcpy(&m_transmitPackage[0], &m_write_header, m_sizeOfHeader);
@@ -163,7 +163,7 @@ bool CPOSIXMQHelper::listenForData(const mqd_t queue)
     }
 
     SMessageHeader *pHeader = (SMessageHeader*)&m_rcvmsg[0];
-    if(numOfBytesRead != (pHeader->size + m_sizeOfHeader))
+    if(numOfBytesRead != (pHeader->max_size + m_sizeOfHeader))
     {
         CLOG(LOGLEV_RUN, "Header size mismatch: (", errno, ") ", strerror(errno));
         return false;
@@ -176,8 +176,8 @@ bool CPOSIXMQHelper::listenForData(const mqd_t queue)
         return false;
     }
 
-    m_read_data_buffer.payload.resize(pHeader->size);
-    std::memcpy(&m_read_data_buffer.payload[0], &m_rcvmsg[m_sizeOfHeader], pHeader->size);
+    m_read_data_buffer.payload.resize(pHeader->max_size);
+    std::memcpy(&m_read_data_buffer.payload[0], &m_rcvmsg[m_sizeOfHeader], pHeader->max_size);
 
     m_recProtect.lock();
     m_read_queue.push(m_read_data_buffer);

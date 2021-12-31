@@ -8,7 +8,7 @@
 # *****************************************************************/
 cmake_minimum_required(VERSION 3.15.0)
 project(Comms)
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set (Wfloat-conversion)
 set (Wfno-stack-protector)
 set (Winconsistent-missing-override)

@@ -96,7 +96,7 @@ bool CTCPIPServer::channel_create()
 
     // send the confirmation message
     SMessageHeader head;
-    head.size = 0;
+    head.max_size = 0;
     head.type = EMsgTypCtrl;
     if(0 > send(m_connection_socket, &head, m_sizeOfHeader, 0 ))
     {

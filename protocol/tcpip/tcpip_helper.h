@@ -50,6 +50,7 @@ protected:
     std::queue<SReadBufferQ> m_read_queue{};
     SReadBufferQ m_read_data_buffer{};
     std::vector<char> m_write_data_buffer{};
+    std::vector<char> m_read_frame_buffer{};
     SMessageHeader m_read_header{};
     SMessageHeader m_write_header{};
 };

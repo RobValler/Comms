@@ -27,7 +27,7 @@ public:
 
     bool connect(std::string server_address);
     bool read(void* message);
-    bool write(void* message);
+    bool write(void* message, int size = 0);
     int sizeOfReadBuffer();
 
 private:    

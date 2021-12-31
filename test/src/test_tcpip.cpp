@@ -116,30 +116,72 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
     }
 }
 
+
+TEST(Comms_TCPIP, LargeDataWriteThenReadProto)
+{
+    const int numberOfWrites = 1;
+    const int val = 460800U;
+    //const int val = 2048U;
+    //const int val = 65528U;
+    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_in(val);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
+    test_msg in, out;
+
+    ASSERT_EQ(client.connect("127.0.0.1"), true);
+
+    // write all ones to buffer
+    for(auto& it : buffer_out){
+        it = 1U;
+    }
+    *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
+
+    for(int index=0; index < numberOfWrites; ++index)
+    {
+        EXPECT_EQ(client.write(&out), true);
+
+        //read
+        //buffer_in={};
+        EXPECT_EQ(server.read(&in), true);
+        std::cout << "size = " << in.data_size() << std::endl;
+        buffer_in = {in.data().begin(), in.data().end()};
+
+        EXPECT_EQ(buffer_in, buffer_out);
+    }
+}
+
 TEST(Comms_TCPIP, LargeDataWriteThenRead)
 {
-    //const int val = 460800U;
-    const int val = 2048U;
+    const int numberOfWrites = 100;
+    const int val = 460800U;
+    //const int val = 2048U;
+    //const int val = 65528U;
     std::vector<char> buffer_out(val);
     std::vector<char> buffer_in(val);
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_None);
     CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_None);
-//    test_msg in, out;
 
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 
-    //*out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
+    // write all ones to buffer
+    for(auto& it : buffer_out){
+        it = 1U;
+    }
 
-    // write
-    std::string str = "wibble";
-    std::copy(str.begin(), str.end(), buffer_out.begin());
-    EXPECT_EQ(client.write(buffer_out.data(), buffer_out.size()), true);
+    for(int index=0; index < numberOfWrites; ++index)
+    {
+        EXPECT_EQ(client.write(buffer_out.data(), buffer_out.size()), true);
 
-    //read
-    buffer_in={};
-    buffer_in.resize(val);
-    EXPECT_EQ(server.read(&buffer_in[0]), true);
+        //read
+        buffer_in={};
+        buffer_in.resize(val);
+        EXPECT_EQ(server.read(&buffer_in[0]), true);
 
-//    EXPECT_EQ(buffer_in, buffer_out);
+        EXPECT_EQ(buffer_in, buffer_out);
+    }
+//    std::this_thread::sleep_for( std::chrono::seconds(100) );
+
 }
+
 

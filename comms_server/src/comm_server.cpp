@@ -74,9 +74,10 @@ bool CCommServer::read(void* message)
     return true;
 }
 
-bool CCommServer::write(void* message)
+bool CCommServer::write(void* message, int size)
 {
     // serialise the output stream
+    m_size_of_message = size;
     if(!m_pSerialiser->serialise(m_write_buffer, m_size_of_message, message))
     {
         CLOG(LOGLEV_RUN, "serialiser returned an error");
