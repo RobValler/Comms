@@ -38,10 +38,12 @@ public:
     bool transmit(const char *data, const int size) override { return ctransmit(m_connection_fd, data, size); }
 
 private:
-    void threadfunc_client();
+    void threadfunc_client_listen();
+    void threadfunc_client_write();
 
-    std::atomic<bool> m_shutdownrequest;
-    std::thread t_client;
+    std::atomic<bool> m_shutdownrequest{false};
+    std::thread t_client_listen;
+    std::thread t_client_write;
     int m_connection_fd{0};
     std::vector<char> m_confirmMsgBuff;
 };

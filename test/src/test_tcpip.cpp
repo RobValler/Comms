@@ -153,7 +153,7 @@ TEST(Comms_TCPIP, LargeDataWriteThenReadProto)
 
 TEST(Comms_TCPIP, LargeDataWriteThenRead)
 {
-    const int numberOfWrites = 100;
+    const int numberOfWrites = 1000;
     const int val = 460800U;
     //const int val = 2048U;
     //const int val = 65528U;
@@ -171,14 +171,23 @@ TEST(Comms_TCPIP, LargeDataWriteThenRead)
 
     for(int index=0; index < numberOfWrites; ++index)
     {
+//        std::cout << "index = " << index << std::endl;
         EXPECT_EQ(client.write(buffer_out.data(), buffer_out.size()), true);
+
+ //       std::this_thread::sleep_for( std::chrono::microseconds(1000) );
 
         //read
         buffer_in={};
         buffer_in.resize(val);
-        EXPECT_EQ(server.read(&buffer_in[0]), true);
+        for(int mini_index = 0; mini_index < 5; ++mini_index)
+        {
+            if(true == server.read(&buffer_in[0]))
+                break;
+            else
+                std::this_thread::sleep_for( std::chrono::microseconds(100) );
+        }
 
-        EXPECT_EQ(buffer_in, buffer_out);
+        ASSERT_EQ(buffer_in, buffer_out);
     }
 //    std::this_thread::sleep_for( std::chrono::seconds(100) );
 

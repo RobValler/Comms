@@ -34,9 +34,8 @@ namespace {
 }
 
 CTCPIPClient::CTCPIPClient()
-    : m_shutdownrequest(false)
 {
-
+    t_client_write = std::thread(&CTCPIPClient::threadfunc_client_write, this);
 }
 
 CTCPIPClient::~CTCPIPClient()
@@ -45,8 +44,15 @@ CTCPIPClient::~CTCPIPClient()
 
     static_cast<void>(client_disconnect());
 
-    if(t_client.joinable())
-        t_client.join();
+    //
+    if(t_client_listen.joinable())
+        t_client_listen.join();
+    else
+        CLOG(LOGLEV_RUN, "client join issue");
+
+    //
+    if(t_client_write.joinable())
+        t_client_write.detach();
     else
         CLOG(LOGLEV_RUN, "client join issue");
 }
@@ -121,7 +127,7 @@ bool CTCPIPClient::client_connect(std::string)
                 CLOG(LOGLEV_RUN, "client connection confirmed");
 
                 // client is connected. Start the client data thread
-                t_client = std::thread(&CTCPIPClient::threadfunc_client, this);
+                t_client_listen = std::thread(&CTCPIPClient::threadfunc_client_listen, this);
 
                 result = true;
                 break;
@@ -144,7 +150,7 @@ bool CTCPIPClient::client_disconnect()
     }
 }
 
-void CTCPIPClient::threadfunc_client()
+void CTCPIPClient::threadfunc_client_listen()
 {
     while(!m_shutdownrequest)
     {
@@ -152,6 +158,19 @@ void CTCPIPClient::threadfunc_client()
         if(!listenForData(m_connection_fd))
         {
             CLOG(LOGLEV_RUN, "error on listen");
+            break;
+        }
+    }
+}
+
+void CTCPIPClient::threadfunc_client_write()
+{
+    while(!m_shutdownrequest)
+    {
+        // listenForData() is a blocking read
+        if(!writeData(m_connection_fd))
+        {
+            CLOG(LOGLEV_RUN, "error on write thread");
             break;
         }
     }

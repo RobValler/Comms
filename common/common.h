@@ -43,7 +43,8 @@ namespace posix_conf
 namespace tcpip_conf
 {
     const std::int32_t max_msg_size_allowable = 1*1024*1024*1024;
-    constexpr std::uint32_t msg_frame_size = 65528U;
+    constexpr std::uint32_t msg_frame_size = 65520; // 2^16 - sizeof(SMessageHeader)
+    //constexpr std::uint32_t msg_frame_size = 10224U;
 }
 
 #endif //  COMMON_H

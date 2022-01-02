@@ -34,6 +34,11 @@ CTCPIPHelper::CTCPIPHelper()
     m_sizeOfHeader = sizeof(SMessageHeader);
 }
 
+CTCPIPHelper::~CTCPIPHelper()
+{
+    m_shutdownRequest = true;
+}
+
 bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
 {
     // spin counter
@@ -41,9 +46,9 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
     std::uint32_t queue_size;
     for(int index=0; index < max_spin_count; ++index)
     {
-        m_recProtect.lock();
+        m_readQueueProtect.lock();
         queue_size = m_read_queue.size();
-        m_recProtect.unlock();
+        m_readQueueProtect.unlock();
 
         if(0 == queue_size)
         {
@@ -65,10 +70,10 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
         }
     }
 
-    m_recProtect.lock();
+    m_readQueueProtect.lock();
     data = m_read_queue.front().payload;
     m_read_queue.pop();
-    m_recProtect.unlock();
+    m_readQueueProtect.unlock();
     size = data.size();
 
     if(size <= 0)
@@ -77,7 +82,7 @@ bool CTCPIPHelper::crecieve(std::vector<char>& data, int& size)
     return true;
 }
 
-bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
+bool CTCPIPHelper::ctransmit(const int, const char *data, const int size)
 {
     ///\ todo move multi-framer to helper class.
     if(size > tcpip_conf::max_msg_size_allowable)
@@ -86,16 +91,16 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
         return false;
     }
 
-    std::int32_t numOfBytesSent;
+    std::uint8_t frame = 0;
     const std::int32_t frame_size = tcpip_conf::msg_frame_size;
     std::int32_t remaining_bytes = size;
     std::int32_t size_of_current_frame = 0;
     int number_of_frames = (size / frame_size) + 1;
 
     // this loop will send large messages in manageable frames.
-    for(std::int8_t index = 0; index < number_of_frames; ++index)
+    while(true)
     {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+        frame++;
 
         // calculate the size of this frame
         if(remaining_bytes > frame_size)
@@ -113,31 +118,24 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
         m_write_header.frame_size = size_of_current_frame;
         m_write_header.max_size = size;
         m_write_header.type = EMsgTypData;
-        m_write_header.frame_no = index + 1;
+        m_write_header.frame_no = frame;
         m_write_header.max_frame_no = number_of_frames;
 
         m_write_data_buffer = {}; ///\ todo needed?
-        m_write_data_buffer.resize(m_write_header.frame_size + m_sizeOfHeader);
-        std::memcpy(&m_write_data_buffer[0], &m_write_header, m_sizeOfHeader);
-        std::memcpy(&m_write_data_buffer[m_sizeOfHeader], data, m_write_header.frame_size);
+        m_write_frame_buffer.resize(m_write_header.frame_size + m_sizeOfHeader);
+        std::memcpy(&m_write_frame_buffer[0], &m_write_header, m_sizeOfHeader);
+        std::memcpy(&m_write_frame_buffer[m_sizeOfHeader], data, m_write_header.frame_size);
 
-        numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , MSG_EOR|MSG_NOSIGNAL );
-        //numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , 0 );
-        if(numOfBytesSent < 0)
-        {
-            CLOG(LOGLEV_RUN, "error", ERR_STR);
-            return false;
-        }
-        else
-        {
-            if(numOfBytesSent != static_cast<std::int32_t>(m_write_data_buffer.size()))
-            {
-                CLOG(LOGLEV_RUN, "Number of bytes sent was not expected", ERR_STR);
-                return false;
-            }
-        }
+        m_write_data_buffer.payload.insert(m_write_data_buffer.payload.end(), m_write_frame_buffer.begin(), m_write_frame_buffer.end());
 
-    } // for
+        m_writeQueueProtect.lock();
+        m_write_queue.push(m_write_data_buffer);
+        m_writeQueueProtect.unlock();
+
+        if(m_write_header.frame_no == m_write_header.max_frame_no)
+            break;
+
+    } // while
 
     return true;
 }
@@ -149,12 +147,12 @@ bool CTCPIPHelper::listenForData(const int fd)
     m_read_data_buffer={};
 
     // loop until all frames have been read
-    while(true)
+    while(!m_shutdownRequest)
     {
         // Check the contents of the header
         m_read_header = {};
-        //numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
-        numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, MSG_EOR|MSG_NOSIGNAL);
+        numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
+        //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, MSG_EOR|MSG_NOSIGNAL);
         //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, 0);
         if(numOfBytesRead <= 0)
         {
@@ -193,7 +191,11 @@ bool CTCPIPHelper::listenForData(const int fd)
             }
             else
             {
-                CLOG(LOGLEV_RUN, "The number of bytes read (", numOfBytesRead
+                CLOG(LOGLEV_RUN, "The number of bytes read "
+                                , static_cast<std::int32_t>(m_read_header.frame_no)
+                                , "/"
+                                , static_cast<std::int32_t>(m_read_header.max_frame_no)
+                                , " (", numOfBytesRead
                                 ,") was not the expected amount (", m_read_header.frame_size, ")");
                 return false;
             }
@@ -214,9 +216,9 @@ bool CTCPIPHelper::listenForData(const int fd)
                 // check the expected size
                 if(m_read_header.max_size == m_read_data_buffer.payload.size())
                 {
-                    m_recProtect.lock();
+                    m_readQueueProtect.lock();
                     m_read_queue.push(m_read_data_buffer);
-                    m_recProtect.unlock();
+                    m_readQueueProtect.unlock();
                     break; // we are done! leave the loop
                 }
                 else
@@ -225,6 +227,45 @@ bool CTCPIPHelper::listenForData(const int fd)
                                     ,") was not the expected amount (", m_read_header.max_size, ")");
 
                 }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool CTCPIPHelper::writeData(const int fd)
+{
+    std::vector<char> data;
+    int size;
+    std::int32_t numOfBytesSent = 0;
+
+    while(!m_shutdownRequest)
+    {
+        if(0U == m_write_queue.size()) {
+            break;
+        }
+
+        m_writeQueueProtect.lock();
+        //data = std::move(m_write_queue.front().payload);
+        data = m_write_queue.front().payload;
+        m_write_queue.pop();
+        m_writeQueueProtect.unlock();
+        size = data.size();
+
+        //numOfBytesSent = send(fd, &data[0], size , MSG_EOR|MSG_NOSIGNAL );
+        numOfBytesSent = send(fd, &data[0], size , 0 );
+        if(numOfBytesSent < 0)
+        {
+            CLOG(LOGLEV_RUN, "error", ERR_STR);
+            return false;
+        }
+        else
+        {
+            if(numOfBytesSent != static_cast<std::int32_t>(size))
+            {
+                CLOG(LOGLEV_RUN, "Number of bytes sent was not expected", ERR_STR);
+                return false;
             }
         }
     }
