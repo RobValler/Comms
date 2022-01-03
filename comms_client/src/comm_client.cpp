@@ -77,6 +77,9 @@ bool CCommClient::connect(std::string server_address)
 
 bool CCommClient::read(void* message)
 {
+    if(true == m_shutdownrequest)
+        return false;
+
     if(0U == m_read_queue.size())
     {
         CLOG(LOGLEV_RUN, "read queue is empty");
@@ -101,6 +104,9 @@ bool CCommClient::read(void* message)
 
 bool CCommClient::write(void* message, int size)
 {
+    if(true == m_shutdownrequest)
+        return false;
+
     // serialise the output stream
     int size_of_write_message = size;
     client_proto::SReadBufferQ m_write_container{};
@@ -132,7 +138,7 @@ void CCommClient::readThread()
         if(!m_pProtocolClient->recieve(m_read_container.payload, size))
         {
             CLOG(LOGLEV_RUN, "recieve returned an error");
-            continue;
+            break;
         }
 
         // write to read buffer
@@ -140,6 +146,8 @@ void CCommClient::readThread()
         m_read_queue.push(m_read_container);
         m_readQueueProtect.unlock();
     }
+
+    m_shutdownrequest = true;
 }
 
 void CCommClient::writeThread()
@@ -164,4 +172,6 @@ void CCommClient::writeThread()
             CLOG(LOGLEV_RUN, "transmition returned an error");
         }
     }
+
+    m_shutdownrequest = true;
 }

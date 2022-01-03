@@ -22,9 +22,11 @@
 #include <stdlib.h>
 #include <cstring>
 
+
 namespace comms {
 namespace tcpip {
 namespace server {
+
 
 CTCPIPServer::CTCPIPServer()
     : m_shutdownrequest(false)
@@ -40,18 +42,16 @@ CTCPIPServer::~CTCPIPServer()
 
 bool CTCPIPServer::channel_create(std::string)
 {
-//    int opt = 1;
-
-
     if ((m_connection_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         CLOG(LOGLEV_RUN, "socket returned an error");
         return false;
     }
 
-//    if (setsockopt(m_connection_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-//        CLOG(LOGLEV_RUN, "setsockopt failed");
-//        return false;
-//    }
+    int opt = 1;
+    if (setsockopt(m_connection_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        CLOG(LOGLEV_RUN, "setsockopt failed");
+        return false;
+    }
 
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;

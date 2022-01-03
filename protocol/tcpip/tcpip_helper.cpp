@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
-
+#include <signal.h>
 #include <chrono>
 #include <thread>
 
@@ -29,9 +29,25 @@ namespace comms {
 namespace tcpip {
 namespace helper {
 
+/// \ brief interrupt handler
+void my_handler(int)
+{
+    CLOG(LOGLEV_RUN, "--> SIG event triggered.", ERR_STR, "<--");
+
+}
+
 CTCPIPHelper::CTCPIPHelper()
 {
     m_sizeOfHeader = sizeof(SMessageHeader);
+
+    // interrupt handler
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = my_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    //sigaction(SIGINT,   &sigIntHandler, NULL); // CTRL+C
+    sigaction(SIGPIPE,  &sigIntHandler, NULL); // broken pipe
+
 }
 
 CTCPIPHelper::~CTCPIPHelper()

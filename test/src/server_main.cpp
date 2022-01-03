@@ -12,15 +12,5 @@
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-//    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.Flush";   // always run
-//    ::testing::GTEST_FLAG(filter) = "-Comms_TCPIP.Connect";
-//    ::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.Connect";
-
-//    ::testing::GTEST_FLAG(filter) = "*.ReadThenWrite";
-    //::testing::GTEST_FLAG(filter) = "Comms_POSIX_MQ.LargeDataWriteThenRead";
-    ::testing::GTEST_FLAG(filter) = "Comms_TCPIP.LargeDataWriteThenRead";
-    //::testing::GTEST_FLAG(filter) = "Comms_TCPIP.Connect";
-
-
     return RUN_ALL_TESTS();
 }

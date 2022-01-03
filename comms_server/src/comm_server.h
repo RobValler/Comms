@@ -39,6 +39,7 @@ public:
     ~CCommServer();
 
     bool connect(std::string server_address);
+    bool create();
     bool read(void* message);
     bool write(void* message, int size = 0);
     int sizeOfReadBuffer();
@@ -48,10 +49,8 @@ private:
     std::atomic<bool> m_shutdownrequest{false};
 
     // threads
-    void createThread();
     void readThread();
     void writeThread();
-    std::thread t_create;
     std::thread t_read;
     std::thread t_write;
 
