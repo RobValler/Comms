@@ -35,31 +35,18 @@ namespace {
 
 CTCPIPClient::CTCPIPClient()
 {
-    t_client_write = std::thread(&CTCPIPClient::threadfunc_client_write, this);
+
 }
 
 CTCPIPClient::~CTCPIPClient()
 {
-    m_shutdownrequest = true;
-
     static_cast<void>(client_disconnect());
-
-    //
-    if(t_client_listen.joinable())
-        t_client_listen.join();
-    else
-        CLOG(LOGLEV_RUN, "client join issue");
-
-    //
-    if(t_client_write.joinable())
-        t_client_write.detach();
-    else
-        CLOG(LOGLEV_RUN, "client join issue");
+    m_shutdownrequest = true;
 }
 
 bool CTCPIPClient::client_connect(std::string)
 {
-    struct sockaddr_in serv_addr;
+
     bool result = false;
 
     m_connection_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -69,6 +56,7 @@ bool CTCPIPClient::client_connect(std::string)
         return false;
     }
 
+    struct sockaddr_in serv_addr;
     serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(8888);
@@ -126,9 +114,6 @@ bool CTCPIPClient::client_connect(std::string)
 
                 CLOG(LOGLEV_RUN, "client connection confirmed");
 
-                // client is connected. Start the client data thread
-                t_client_listen = std::thread(&CTCPIPClient::threadfunc_client_listen, this);
-
                 result = true;
                 break;
             } // else
@@ -147,32 +132,6 @@ bool CTCPIPClient::client_disconnect()
     } else {
         CLOG(LOGLEV_RUN, "failed shutdown on ", m_connection_fd, ERR_STR);
         return false;
-    }
-}
-
-void CTCPIPClient::threadfunc_client_listen()
-{
-    while(!m_shutdownrequest)
-    {
-        // listenForData() is a blocking read
-        if(!listenForData(m_connection_fd))
-        {
-            CLOG(LOGLEV_RUN, "error on listen");
-            break;
-        }
-    }
-}
-
-void CTCPIPClient::threadfunc_client_write()
-{
-    while(!m_shutdownrequest)
-    {
-        // listenForData() is a blocking read
-        if(!writeData(m_connection_fd))
-        {
-            CLOG(LOGLEV_RUN, "error on write thread");
-            break;
-        }
     }
 }
 

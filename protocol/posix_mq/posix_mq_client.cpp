@@ -22,7 +22,7 @@ namespace client {
 
 CPOSIXMQClient::CPOSIXMQClient()
 {
-    if(channel_create("_client"))
+    if(cchannel_create("_client"))
     {
         t_provider_channel_thread = std::thread(&CPOSIXMQClient::threadfunc_client, this);
     }

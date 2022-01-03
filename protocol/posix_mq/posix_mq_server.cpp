@@ -25,7 +25,7 @@ namespace server {
 
 CPOSIXMQServer::CPOSIXMQServer()
 {
-    if(channel_create("_server"))
+    if(cchannel_create("_server"))
     {
         t_provider_channel_thread = std::thread(&CPOSIXMQServer::threadfunc_server, this);
     }

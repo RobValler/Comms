@@ -29,48 +29,43 @@ namespace server {
 CTCPIPServer::CTCPIPServer()
     : m_shutdownrequest(false)
 {
-    t_server = std::thread(&CTCPIPServer::threadfunc_server, this);
+
 }
 
 CTCPIPServer::~CTCPIPServer()
 {
-    m_shutdownrequest = true;
     shutdown(m_connection_fd, SHUT_RDWR); // aborts any blocking calls on the server
-
-    if(t_server.joinable())
-        t_server.detach(); ///\todo re-evaluate!
-    else
-        CLOG(LOGLEV_RUN, "server join issue");
+    m_shutdownrequest = true;
 }
 
-bool CTCPIPServer::channel_create()
+bool CTCPIPServer::channel_create(std::string)
 {
-    int opt = 1;
-    struct sockaddr_in address;    
-    int addrlen = sizeof(address);
+//    int opt = 1;
+
 
     if ((m_connection_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         CLOG(LOGLEV_RUN, "socket returned an error");
         return false;
     }
 
-    if (setsockopt(m_connection_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        CLOG(LOGLEV_RUN, "setsockopt failed");
-        return false;
-    }
+//    if (setsockopt(m_connection_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+//        CLOG(LOGLEV_RUN, "setsockopt failed");
+//        return false;
+//    }
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( 8888 );
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_port = htons( 8888 );
 
-    if (bind(m_connection_fd, (struct sockaddr *)&address, sizeof(address))<0)
+    if (bind(m_connection_fd, (struct sockaddr *)&server_address, sizeof(server_address))<0)
     {
         CLOG(LOGLEV_RUN, "bind failed", ERR_STR);
         return false;
     }
 
     // listen out for any external connections.
-    if (listen(m_connection_fd, 10) < 0) {
+    if (listen(m_connection_fd, 3) < 0) {
         CLOG(LOGLEV_RUN, "listen failed");
         return false;
     }
@@ -82,7 +77,9 @@ bool CTCPIPServer::channel_create()
 //    }
 
     // accept the connection.
-    m_connection_socket = accept(m_connection_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+    struct sockaddr_in client_address;
+    int addrlen_client = sizeof(struct sockaddr_in);
+    m_connection_socket = accept(m_connection_fd, (struct sockaddr *)&client_address, (socklen_t*)&addrlen_client);
     if ( m_connection_socket < 0) {
         if(!m_shutdownrequest) {
             CLOG(LOGLEV_RUN, "accept failed = ", m_connection_socket);
@@ -96,8 +93,12 @@ bool CTCPIPServer::channel_create()
 
     // send the confirmation message
     SMessageHeader head;
+    head.instID = 0;
+//    head.frame_size = 0;
     head.max_size = 0;
     head.type = EMsgTypCtrl;
+    head.frame_no = 1;
+    head.max_frame_no = 1;
     if(0 > send(m_connection_socket, &head, m_sizeOfHeader, 0 ))
     {
         CLOG(LOGLEV_RUN, "confirmation send failed");
@@ -105,27 +106,6 @@ bool CTCPIPServer::channel_create()
     }
 
     return true;
-}
-
-void CTCPIPServer::threadfunc_server()
-{
-    bool result = channel_create();
-    if(result)
-    {
-        while(!m_shutdownrequest)
-        {
-            // listenForData() is a blocking read
-            if(!listenForData(m_connection_socket))
-            {
-                CLOG(LOGLEV_RUN, "error on listen");
-                break;
-            }
-        }
-    }
-    else
-    {
-        CLOG(LOGLEV_RUN, "server_connect failed");
-    }
 }
 
 } // comms

@@ -30,17 +30,12 @@ public:
 
     bool client_connect(std::string) override { return false; }
     bool client_disconnect() override {return false; }
-    bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
+    bool recieve(std::vector<char>& data, int& size) override { return crecieve(m_connection_socket, data, size); }
     bool transmit(const char *data, const int size) override { return ctransmit(m_connection_socket, data, size); }
-    int sizeOfReadBuffer() override { return csizeOfReadBuffer(); }
+    bool channel_create(std::string name) override;
 
 private:
-    void threadfunc_server();
-    bool channel_create();
-
     std::atomic<bool> m_shutdownrequest;
-    std::thread t_server;
-
     int m_connection_fd{0};
     int m_connection_socket{0};
 };

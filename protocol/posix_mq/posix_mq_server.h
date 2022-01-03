@@ -38,7 +38,8 @@ public:
     bool client_disconnect() override { return cclient_disconnect(); }
     bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
     bool transmit(const char *data, const int size) override { return ctransmit(m_listener_channel_desc, data, size); }
-    int sizeOfReadBuffer() override { return 0; }
+    //int sizeOfReadBuffer() override { return 0; }
+    bool channel_create(std::string name) override { return cchannel_create(name); }
 
 private:
     void threadfunc_server();

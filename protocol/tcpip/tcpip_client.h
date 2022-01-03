@@ -34,16 +34,11 @@ public:
 
     bool client_connect(std::string ip_address) override;
     bool client_disconnect() override;
-    bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
+    bool recieve(std::vector<char>& data, int& size) override { return crecieve(m_connection_fd, data, size); }
     bool transmit(const char *data, const int size) override { return ctransmit(m_connection_fd, data, size); }
 
 private:
-    void threadfunc_client_listen();
-    void threadfunc_client_write();
-
     std::atomic<bool> m_shutdownrequest{false};
-    std::thread t_client_listen;
-    std::thread t_client_write;
     int m_connection_fd{0};
     std::vector<char> m_confirmMsgBuff;
 };

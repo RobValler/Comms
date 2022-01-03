@@ -24,7 +24,7 @@ CPOSIXMQHelper::CPOSIXMQHelper()
     m_sizeOfHeader = sizeof(SMessageHeader);
 }
 
-bool CPOSIXMQHelper::channel_create(std::string name)
+bool CPOSIXMQHelper::cchannel_create(std::string name)
 {
     // create the posix mq channel
     struct mq_attr attr;

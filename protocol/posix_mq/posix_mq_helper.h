@@ -37,7 +37,7 @@ public:
     virtual ~CPOSIXMQHelper() { }                                   // Destructor
 
 protected:
-    bool channel_create(std::string name);
+    bool cchannel_create(std::string name);
     bool cclient_connect(std::string channel);
     bool cclient_disconnect();
     bool crecieve(std::vector<char>& data, int& size);
