@@ -72,26 +72,27 @@ bool CCommClient::connect(std::string server_address)
     return true;
 }
 
-bool CCommClient::read(void* message)
+bool CCommClient::read(void* message, int& size)
 {
     if(true == m_shutdownrequest)
         return false;
 
     if(0U == m_read_queue.size())
     {
-        //CLOG(LOGLEV_RUN, "read queue is empty");
+        CLOG(LOGLEV_RUN, "read queue is empty");
         return false;
     }
 
     // fetch from buffer
     m_readQueueProtect.lock();
-    m_read_container = std::move(m_read_queue.front());
-//    m_read_container = m_read_queue.front();
+    m_readcall_container = std::move(m_read_queue.front());
     m_read_queue.pop();
     m_readQueueProtect.unlock();
 
+    size = m_readcall_container.payload.size();
+
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(m_read_container.payload, m_read_container.payload.size(), message))
+    if(!m_pSerialiser->deserialise(m_readcall_container.payload, message, m_readcall_container.payload.size()))
     {
         CLOG(LOGLEV_RUN, "deserialise returned an error");
         return false;
@@ -107,8 +108,8 @@ bool CCommClient::write(void* message, int size)
 
     // serialise the output stream
     int size_of_write_message = size;
-    client_proto::SReadBufferQ m_write_container{};
-    if(!m_pSerialiser->serialise(m_write_container.payload, size_of_write_message, message))
+    client_proto::SReadBufferQ m_writecall_container{};
+    if(!m_pSerialiser->serialise(message, m_writecall_container.payload, size_of_write_message))
     {
         CLOG(LOGLEV_RUN, "serialiser returned an error");
         return false;
@@ -116,7 +117,7 @@ bool CCommClient::write(void* message, int size)
 
     // add to write queue
     m_writeQueueProtect.lock();
-    m_write_queue.push(std::move(m_write_container));
+    m_write_queue.push(std::move(m_writecall_container));
     m_writeQueueProtect.unlock();
 
     return true;
@@ -133,7 +134,7 @@ void CCommClient::readThread()
     while(!m_shutdownrequest)
     {
         // fetch the intput stream
-        if(!m_pProtocolClient->recieve(m_read_container.payload, size))
+        if(!m_pProtocolClient->recieve(m_readthread_container.payload, size))
         {
             CLOG(LOGLEV_RUN, "recieve returned an error");
             break;
@@ -141,7 +142,7 @@ void CCommClient::readThread()
 
         // write to read buffer
         m_readQueueProtect.lock();
-        m_read_queue.push(m_read_container);
+        m_read_queue.push(m_readthread_container);
         m_readQueueProtect.unlock();
     }
 
@@ -159,12 +160,12 @@ void CCommClient::writeThread()
         }
 
         m_writeQueueProtect.lock();
-        m_write_container = std::move(m_write_queue.front());
+        m_writethread_container = std::move(m_write_queue.front());
         m_write_queue.pop();
         m_writeQueueProtect.unlock();
 
         // transmit the output stream
-        if(!m_pProtocolClient->transmit(m_write_container.payload.data(), m_write_container.payload.size()))
+        if(!m_pProtocolClient->transmit(m_writethread_container.payload.data(), m_writethread_container.payload.size()))
         {
             CLOG(LOGLEV_RUN, "transmition returned an error");
         }

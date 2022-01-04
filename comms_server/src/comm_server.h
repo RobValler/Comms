@@ -14,6 +14,8 @@
 #include <atomic>
 #include <queue>
 #include <mutex>
+#include <condition_variable>
+
 
 class IProtocolServer;
 class ISerialiser;
@@ -37,7 +39,7 @@ public:
     ~CCommServer();
 
     bool connect(std::string server_address);
-    bool create();
+    bool init();
     bool read(void* message);
     bool write(void* message, int size = 0);
     int sizeOfReadBuffer();
@@ -51,6 +53,8 @@ private:
     void writeThread();
     std::thread t_read;
     std::thread t_write;
+    std::mutex cv_m;
+    std::condition_variable cv_writeThread;
 
     // delagates
     std::shared_ptr<IProtocolServer> m_pProtocolServer;
@@ -58,11 +62,13 @@ private:
 
     // buffers read
     std::queue<server_proto::SReadBufferQ> m_read_queue{};
-    server_proto::SReadBufferQ m_read_container{};
+    server_proto::SReadBufferQ m_readcall_container{};
+    server_proto::SReadBufferQ m_readthread_container{};
     std::mutex m_readQueueProtect;
 
     // buffers write
     std::queue<server_proto::SReadBufferQ> m_write_queue{};
-    server_proto::SReadBufferQ m_write_container{};
+    server_proto::SReadBufferQ m_writecall_container{};
+    server_proto::SReadBufferQ m_writethread_container{};
     std::mutex m_writeQueueProtect;
 };

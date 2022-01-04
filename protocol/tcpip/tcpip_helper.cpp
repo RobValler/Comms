@@ -116,6 +116,7 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
                             , " (", numOfBytesRead
                             ,") was not the expected amount (", m_read_header.frame_size, ")");
 #endif
+
             // read the remaining bytes if the read does not wait for all requested data
             int leftoverMessage = 0;
             for(int multi_read_index = 0; multi_read_index < 20; ++ multi_read_index)
@@ -125,7 +126,7 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
                     leftoverMessage = static_cast<int>(m_read_header.frame_size) - numOfBytesRead;
                     numOfBytesRead += recv(fd, &data[numOfBytesRead], leftoverMessage, MSG_WAITALL);
                 }
-                else if (numOfBytesRead == static_cast<int>(m_read_header.frame_size))
+                else if (numOfBytesRead >= static_cast<int>(m_read_header.frame_size))
                 {
                     break;
                 }

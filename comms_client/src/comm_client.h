@@ -39,7 +39,7 @@ public:
     ~CCommClient();                                          // Destructor
 
     bool connect(std::string server_address);
-    bool read(void* message);
+    bool read(void* message, int& size);
     bool write(void* message, int size = 0);
     int numOfMessages();
 
@@ -59,11 +59,13 @@ private:
 
     // buffers read
     std::queue<client_proto::SReadBufferQ> m_read_queue{};
-    client_proto::SReadBufferQ m_read_container{};
+    client_proto::SReadBufferQ m_readcall_container{};
+    client_proto::SReadBufferQ m_readthread_container{};
     std::mutex m_readQueueProtect;
 
     // buffers write
     std::queue<client_proto::SReadBufferQ> m_write_queue{};
-    client_proto::SReadBufferQ m_write_container{};
+    client_proto::SReadBufferQ m_writecall_container{};
+    client_proto::SReadBufferQ m_writethread_container{};
     std::mutex m_writeQueueProtect;
 };

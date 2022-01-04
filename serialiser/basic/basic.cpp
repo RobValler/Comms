@@ -16,21 +16,21 @@ namespace comms {
 namespace serial {
 namespace basic {
 
-bool CSerialiserBasic::serialise(std::vector<char>& buffer, int& size_of_message, void* incomming_data)
+bool CSerialiserBasic::serialise(void* incomming_data, std::vector<char>& outgoing_data, int& outgoing_size)
 {
-    if(0U == size_of_message)
+    if(0U == outgoing_size)
     {
         CLOG(LOGLEV_RUN, "size_of_message was not correctly set");
         return false;
     }
-    buffer.resize(size_of_message);
-    std::memcpy(&buffer[0], incomming_data, size_of_message);
+    outgoing_data.resize(outgoing_size);
+    std::memcpy(&outgoing_data[0], incomming_data, outgoing_size);
     return true;
 }
 
-bool CSerialiserBasic::deserialise(const std::vector<char>& buffer, int size_of_message, void* outgoing_data)
+bool CSerialiserBasic::deserialise(const std::vector<char>& incomming_data, void* outgoing_data, const int outgoing_size)
 {
-    std::memcpy(outgoing_data, &buffer[0], size_of_message);
+    std::memcpy(outgoing_data, &incomming_data[0], outgoing_size);
     return true;
 }
 
