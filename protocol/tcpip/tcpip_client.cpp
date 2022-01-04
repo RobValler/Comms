@@ -30,7 +30,7 @@ namespace tcpip {
 namespace client {
 
 namespace {
-    const int l_delayBetweenConnectAttempt_ms = 100;
+    const int l_delayBetweenConnectAttempt_ms = 1000;
 }
 
 CTCPIPClient::CTCPIPClient()
@@ -90,7 +90,6 @@ bool CTCPIPClient::client_connect(std::string)
             {
                 // if the connection failed, do nothing and try again in the next loop.
                 CLOG(LOGLEV_RUN, "connection attempt failed", ERR_STR);
-                continue;
             }
             else
             {

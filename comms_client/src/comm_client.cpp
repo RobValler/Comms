@@ -54,9 +54,6 @@ CCommClient::~CCommClient()
     m_pProtocolClient->client_disconnect();
     m_shutdownrequest = true;
 
-    m_pSerialiser.reset();
-    m_pProtocolClient.reset();
-
     if(t_read.joinable())
         t_read.join();
 
@@ -82,13 +79,14 @@ bool CCommClient::read(void* message)
 
     if(0U == m_read_queue.size())
     {
-        CLOG(LOGLEV_RUN, "read queue is empty");
+        //CLOG(LOGLEV_RUN, "read queue is empty");
         return false;
     }
 
     // fetch from buffer
     m_readQueueProtect.lock();
     m_read_container = std::move(m_read_queue.front());
+//    m_read_container = m_read_queue.front();
     m_read_queue.pop();
     m_readQueueProtect.unlock();
 
@@ -148,12 +146,11 @@ void CCommClient::readThread()
     }
 
     m_shutdownrequest = true;
+    CLOG(LOGLEV_RUN, "thread exited");
 }
 
 void CCommClient::writeThread()
 {
-    client_proto::SReadBufferQ m_write_container{};
-
     while(!m_shutdownrequest)
     {
         if(0U == m_write_queue.size())
@@ -174,4 +171,5 @@ void CCommClient::writeThread()
     }
 
     m_shutdownrequest = true;
+    CLOG(LOGLEV_RUN, "thread exited");
 }

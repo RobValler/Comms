@@ -64,6 +64,6 @@ private:
 
     // buffers write
     std::queue<client_proto::SReadBufferQ> m_write_queue{};
-    //client_proto::SReadBufferQ m_write_container{};
+    client_proto::SReadBufferQ m_write_container{};
     std::mutex m_writeQueueProtect;
 };

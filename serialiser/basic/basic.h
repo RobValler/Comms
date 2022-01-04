@@ -11,6 +11,8 @@
 
 #include "iserialiser.h"
 
+#include <vector>
+
 namespace comms {
 namespace serial {
 namespace basic {

@@ -76,6 +76,9 @@ bool CTCPIPServer::channel_create(std::string)
 //        return false;
 //    }
 
+    ///\ todo select() call?
+
+
     // accept the connection.
     struct sockaddr_in client_address;
     int addrlen_client = sizeof(struct sockaddr_in);

@@ -45,7 +45,7 @@ CTCPIPHelper::CTCPIPHelper()
     sigIntHandler.sa_handler = my_handler;
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
-    //sigaction(SIGINT,   &sigIntHandler, NULL); // CTRL+C
+    sigaction(SIGINT,   &sigIntHandler, NULL); // CTRL+C
     sigaction(SIGPIPE,  &sigIntHandler, NULL); // broken pipe
 
 }
@@ -61,9 +61,9 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
 
     // Check the contents of the header
     m_read_header = {};
-    numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
+    //numOfBytesRead = read( fd , &m_read_header, m_sizeOfHeader);
     //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, MSG_EOR|MSG_NOSIGNAL);
-    //numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, MSG_PEEK);
+    numOfBytesRead = recv( fd , &m_read_header, m_sizeOfHeader, MSG_WAITALL);
     if(numOfBytesRead <= 0)
     {
         if(0 == numOfBytesRead)
@@ -91,8 +91,12 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
 
     data = {};
     data.resize(m_read_header.frame_size);
-    numOfBytesRead = read(fd, data.data(), m_read_header.frame_size);
-//    numOfBytesRead = recv(fd, data.data(), m_read_header.frame_size, 0);
+
+    numOfBytesRead = 0;
+    //numOfBytesRead += recv(fd, &data[0], m_read_header.frame_size, 0);
+    numOfBytesRead += read(fd, &data[0], m_read_header.frame_size);
+
+    // check the result
     if(numOfBytesRead != static_cast<std::int32_t>(m_read_header.frame_size))
     {
         if(numOfBytesRead == -1)
@@ -107,13 +111,27 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
         }
         else
         {
+#ifdef INCOMPLETE_MSG_DEBUG
             CLOG(LOGLEV_RUN, "The number of bytes read "
-                            , static_cast<std::int32_t>(m_read_header.frame_no)
-                            , "/"
-                            , static_cast<std::int32_t>(m_read_header.max_frame_no)
                             , " (", numOfBytesRead
                             ,") was not the expected amount (", m_read_header.frame_size, ")");
-            return false;
+#endif
+            // read the remaining bytes if the read does not wait for all requested data
+            int leftoverMessage = 0;
+            for(int multi_read_index = 0; multi_read_index < 20; ++ multi_read_index)
+            {
+                if(numOfBytesRead < static_cast<int>(m_read_header.frame_size))
+                {
+                    leftoverMessage = static_cast<int>(m_read_header.frame_size) - numOfBytesRead;
+                    numOfBytesRead += recv(fd, &data[numOfBytesRead], leftoverMessage, MSG_WAITALL);
+                }
+                else if (numOfBytesRead == static_cast<int>(m_read_header.frame_size))
+                {
+                    break;
+                }
+            }
+
+//            return false;
         }
     }
 
@@ -144,7 +162,11 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
 
     //numOfBytesSent = send(fd, &data[0], size , MSG_EOR|MSG_NOSIGNAL );
     int numOfBytesSent = send(fd, &m_write_data_buffer[0], m_write_data_buffer.size() , 0 );
-    if(numOfBytesSent < 0)
+    if(0U == numOfBytesSent)
+    {
+        CLOG(LOGLEV_RUN, "no data sent", ERR_STR);
+    }
+    else if(numOfBytesSent < 0)
     {
         CLOG(LOGLEV_RUN, "error", ERR_STR);
         return false;
@@ -153,7 +175,7 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
     {
         if(numOfBytesSent != static_cast<std::int32_t>(m_write_data_buffer.size()))
         {
-            CLOG(LOGLEV_RUN, "Number of bytes sent was not expected", ERR_STR);
+            CLOG(LOGLEV_RUN, "Number of bytes sent was not expected");
             return false;
         }
     }

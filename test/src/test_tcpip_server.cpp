@@ -20,12 +20,8 @@
 
 TEST(Comms_server_TCPIP, LargeDataWriteThenRead)
 {
-    bool result = true;
-    //const int val = 460800U;
-    const int val = 2048U;
-    //const int val = 65528U;
+    const int val = 460800U;
     std::vector<char> buffer_out(val);
-    std::vector<char> buffer_in(val);
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_None);
 
     ASSERT_EQ(server.create(), true);
@@ -35,15 +31,10 @@ TEST(Comms_server_TCPIP, LargeDataWriteThenRead)
         it = 1U;
     }
 
-    while(true)
+    for(int index = 0; index < 100; ++index)
     {
-//        std::this_thread::sleep_for( std::chrono::milliseconds(100) );
+        std::this_thread::sleep_for( std::chrono::milliseconds(5) );
 
-        result = server.write(buffer_out.data(), buffer_out.size());
-        EXPECT_EQ(result, true);
-        if(false == result)
-            break;
-
-        //EXPECT_EQ(buffer_in, buffer_out);
+        EXPECT_EQ(server.write(buffer_out.data(), buffer_out.size()), true);
     }
 }

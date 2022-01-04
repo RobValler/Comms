@@ -8,8 +8,9 @@
  *****************************************************************/
 
 #include "basic.h"
-#include <cstring>
 #include "Logger.h"
+
+#include <cstring>
 
 namespace comms {
 namespace serial {

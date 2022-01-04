@@ -20,32 +20,25 @@
 
 TEST(Comms_client_TCPIP, LargeDataWriteThenRead)
 {
-
-    //const int val = 460800U;
-    const int val = 2048U;
-    //const int val = 65528U;
+    const int val = 460800U;
     std::vector<char> buffer_out(val);
     std::vector<char> buffer_in(val);
     CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_None);
 
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 
-//    // write all ones to buffer
-//    for(auto& it : buffer_out){
-//        it = 1U;
-//    }
+    // write all ones to comparison buffer
+    for(auto& it : buffer_out){
+        it = 1U;
+    }
 
-    while(true)
+    for(int index = 0; index < 100; ++index)
     {
-        std::this_thread::sleep_for( std::chrono::milliseconds(5) );
+        std::this_thread::sleep_for( std::chrono::milliseconds(10) );
 
         buffer_in={};
         buffer_in.resize(val);
-//        bool result = client.read(&buffer_in[0]);
-//        EXPECT_EQ(result, true);
-//        if(false == result)
-//            break;
-
-//        EXPECT_EQ(buffer_in, buffer_out);
+        EXPECT_EQ(client.read(&buffer_in[0]), true);
+        EXPECT_EQ(buffer_in, buffer_out);
     }
 }
