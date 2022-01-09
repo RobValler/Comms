@@ -32,7 +32,7 @@ public:
     CTCPIPHelper(CTCPIPHelper&&) = delete;                     // Move constructor
     CTCPIPHelper& operator=(const CTCPIPHelper&) = delete;     // Copy assignment operator
     CTCPIPHelper& operator=(CTCPIPHelper&&) = delete;          // Move assignment operator
-    virtual ~CTCPIPHelper();                                   // Destructor
+    virtual ~CTCPIPHelper() =default;                          // Destructor
 
     bool crecieve(const int fd, std::vector<char>& data, int& size);
     bool ctransmit(const int fd, const char *data, const int size);

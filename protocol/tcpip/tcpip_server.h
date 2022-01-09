@@ -25,7 +25,7 @@ class CTCPIPServer
         , public helper::CTCPIPHelper
 {
 public:
-    CTCPIPServer();
+    CTCPIPServer() = default;
     ~CTCPIPServer();
 
     bool client_connect(std::string) override { return false; }
@@ -35,7 +35,7 @@ public:
     bool channel_create(std::string name) override;
 
 private:
-    std::atomic<bool> m_shutdownrequest;
+    std::atomic<bool> m_shutdownrequest{false};
     int m_connection_fd{0};
     int m_connection_socket{0};
 };

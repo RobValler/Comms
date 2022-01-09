@@ -124,8 +124,11 @@ bool CCommClient::write(void* message, int size)
 }
 
 int CCommClient::numOfMessages()
-{
-    return 0;
+{    
+//    m_writeQueueProtect.lock();
+    int size = m_read_queue.size();
+//    m_writeQueueProtect.unlock();
+    return size;
 }
 
 void CCommClient::readThread()

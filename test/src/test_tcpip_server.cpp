@@ -39,7 +39,6 @@ TEST(Comms_server_TCPIP, LargeDataWriteThenRead)
     }
 }
 
-
 TEST(Comms_server_TCPIP, LargeDataWriteThenReadProto)
 {
     const int val = 460800U;
@@ -61,5 +60,6 @@ TEST(Comms_server_TCPIP, LargeDataWriteThenReadProto)
     {
         std::this_thread::sleep_for( std::chrono::microseconds(500) );
         ASSERT_EQ(server.write(&out), true);
+        std::cout << "message sent!! " << index << std::endl;
     }
 }

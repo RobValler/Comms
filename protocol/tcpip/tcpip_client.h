@@ -25,7 +25,7 @@ class CTCPIPClient
         , public helper::CTCPIPHelper
 {
 public:
-    CTCPIPClient();
+    CTCPIPClient() =default;
     CTCPIPClient(const CTCPIPClient&) = delete;                // Copy constructor
     CTCPIPClient(CTCPIPClient&&) = delete;                     // Move constructor
     CTCPIPClient& operator=(const CTCPIPClient&) = delete;     // Copy assignment operator

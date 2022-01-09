@@ -46,13 +46,8 @@ CTCPIPHelper::CTCPIPHelper()
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT,   &sigIntHandler, NULL); // CTRL+C
+    //sigaction(SIGTSTP,  &sigIntHandler, NULL); // CTRL+Z
     sigaction(SIGPIPE,  &sigIntHandler, NULL); // broken pipe
-
-}
-
-CTCPIPHelper::~CTCPIPHelper()
-{
-
 }
 
 bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
@@ -68,7 +63,7 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
     {
         if(0 == numOfBytesRead)
         {
-            CLOG(LOGLEV_RUN, "Connection closed,", ERR_STR);
+            CLOG(LOGLEV_RUN, "Connection closed.", ERR_STR);
             return false;
         }
         else if(-1 == numOfBytesRead)

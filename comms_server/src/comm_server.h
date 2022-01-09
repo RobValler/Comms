@@ -39,6 +39,11 @@ public:
     ~CCommServer();
 
     bool connect(std::string server_address);
+
+/*! \fn bool init();
+    \brief blocking call, block is released on successful connection or failure
+    \return success/no success
+*/
     bool init();
     bool read(void* message);
     bool write(void* message, int size = 0);

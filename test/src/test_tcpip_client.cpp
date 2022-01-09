@@ -68,15 +68,25 @@ TEST(Comms_client_TCPIP, LargeDataWriteThenReadProto)
     }
     *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
 
-    for(int index = 0; index < 10; ++index)
+    int index = 0;
+    while(index < 10)
     {
         std::this_thread::sleep_for( std::chrono::milliseconds(100));
 
         in.Clear();
-        EXPECT_EQ(client.read(&in, size), true);
-        EXPECT_EQ(in.test_string(), "moose");
-        const google::protobuf::RepeatedField<int32_t> & myField1 = in.data();
-        const google::protobuf::RepeatedField<int32_t> & myField2 = out.data();
-        EXPECT_EQ(true, std::equal(myField1.begin(), myField1.end(), myField2.begin()));
+        if(client.numOfMessages() > 0)
+        {
+            EXPECT_EQ(client.read(&in, size), true);
+            EXPECT_EQ(in.test_string(), "moose");
+            const google::protobuf::RepeatedField<int32_t> & myField1 = in.data();
+            const google::protobuf::RepeatedField<int32_t> & myField2 = out.data();
+            EXPECT_EQ(true, std::equal(myField1.begin(), myField1.end(), myField2.begin()));
+            index++;
+            std::cout << "message read!! " << index << std::endl;
+        }
+        else
+        {
+            std::cout << "message NOT read!! " << index << std::endl;
+        }
     }
 }

@@ -33,11 +33,6 @@ namespace {
     const int l_delayBetweenConnectAttempt_ms = 1000;
 }
 
-CTCPIPClient::CTCPIPClient()
-{
-
-}
-
 CTCPIPClient::~CTCPIPClient()
 {
     static_cast<void>(client_disconnect());
@@ -89,11 +84,11 @@ bool CTCPIPClient::client_connect(std::string)
             if (0 > connect(m_connection_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
             {
                 // if the connection failed, do nothing and try again in the next loop.
-                CLOG(LOGLEV_RUN, "connection attempt failed", ERR_STR);
+                CLOG(LOGLEV_RUN, "Connection attempt failed.", ERR_STR);
             }
             else
             {
-                CLOG(LOGLEV_RUN, "client connected");
+                CLOG(LOGLEV_RUN, "Client connected.");
 
                 // read handshaking message with server
                 m_confirmMsgBuff.resize(m_sizeOfHeader);
@@ -107,17 +102,19 @@ bool CTCPIPClient::client_connect(std::string)
                 SMessageHeader *pHeader = (SMessageHeader*)&m_confirmMsgBuff[0];
                 if(EMsgTypCtrl != pHeader->type)
                 {
-                    CLOG(LOGLEV_RUN, "wrong msg type");
+                    CLOG(LOGLEV_RUN, "Wrong msg type");
                     continue;
                 }
 
-                CLOG(LOGLEV_RUN, "client connection confirmed");
+                CLOG(LOGLEV_RUN, "Client connection confirmed");
 
                 result = true;
                 break;
-            } // else
-        } // if(l_max_num_of_connect_attempts
+            } //
+        } //
+
         std::this_thread::sleep_for( std::chrono::milliseconds(l_delayBetweenConnectAttempt_ms) );
+
     } // for
 
     return result;

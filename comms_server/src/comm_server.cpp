@@ -56,6 +56,7 @@ CCommServer::CCommServer(server_proto::EProtocolType protocol, server_proto::ESe
 CCommServer::~CCommServer()
 {
     m_shutdownrequest = true;
+    cv_writeThread.notify_one();
 
     if(t_read.joinable())
         t_read.join();
@@ -172,6 +173,9 @@ void CCommServer::writeThread()
         // block the loop until new data comes
         std::unique_lock<std::mutex> thread_lock(cv_m);
         cv_writeThread.wait(thread_lock);
+
+        if(m_shutdownrequest)
+            break;
 
         m_writeQueueProtect.lock();
         //m_write_container = std::move(m_write_queue.front());

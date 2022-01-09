@@ -28,15 +28,13 @@ namespace tcpip {
 namespace server {
 
 
-CTCPIPServer::CTCPIPServer()
-    : m_shutdownrequest(false)
-{
-
-}
-
 CTCPIPServer::~CTCPIPServer()
 {
-    shutdown(m_connection_fd, SHUT_RDWR); // aborts any blocking calls on the server
+    // aborts any blocking calls on the server
+    if( 0 > shutdown(m_connection_fd, SHUT_RDWR))
+    {
+        CLOG(LOGLEV_RUN, "Shutdown failed.", ERR_STR);
+    }
     m_shutdownrequest = true;
 }
 
@@ -53,6 +51,8 @@ bool CTCPIPServer::channel_create(std::string)
         return false;
     }
 
+    CLOG(LOGLEV_RUN, "Socket options set", ERR_STR);
+
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
@@ -60,15 +60,20 @@ bool CTCPIPServer::channel_create(std::string)
 
     if (bind(m_connection_fd, (struct sockaddr *)&server_address, sizeof(server_address))<0)
     {
-        CLOG(LOGLEV_RUN, "bind failed", ERR_STR);
+        CLOG(LOGLEV_RUN, "bind failed.", ERR_STR);
         return false;
     }
 
+    CLOG(LOGLEV_RUN, "Socket bound.", ERR_STR);
+
     // listen out for any external connections.
-    if (listen(m_connection_fd, 3) < 0) {
-        CLOG(LOGLEV_RUN, "listen failed");
+    if (listen(m_connection_fd, 3) < 0)
+    {
+        CLOG(LOGLEV_RUN, "Listen failed.", ERR_STR);
         return false;
     }
+
+    CLOG(LOGLEV_RUN, "External client found.", ERR_STR);
 
     //set non blocking
 //    if(fcntl(m_connection_fd, F_SETFL, fcntl(m_connection_fd, F_GETFL) | O_NONBLOCK) < 0) {
@@ -77,22 +82,26 @@ bool CTCPIPServer::channel_create(std::string)
 //    }
 
     ///\ todo select() call?
-
+//    select()
 
     // accept the connection.
     struct sockaddr_in client_address;
     int addrlen_client = sizeof(struct sockaddr_in);
     m_connection_socket = accept(m_connection_fd, (struct sockaddr *)&client_address, (socklen_t*)&addrlen_client);
     if ( m_connection_socket < 0) {
-        if(!m_shutdownrequest) {
-            CLOG(LOGLEV_RUN, "accept failed = ", m_connection_socket);
+        if(!m_shutdownrequest)
+        {
+            CLOG(LOGLEV_RUN, "Accept failed = ", m_connection_socket);
             return false;
-        } else {
+        }
+        else
+        {
+            CLOG(LOGLEV_RUN, "Client accept aborted, shutdown request detected.");
             return true;
         }
     }
 
-    CLOG(LOGLEV_RUN, "server has connected to a client");
+    CLOG(LOGLEV_RUN, "Server has connected to a client.");
 
     // send the confirmation message
     SMessageHeader head;
