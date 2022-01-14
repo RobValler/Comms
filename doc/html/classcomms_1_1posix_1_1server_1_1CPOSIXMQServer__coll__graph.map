@@ -1,7 +1,7 @@
 <map id="comms::posix::server::CPOSIXMQServer" name="comms::posix::server::CPOSIXMQServer">
-<area shape="rect" id="node1" title=" " alt="" coords="16,565,187,804"/>
-<area shape="rect" id="node2" href="$classIProtocolServer.html" title=" " alt="" coords="5,263,165,413"/>
-<area shape="rect" id="node3" href="$classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html" title=" " alt="" coords="189,160,403,516"/>
-<area shape="rect" id="node4" href="$structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="127,5,289,97"/>
-<area shape="rect" id="node5" href="$structSMessageHeader.html" title=" " alt="" coords="317,5,451,97"/>
+<area shape="rect" id="node1" title=" " alt="" coords="16,624,187,877"/>
+<area shape="rect" id="node2" href="$classIProtocolServer.html" title=" " alt="" coords="5,314,165,479"/>
+<area shape="rect" id="node3" href="$classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html" title=" " alt="" coords="189,219,403,575"/>
+<area shape="rect" id="node4" href="$structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="127,35,289,127"/>
+<area shape="rect" id="node5" href="$structSMessageHeader.html" title="\ todo sort the padding out for linux (and windows)" alt="" coords="317,5,451,156"/>
 </map>

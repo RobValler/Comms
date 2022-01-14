@@ -77,8 +77,8 @@ Inheritance diagram for comms::posix::server::CPOSIXMQServer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classcomms_1_1posix_1_1server_1_1CPOSIXMQServer__inherit__graph.png" border="0" usemap="#comms_1_1posix_1_1server_1_1CPOSIXMQServer_inherit__map" alt="Inheritance graph"/></div>
 <map name="comms_1_1posix_1_1server_1_1CPOSIXMQServer_inherit__map" id="comms_1_1posix_1_1server_1_1CPOSIXMQServer_inherit__map">
-<area shape="rect" title=" " alt="" coords="105,439,276,677"/>
-<area shape="rect" href="classIProtocolServer.html" title=" " alt="" coords="5,123,165,273"/>
+<area shape="rect" title=" " alt="" coords="105,439,276,692"/>
+<area shape="rect" href="classIProtocolServer.html" title=" " alt="" coords="5,115,165,281"/>
 <area shape="rect" href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html" title=" " alt="" coords="189,5,403,391"/>
 </map>
 </div>
@@ -87,11 +87,11 @@ Collaboration diagram for comms::posix::server::CPOSIXMQServer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classcomms_1_1posix_1_1server_1_1CPOSIXMQServer__coll__graph.png" border="0" usemap="#comms_1_1posix_1_1server_1_1CPOSIXMQServer_coll__map" alt="Collaboration graph"/></div>
 <map name="comms_1_1posix_1_1server_1_1CPOSIXMQServer_coll__map" id="comms_1_1posix_1_1server_1_1CPOSIXMQServer_coll__map">
-<area shape="rect" title=" " alt="" coords="16,565,187,804"/>
-<area shape="rect" href="classIProtocolServer.html" title=" " alt="" coords="5,263,165,413"/>
-<area shape="rect" href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html" title=" " alt="" coords="189,160,403,516"/>
-<area shape="rect" href="structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="127,5,289,97"/>
-<area shape="rect" href="structSMessageHeader.html" title=" " alt="" coords="317,5,451,97"/>
+<area shape="rect" title=" " alt="" coords="16,624,187,877"/>
+<area shape="rect" href="classIProtocolServer.html" title=" " alt="" coords="5,314,165,479"/>
+<area shape="rect" href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html" title=" " alt="" coords="189,219,403,575"/>
+<area shape="rect" href="structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="127,35,289,127"/>
+<area shape="rect" href="structSMessageHeader.html" title="\ todo sort the padding out for linux (and windows)" alt="" coords="317,5,451,156"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -121,9 +121,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>recieve</b> (std::vec
 <tr class="memitem:a55109270baebee8a27954c753cf8a2b7"><td class="memItemLeft" align="right" valign="top"><a id="a55109270baebee8a27954c753cf8a2b7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>transmit</b> (const char *data, const int size) override</td></tr>
 <tr class="separator:a55109270baebee8a27954c753cf8a2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fa6de3f05241f382f9ebcc53c9a2efe"><td class="memItemLeft" align="right" valign="top"><a id="a1fa6de3f05241f382f9ebcc53c9a2efe"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>sizeOfReadBuffer</b> () override</td></tr>
-<tr class="separator:a1fa6de3f05241f382f9ebcc53c9a2efe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0ca72230414374cfe02a06585273e94"><td class="memItemLeft" align="right" valign="top"><a id="ae0ca72230414374cfe02a06585273e94"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>channel_create</b> (std::string name) override</td></tr>
+<tr class="separator:ae0ca72230414374cfe02a06585273e94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a966da7a814b2001a2ee50cbfecca759c"><td class="memItemLeft" align="right" valign="top"><a id="a966da7a814b2001a2ee50cbfecca759c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>channel_destroy</b> () override</td></tr>
+<tr class="separator:a966da7a814b2001a2ee50cbfecca759c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html">comms::posix::helper::CPOSIXMQHelper</a></td></tr>
 <tr class="memitem:a3e783b9ae0abc741141dda847d3fbd71 inherit pub_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memItemLeft" align="right" valign="top"><a id="a3e783b9ae0abc741141dda847d3fbd71"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CPOSIXMQHelper</b> (const <a class="el" href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html">CPOSIXMQHelper</a> &amp;)=delete</td></tr>
@@ -141,9 +144,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>sizeOfReadBuffer</b> (
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html">comms::posix::helper::CPOSIXMQHelper</a></td></tr>
-<tr class="memitem:a28c59e0d347bad7d6d5b558a80463bdc inherit pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memItemLeft" align="right" valign="top"><a id="a28c59e0d347bad7d6d5b558a80463bdc"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>channel_create</b> (std::string name)</td></tr>
-<tr class="separator:a28c59e0d347bad7d6d5b558a80463bdc inherit pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeded4c55c296586d6e112f12e877dcef inherit pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memItemLeft" align="right" valign="top"><a id="aeded4c55c296586d6e112f12e877dcef"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>cchannel_create</b> (std::string name)</td></tr>
+<tr class="separator:aeded4c55c296586d6e112f12e877dcef inherit pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26440e253472e0a477b255cf57a0f35a inherit pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memItemLeft" align="right" valign="top"><a id="a26440e253472e0a477b255cf57a0f35a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>cclient_connect</b> (std::string channel)</td></tr>
 <tr class="separator:a26440e253472e0a477b255cf57a0f35a inherit pro_methods_classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>

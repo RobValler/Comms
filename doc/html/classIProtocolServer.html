@@ -73,9 +73,9 @@ Inheritance diagram for IProtocolServer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIProtocolServer__inherit__graph.png" border="0" usemap="#IProtocolServer_inherit__map" alt="Inheritance graph"/></div>
 <map name="IProtocolServer_inherit__map" id="IProtocolServer_inherit__map">
-<area shape="rect" title=" " alt="" coords="105,5,265,156"/>
-<area shape="rect" href="classcomms_1_1posix_1_1server_1_1CPOSIXMQServer.html" title=" " alt="" coords="5,204,176,443"/>
-<area shape="rect" href="classcomms_1_1tcpip_1_1server_1_1CTCPIPServer.html" title=" " alt="" coords="200,233,360,413"/>
+<area shape="rect" title=" " alt="" coords="105,5,265,171"/>
+<area shape="rect" href="classcomms_1_1posix_1_1server_1_1CPOSIXMQServer.html" title=" " alt="" coords="5,219,176,472"/>
+<area shape="rect" href="classcomms_1_1tcpip_1_1server_1_1CTCPIPServer.html" title=" " alt="" coords="200,248,360,443"/>
 </map>
 </div>
 <div class="dynheader">
@@ -83,7 +83,7 @@ Collaboration diagram for IProtocolServer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIProtocolServer__coll__graph.png" border="0" usemap="#IProtocolServer_coll__map" alt="Collaboration graph"/></div>
 <map name="IProtocolServer_coll__map" id="IProtocolServer_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,165,156"/>
+<area shape="rect" title=" " alt="" coords="5,5,165,171"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -101,9 +101,12 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>recieve</b> (
 <tr class="memitem:a3a651c3783645a0b023c3593e8e17df4"><td class="memItemLeft" align="right" valign="top"><a id="a3a651c3783645a0b023c3593e8e17df4"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>transmit</b> (const char *, const int)=0</td></tr>
 <tr class="separator:a3a651c3783645a0b023c3593e8e17df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25e3a128e99617e7adbfcc9cdb3b6c89"><td class="memItemLeft" align="right" valign="top"><a id="a25e3a128e99617e7adbfcc9cdb3b6c89"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>sizeOfReadBuffer</b> ()=0</td></tr>
-<tr class="separator:a25e3a128e99617e7adbfcc9cdb3b6c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae415887ff563e44a68e5b3faf28c470d"><td class="memItemLeft" align="right" valign="top"><a id="ae415887ff563e44a68e5b3faf28c470d"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>channel_create</b> (std::string)=0</td></tr>
+<tr class="separator:ae415887ff563e44a68e5b3faf28c470d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47774020b3bbe606d18eb0ec981f8c80"><td class="memItemLeft" align="right" valign="top"><a id="a47774020b3bbe606d18eb0ec981f8c80"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>channel_destroy</b> ()=0</td></tr>
+<tr class="separator:a47774020b3bbe606d18eb0ec981f8c80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/rob/WORK/Development/Comms/protocol/<a class="el" href="iprotocol__server_8h_source.html">iprotocol_server.h</a></li>

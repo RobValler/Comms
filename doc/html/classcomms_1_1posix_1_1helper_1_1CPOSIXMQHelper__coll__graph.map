@@ -1,5 +1,5 @@
 <map id="comms::posix::helper::CPOSIXMQHelper" name="comms::posix::helper::CPOSIXMQHelper">
-<area shape="rect" id="node1" title=" " alt="" coords="68,160,281,516"/>
-<area shape="rect" id="node2" href="$structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="5,5,168,97"/>
-<area shape="rect" id="node3" href="$structSMessageHeader.html" title=" " alt="" coords="195,5,330,97"/>
+<area shape="rect" id="node1" title=" " alt="" coords="68,219,281,575"/>
+<area shape="rect" id="node2" href="$structcomms_1_1posix_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="5,35,168,127"/>
+<area shape="rect" id="node3" href="$structSMessageHeader.html" title="\ todo sort the padding out for linux (and windows)" alt="" coords="195,5,330,156"/>
 </map>

@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['m_5fwrite_5fheader_16',['m_write_header',['../classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html#aa6056a92ebeee0b06c6943b1ade8efcb',1,'comms::posix::helper::CPOSIXMQHelper']]],
-  ['messages_17',['messages',['../md__home_rob_WORK_Development_Comms_messages_README.html',1,'']]]
+  ['init_17',['init',['../classCCommServer.html#a6ebe2610c31353c6c664b1b1b137198c',1,'CCommServer']]],
+  ['instid_18',['instID',['../structSMessageHeader.html#abd9e373afa1572ca197740c246c51344',1,'SMessageHeader']]],
+  ['iprotocolclient_19',['IProtocolClient',['../classIProtocolClient.html',1,'']]],
+  ['iprotocolserver_20',['IProtocolServer',['../classIProtocolServer.html',1,'']]],
+  ['iserialiser_21',['ISerialiser',['../classISerialiser.html',1,'']]]
 ];

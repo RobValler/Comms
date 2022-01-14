@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['m_5fwrite_5fheader_45',['m_write_header',['../classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html#aa6056a92ebeee0b06c6943b1ade8efcb',1,'comms::posix::helper::CPOSIXMQHelper']]]
+  ['frame_5fno_58',['frame_no',['../structSMessageHeader.html#a407faafb0ed52bad6e4840c97c2dc0b4',1,'SMessageHeader']]],
+  ['frame_5fsize_59',['frame_size',['../structSMessageHeader.html#a3752b58922b71b08c370229b4d0dd101',1,'SMessageHeader']]]
 ];
