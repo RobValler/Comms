@@ -54,11 +54,11 @@ CCommClient::~CCommClient()
     m_pProtocolClient->client_disconnect();
     m_shutdownrequest = true;
 
-    if(t_read.joinable())
-        t_read.join();
-
     if(t_write.joinable())
         t_write.join();
+
+    if(t_read.joinable())
+        t_read.join();
 }
 
 bool CCommClient::connect(std::string server_address)

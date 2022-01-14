@@ -100,7 +100,7 @@ bool CTCPIPClient::client_connect(std::string)
 
                 // check the handshake message
                 SMessageHeader *pHeader = (SMessageHeader*)&m_confirmMsgBuff[0];
-                if(EMsgTypCtrl != pHeader->type)
+                if(EMsgTypConnect != pHeader->type)
                 {
                     CLOG(LOGLEV_RUN, "Wrong msg type");
                     continue;

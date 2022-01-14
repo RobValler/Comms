@@ -30,11 +30,6 @@ namespace server {
 
 CTCPIPServer::~CTCPIPServer()
 {
-    // aborts any blocking calls on the server
-    if( 0 > shutdown(m_connection_fd, SHUT_RDWR))
-    {
-        CLOG(LOGLEV_RUN, "Shutdown failed.", ERR_STR);
-    }
     m_shutdownrequest = true;
 }
 
@@ -108,12 +103,41 @@ bool CTCPIPServer::channel_create(std::string)
     head.instID = 0;
 //    head.frame_size = 0;
     head.max_size = 0;
-    head.type = EMsgTypCtrl;
+    head.type = EMsgTypConnect;
     head.frame_no = 1;
     head.max_frame_no = 1;
     if(0 > send(m_connection_socket, &head, m_sizeOfHeader, 0 ))
     {
-        CLOG(LOGLEV_RUN, "confirmation send failed");
+        CLOG(LOGLEV_RUN, "confirmation send failed.", ERR_STR);
+        return false;
+    }
+
+    return true;
+}
+
+bool CTCPIPServer::channel_destroy()
+{
+    // notify any clients that this is closing
+    SMessageHeader head;
+    head.instID = 0;
+    head.frame_size = 0;
+    head.max_size = 0;
+    head.type = EMsgTypDisConnect;
+    head.frame_no = 1;
+    head.max_frame_no = 1;
+    if(0 > send(m_connection_socket, &head, m_sizeOfHeader, 0 ))
+    {
+        CLOG(LOGLEV_RUN, "Disconnect send failed.", ERR_STR);
+        return false;
+    }
+
+    // shutdown the server FD
+    if(-1 == m_connection_fd)
+        return false;
+
+    if( 0 > shutdown(m_connection_fd, SHUT_RDWR))
+    {
+        CLOG(LOGLEV_RUN, "Shutdown failed.", ERR_STR);
         return false;
     }
 

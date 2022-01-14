@@ -79,6 +79,24 @@ bool CTCPIPHelper::crecieve(const int fd, std::vector<char>& data, int&)
     }
 
     // check the message type
+    switch(m_read_header.type)
+    {
+        case EMsgTypData:
+            // data package - continue
+            break;
+        case EMsgTypDisConnect:
+        {
+            // Disconnect message - only the server would send this.
+            CLOG(LOGLEV_RUN, "Disconnect message received.");
+            return false;
+        }
+        default:
+        {
+            CLOG(LOGLEV_RUN, "Wrong header type.");
+            return false;
+        }
+    }
+
     if(EMsgTypData != m_read_header.type) {
         CLOG(LOGLEV_RUN, "wrong header type");
         return false;

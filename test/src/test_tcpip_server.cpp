@@ -18,10 +18,9 @@
 #include <thread>
 #include <iostream>
 
-TEST(Comms_server_TCPIP, LargeDataWriteThenRead)
+TEST(Comms_server_TCPIP, LargeDataWriteThenReadBasic)
 {
-    const int val = 460800U;
-    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_out(sizeOfData);
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_None);
 
     ASSERT_EQ(server.init(), true);
@@ -31,35 +30,31 @@ TEST(Comms_server_TCPIP, LargeDataWriteThenRead)
         it = 1U;
     }
 
-    for(int index = 0; index < 1000; ++index)
+    for(int index = 0; index < numOfLoops; ++index)
     {
-        std::this_thread::sleep_for( std::chrono::microseconds(500) );
-
+        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenReads_usec) );
         EXPECT_EQ(server.write(buffer_out.data(), buffer_out.size()), true);
+        std::cout << "sent " << index << std::endl;
     }
 }
 
 TEST(Comms_server_TCPIP, LargeDataWriteThenReadProto)
-{
-    const int val = 460800U;
-    std::vector<char> buffer_out(val);
+{    
+    std::vector<char> buffer_out(sizeOfData);
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
     test_msg in, out;
 
     ASSERT_EQ(server.init(), true);
 
-    // write all ones to buffer
+    // write all ones to the protobuffer
     for(auto& it : buffer_out){
         it = 1U;
     }
-
     *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
-    out.set_test_string("moose");
 
-    for(int index = 0; index < 10; ++index)
+    for(int index = 0; index < numOfLoops; ++index)
     {
-        std::this_thread::sleep_for( std::chrono::microseconds(500) );
+        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenReads_usec) );
         ASSERT_EQ(server.write(&out), true);
-        std::cout << "message sent!! " << index << std::endl;
-    }
+    }    
 }

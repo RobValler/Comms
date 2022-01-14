@@ -27,7 +27,7 @@ file(GLOB_RECURSE SERVER_SOURCES
     ${ProtobufIncludePath}/*.pb.cc
     )
 file(GLOB_RECURSE SERVER_HEADERS
-    #${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common.h
     ${ProtobufIncludePath}/*.pb.h
     )
 
@@ -42,7 +42,7 @@ file(GLOB_RECURSE CLIENT_SOURCES
     ${ProtobufIncludePath}/*.pb.cc
     )
 file(GLOB_RECURSE CLIENT_HEADERS
-    #${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common.h
     ${ProtobufIncludePath}/*.pb.h
     )
 

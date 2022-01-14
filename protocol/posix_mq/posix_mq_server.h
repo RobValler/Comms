@@ -40,6 +40,7 @@ public:
     bool transmit(const char *data, const int size) override { return ctransmit(m_listener_channel_desc, data, size); }
     //int sizeOfReadBuffer() override { return 0; }
     bool channel_create(std::string name) override { return cchannel_create(name); }
+    bool channel_destroy() override { return false; }
 
 private:
     void threadfunc_server();

@@ -17,18 +17,19 @@
 enum EMessageType : std::uint8_t
 {
     EMsgTypNone = 0,
-    EMsgTypCtrl,
+    EMsgTypConnect,
+    EMsgTypDisConnect,
     EMsgTypData
 };
 
 ///\ todo sort the padding out for linux (and windows)
 struct SMessageHeader {
     std::uint8_t instID;                ///< ID for this message instance
-    std::uint32_t frame_size;           ///< message size size
+    std::uint32_t frame_size;           ///< message size size - NOT USED
     std::uint32_t max_size;             ///< total message size
     std::uint8_t type;                  ///< message type. data or control
-    std::uint8_t frame_no;              ///< curret frame
-    std::uint8_t max_frame_no;          ///< number of frames for this message
+    std::uint8_t frame_no;              ///< curret frame - NOT USED
+    std::uint8_t max_frame_no;          ///< number of frames for this message - NOT USED
 };
 
 const std::string l_mq_channel_name("/posix_test_mq"); ///\ todo replace with parameter

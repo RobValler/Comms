@@ -11,8 +11,6 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <google/protobuf/repeated_field.h>
 
-
-
 #include "comm_client.h"
 #include "example.pb.h"
 #include "common.h"
@@ -22,13 +20,10 @@
 #include <thread>
 #include <iostream>
 
-TEST(Comms_client_TCPIP, LargeDataWriteThenRead)
+TEST(Comms_client_TCPIP, LargeDataWriteThenReadBasic)
 {
-
-    const int val = 460800U;
-    int size;
-    std::vector<char> buffer_out(val);
-    std::vector<char> buffer_in(val);
+    std::vector<char> buffer_out(sizeOfData);
+    std::vector<char> buffer_in(sizeOfData);
     CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_None);
 
     ASSERT_EQ(client.connect("127.0.0.1"), true);
@@ -38,25 +33,38 @@ TEST(Comms_client_TCPIP, LargeDataWriteThenRead)
         it = 1U;
     }
 
-    for(int index = 0; index < 1000; ++index)
+    int size = 0;
+    int index = 0;
+    int numOfTimesNotRead = 0;
+    while(index < numOfLoops)
     {
-        std::this_thread::sleep_for( std::chrono::microseconds(1500));
+        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenReads_usec));
 
-        buffer_in={};
-        buffer_in.resize(val);
-        EXPECT_EQ(client.read(&buffer_in[0], size), true);
-        EXPECT_EQ(buffer_in.size(), size);
-        EXPECT_EQ(buffer_in, buffer_out);
+        if(client.numOfMessages() > 0)
+        {
+            buffer_in={};
+            buffer_in.resize(sizeOfData);
+            EXPECT_EQ(client.read(&buffer_in[0], size), true);
+            EXPECT_EQ(buffer_in.size(), size);
+            EXPECT_EQ(buffer_in, buffer_out);
+            index++;
+            std::cout << "read " << index << std::endl;
+        }
+        else
+        {
+            numOfTimesNotRead++;
+            //std::cout << "not read" << std::endl;
+        }
     }
+
+    std::cout << "Number of failed reads " << numOfTimesNotRead << std::endl;
 }
 
 TEST(Comms_client_TCPIP, LargeDataWriteThenReadProto)
 {
-
-    const int val = 460800U;
     int size;
-    std::vector<char> buffer_in(val);
-    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_in(sizeOfData);
+    std::vector<char> buffer_out(sizeOfData);
     CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
 
@@ -69,24 +77,26 @@ TEST(Comms_client_TCPIP, LargeDataWriteThenReadProto)
     *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
 
     int index = 0;
-    while(index < 10)
+    int numOfTimesNotRead = 0;
+    while(index < numOfLoops)
     {
-        std::this_thread::sleep_for( std::chrono::milliseconds(100));
+        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenReads_usec));
 
-        in.Clear();
         if(client.numOfMessages() > 0)
         {
+            in.Clear();
             EXPECT_EQ(client.read(&in, size), true);
-            EXPECT_EQ(in.test_string(), "moose");
+            //EXPECT_EQ(in.test_string(), "moose");
             const google::protobuf::RepeatedField<int32_t> & myField1 = in.data();
             const google::protobuf::RepeatedField<int32_t> & myField2 = out.data();
             EXPECT_EQ(true, std::equal(myField1.begin(), myField1.end(), myField2.begin()));
             index++;
-            std::cout << "message read!! " << index << std::endl;
         }
         else
         {
-            std::cout << "message NOT read!! " << index << std::endl;
+            numOfTimesNotRead++;
         }
     }
+
+    std::cout << "Number of failed reads " << numOfTimesNotRead << std::endl;
 }

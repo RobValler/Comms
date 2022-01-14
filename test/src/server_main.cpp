@@ -13,5 +13,6 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::GTEST_FLAG(filter) = "*.*Proto";
+    //::testing::GTEST_FLAG(filter) = "*.*Basic";
     return RUN_ALL_TESTS();
 }

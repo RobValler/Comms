@@ -20,6 +20,6 @@ public:
     virtual bool client_disconnect()=0;
     virtual bool recieve(std::vector<char>&, int&) =0;
     virtual bool transmit(const char*, const int) =0;
-    //virtual int sizeOfReadBuffer() =0;
     virtual bool channel_create(std::string) =0;
+    virtual bool channel_destroy() =0;
 };

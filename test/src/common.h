@@ -7,13 +7,11 @@
  * without the express permission of the copyright holder
  *****************************************************************/
 
-#include <gtest/gtest.h>
+#pragma once
 
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::GTEST_FLAG(filter) = "*.*Proto";
-    //::testing::GTEST_FLAG(filter) = "*.*Basic";
-    return RUN_ALL_TESTS();
+namespace {
+    constexpr int sizeOfData = 460800U;
+    constexpr int numOfLoops = 100U;
+    constexpr int delayBetweenWrites_usec = 500U;
+    constexpr int delayBetweenReads_usec = 1500U;
 }
-

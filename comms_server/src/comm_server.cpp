@@ -55,15 +55,15 @@ CCommServer::CCommServer(server_proto::EProtocolType protocol, server_proto::ESe
 
 CCommServer::~CCommServer()
 {
+    m_pProtocolServer->channel_destroy();
     m_shutdownrequest = true;
     cv_writeThread.notify_one();
-
-    if(t_read.joinable())
-        t_read.join();
 
     if(t_write.joinable())
         t_write.join();
 
+    if(t_read.joinable())
+        t_read.join();
 }
 
 bool CCommServer::connect(std::string server_address)

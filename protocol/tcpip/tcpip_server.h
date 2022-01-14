@@ -33,6 +33,7 @@ public:
     bool recieve(std::vector<char>& data, int& size) override { return crecieve(m_connection_socket, data, size); }
     bool transmit(const char *data, const int size) override { return ctransmit(m_connection_socket, data, size); }
     bool channel_create(std::string name) override;
+    bool channel_destroy() override;
 
 private:
     std::atomic<bool> m_shutdownrequest{false};
