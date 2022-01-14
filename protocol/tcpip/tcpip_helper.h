@@ -43,6 +43,7 @@ protected:
 
     SMessageHeader m_read_header{};
     SMessageHeader m_write_header{};
+    std::vector<char> m_write_data_buffer{};
 
 };
 

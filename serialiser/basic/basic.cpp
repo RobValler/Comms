@@ -28,7 +28,7 @@ bool CSerialiserBasic::serialise(void* incomming_data, std::vector<char>& outgoi
     return true;
 }
 
-bool CSerialiserBasic::deserialise(const std::vector<char>& incomming_data, void* outgoing_data, const int outgoing_size)
+bool CSerialiserBasic::deserialise(const std::vector<char>& incomming_data, void* outgoing_data, int& outgoing_size)
 {
     std::memcpy(outgoing_data, &incomming_data[0], outgoing_size);
     return true;

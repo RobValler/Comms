@@ -92,7 +92,7 @@ bool CCommClient::read(void* message, int& size)
     size = m_readcall_container.payload.size();
 
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(m_readcall_container.payload, message, m_readcall_container.payload.size()))
+    if(!m_pSerialiser->deserialise(m_readcall_container.payload, message, size))
     {
         CLOG(LOGLEV_RUN, "deserialise returned an error");
         return false;
@@ -125,9 +125,9 @@ bool CCommClient::write(void* message, int size)
 
 int CCommClient::numOfMessages()
 {    
-//    m_writeQueueProtect.lock();
+    m_writeQueueProtect.lock();
     int size = m_read_queue.size();
-//    m_writeQueueProtect.unlock();
+    m_writeQueueProtect.unlock();
     return size;
 }
 

@@ -10,8 +10,9 @@
 #pragma once
 
 namespace {
-    constexpr int sizeOfData = 460800U;
-    constexpr int numOfLoops = 100U;
-    constexpr int delayBetweenWrites_usec = 500U;
-    constexpr int delayBetweenReads_usec = 1500U;
+    //constexpr int sizeOfData = 4608000U;
+    constexpr int sizeOfData = 7*1024*1024;
+    constexpr int numOfLoops = 10U;
+    constexpr int delayBetweenWrites_usec = 0U;
+    constexpr int delayBetweenReads_usec = 0U;
 }

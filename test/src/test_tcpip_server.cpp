@@ -32,10 +32,11 @@ TEST(Comms_server_TCPIP, LargeDataWriteThenReadBasic)
 
     for(int index = 0; index < numOfLoops; ++index)
     {
-        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenReads_usec) );
+        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenWrites_usec) );
         EXPECT_EQ(server.write(buffer_out.data(), buffer_out.size()), true);
         std::cout << "sent " << index << std::endl;
     }
+    std::this_thread::sleep_for( std::chrono::seconds(1) );
 }
 
 TEST(Comms_server_TCPIP, LargeDataWriteThenReadProto)
@@ -54,7 +55,7 @@ TEST(Comms_server_TCPIP, LargeDataWriteThenReadProto)
 
     for(int index = 0; index < numOfLoops; ++index)
     {
-        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenReads_usec) );
+        std::this_thread::sleep_for( std::chrono::microseconds(delayBetweenWrites_usec) );
         ASSERT_EQ(server.write(&out), true);
     }    
 }

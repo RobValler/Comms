@@ -52,7 +52,7 @@ bool CSerialiserProto::serialise(void* incomming_data, std::vector<char>& outgoi
     return true;
 }
 
-bool CSerialiserProto::deserialise(const std::vector<char>& incomming_data, void* outgoing_data, const int outgoing_size)
+bool CSerialiserProto::deserialise(const std::vector<char>& incomming_data, void* outgoing_data, int& outgoing_size)
 {
     using namespace google::protobuf::io;
 
@@ -66,6 +66,7 @@ bool CSerialiserProto::deserialise(const std::vector<char>& incomming_data, void
     CodedInputStream coded_input(&ais);
     std::uint32_t size = static_cast<std::uint32_t>(outgoing_size);
     coded_input.ReadVarint32(&size);
+    outgoing_size = size;
     google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(size);
     message->ParseFromCodedStream(&coded_input);
     coded_input.ConsumedEntireMessage();

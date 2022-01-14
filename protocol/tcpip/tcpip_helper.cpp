@@ -168,7 +168,7 @@ bool CTCPIPHelper::ctransmit(const int fd, const char *data, const int size)
     m_write_header.frame_no = 1;
     m_write_header.max_frame_no = 1;
 
-    std::vector<char> m_write_data_buffer = {}; ///\ todo needed?
+    m_write_data_buffer = {};
     m_write_data_buffer.resize(m_write_header.frame_size + m_sizeOfHeader);
     std::memcpy(&m_write_data_buffer[0], &m_write_header, m_sizeOfHeader);
     std::memcpy(&m_write_data_buffer[m_sizeOfHeader], data, m_write_header.frame_size);

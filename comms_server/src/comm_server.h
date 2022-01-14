@@ -36,6 +36,10 @@ class CCommServer
 {
 public:    
     CCommServer(server_proto::EProtocolType protocol, server_proto::ESerialType serial);
+    CCommServer(const CCommServer&) = delete;                // Copy constructor
+    CCommServer(CCommServer&&) = delete;                     // Move constructor
+    CCommServer& operator=(const CCommServer&) = delete;     // Copy assignment operator
+    CCommServer& operator=(CCommServer&&) = delete;          // Move assignment operator
     ~CCommServer();
 
     bool connect(std::string server_address);
@@ -45,7 +49,7 @@ public:
     \return success/no success
 */
     bool init();
-    bool read(void* message);
+    bool read(void* message, int& size);
     bool write(void* message, int size = 0);
     int sizeOfReadBuffer();
 

@@ -15,5 +15,5 @@ class ISerialiser
 public:
     virtual ~ISerialiser(){}
     virtual bool serialise(void*, std::vector<char>&, int&) =0;
-    virtual bool deserialise(const std::vector<char>&, void*, const int) =0;
+    virtual bool deserialise(const std::vector<char>&, void*, int&) =0;
 };

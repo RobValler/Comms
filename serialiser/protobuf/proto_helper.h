@@ -23,7 +23,7 @@ public:
     ~CSerialiserProto();
 
     bool serialise(void* incomming_data, std::vector<char>& outgoing_data, int& outgoing_size) override;
-    bool deserialise(const std::vector<char>& incomming_data, void* outgoing_data, const int outgoing_size) override;
+    bool deserialise(const std::vector<char>& incomming_data, void* outgoing_data, int&) override;
 
 };
 

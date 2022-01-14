@@ -82,7 +82,7 @@ bool CCommServer::init()
     return true;
 }
 
-bool CCommServer::read(void* message)
+bool CCommServer::read(void* message, int& size)
 {
     if(true == m_shutdownrequest)
         return false;
@@ -99,8 +99,10 @@ bool CCommServer::read(void* message)
     m_read_queue.pop();
     m_readQueueProtect.unlock();
 
+    size = m_readcall_container.payload.size();
+
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(m_readcall_container.payload, message, m_readcall_container.payload.size()))
+    if(!m_pSerialiser->deserialise(m_readcall_container.payload, message, size))
     {
         CLOG(LOGLEV_RUN, "deserialise returned an error");
         return false;
@@ -177,9 +179,10 @@ void CCommServer::writeThread()
         if(m_shutdownrequest)
             break;
 
+        ///\todo make sure the complete buffer is flushed and not just one entry
         m_writeQueueProtect.lock();
-        //m_write_container = std::move(m_write_queue.front());
-        m_writethread_container = m_write_queue.front();
+        m_writethread_container = std::move(m_write_queue.front());
+        //m_writethread_container = m_write_queue.front();
         m_write_queue.pop();
         m_writeQueueProtect.unlock();
 
