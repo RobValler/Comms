@@ -1,0 +1,5 @@
+<map id="IProtocolClient" name="IProtocolClient">
+<area shape="rect" id="node1" title=" " alt="" coords="102,5,262,141"/>
+<area shape="rect" id="node2" href="$classcomms_1_1posix_1_1client_1_1CPOSIXMQClient.html" title=" " alt="" coords="5,189,172,413"/>
+<area shape="rect" id="node3" href="$classcomms_1_1tcpip_1_1client_1_1CTCPIPClient.html" title=" " alt="" coords="197,189,357,413"/>
+</map>
