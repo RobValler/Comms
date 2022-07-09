@@ -1,7 +1,9 @@
 #!/bin/sh
 set -e
-mkdir -p build || true
+rm -rf build || true
+mkdir -p build
 cd build
+conan install ..
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j16
 #test/./comms_test_server &

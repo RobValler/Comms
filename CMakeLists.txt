@@ -14,6 +14,9 @@ set (Wfno-stack-protector)
 set (Winconsistent-missing-override)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     add_compile_options( -Wall -Wextra -Werror)
     message("The build config is DEBUG")
@@ -22,7 +25,7 @@ else()
     message("The build config is RELEASE")
 endif()
 
-FIND_PACKAGE(Protobuf REQUIRED)
+#FIND_PACKAGE(Protobuf REQUIRED)
 
 include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../DevFramework/Logger)

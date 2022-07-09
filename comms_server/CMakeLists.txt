@@ -37,5 +37,5 @@ file(GLOB HEADERS
 
 # compile
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY} rt)
+target_link_libraries(${PROJECT_NAME} CONAN_PKG::protobuf rt)
 
