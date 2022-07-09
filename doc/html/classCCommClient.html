@@ -71,30 +71,71 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for CCommClient:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCCommClient__coll__graph.png" border="0" usemap="#aCCommClient_coll__map" alt="Collaboration graph"/></div>
-<map name="aCCommClient_coll__map" id="aCCommClient_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,161,156"/>
+<div class="center"><img src="classCCommClient__coll__graph.png" border="0" usemap="#CCommClient_coll__map" alt="Collaboration graph"/></div>
+<map name="CCommClient_coll__map" id="CCommClient_coll__map">
+<area shape="rect" title=" " alt="" coords="5,5,161,215"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:add6bdacdc0b49159e36191c91157bc0b"><td class="memItemLeft" align="right" valign="top"><a id="add6bdacdc0b49159e36191c91157bc0b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CCommClient</b> (client_proto::EProtocolType type)</td></tr>
-<tr class="separator:add6bdacdc0b49159e36191c91157bc0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6327937801d6e386bf427ab970726f21"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCCommClient.html#a6327937801d6e386bf427ab970726f21">CCommClient</a> (client_proto::EProtocolType protocol, client_proto::ESerialType serial)</td></tr>
+<tr class="separator:a6327937801d6e386bf427ab970726f21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ff6f25ca346e347ac94a19e387fc52f"><td class="memItemLeft" align="right" valign="top"><a id="a6ff6f25ca346e347ac94a19e387fc52f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>CCommClient</b> (const <a class="el" href="classCCommClient.html">CCommClient</a> &amp;)=delete</td></tr>
+<tr class="separator:a6ff6f25ca346e347ac94a19e387fc52f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3324aba46afd6a9fdc815bd94c1b2643"><td class="memItemLeft" align="right" valign="top"><a id="a3324aba46afd6a9fdc815bd94c1b2643"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>CCommClient</b> (<a class="el" href="classCCommClient.html">CCommClient</a> &amp;&amp;)=delete</td></tr>
+<tr class="separator:a3324aba46afd6a9fdc815bd94c1b2643"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0da24d44b8653e349653988a73859852"><td class="memItemLeft" align="right" valign="top"><a id="a0da24d44b8653e349653988a73859852"></a>
+<a class="el" href="classCCommClient.html">CCommClient</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classCCommClient.html">CCommClient</a> &amp;)=delete</td></tr>
+<tr class="separator:a0da24d44b8653e349653988a73859852"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b7437a77da9d99f9b0a2f4c964993d9"><td class="memItemLeft" align="right" valign="top"><a id="a4b7437a77da9d99f9b0a2f4c964993d9"></a>
+<a class="el" href="classCCommClient.html">CCommClient</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classCCommClient.html">CCommClient</a> &amp;&amp;)=delete</td></tr>
+<tr class="separator:a4b7437a77da9d99f9b0a2f4c964993d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9409643d8746f33a888a0c2cda23fde3"><td class="memItemLeft" align="right" valign="top"><a id="a9409643d8746f33a888a0c2cda23fde3"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>connect</b> (std::string server_address)</td></tr>
 <tr class="separator:a9409643d8746f33a888a0c2cda23fde3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d0491394ac32cb701790827de11c3a9"><td class="memItemLeft" align="right" valign="top"><a id="a9d0491394ac32cb701790827de11c3a9"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (void *message)</td></tr>
-<tr class="separator:a9d0491394ac32cb701790827de11c3a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a331e6e0f3b1b53bdc40eafbf0fd7e397"><td class="memItemLeft" align="right" valign="top"><a id="a331e6e0f3b1b53bdc40eafbf0fd7e397"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (void *message)</td></tr>
-<tr class="separator:a331e6e0f3b1b53bdc40eafbf0fd7e397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9407ca803c7da9809b8c0a12f679844"><td class="memItemLeft" align="right" valign="top"><a id="ac9407ca803c7da9809b8c0a12f679844"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (void *message, int &amp;size)</td></tr>
+<tr class="separator:ac9407ca803c7da9809b8c0a12f679844"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf5d33804192ad9a43da1d3f1d03f044"><td class="memItemLeft" align="right" valign="top"><a id="adf5d33804192ad9a43da1d3f1d03f044"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (void *message, int size=0)</td></tr>
+<tr class="separator:adf5d33804192ad9a43da1d3f1d03f044"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24ec9ec284664216ae24640d32dfb0ac"><td class="memItemLeft" align="right" valign="top"><a id="a24ec9ec284664216ae24640d32dfb0ac"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>numOfMessages</b> ()</td></tr>
 <tr class="separator:a24ec9ec284664216ae24640d32dfb0ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a6327937801d6e386bf427ab970726f21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6327937801d6e386bf427ab970726f21">&#9670;&nbsp;</a></span>CCommClient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">CCommClient::CCommClient </td>
+          <td>(</td>
+          <td class="paramtype">client_proto::EProtocolType&#160;</td>
+          <td class="paramname"><em>protocol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">client_proto::ESerialType&#160;</td>
+          <td class="paramname"><em>serial</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>\ todo add something here</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/rob/WORK/Development/Comms/comms_client/src/<a class="el" href="comm__client_8h_source.html">comm_client.h</a></li>
 <li>/home/rob/WORK/Development/Comms/comms_client/src/comm_client.cpp</li>

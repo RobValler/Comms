@@ -1,7 +1,6 @@
 <map id="comms::tcpip::client::CTCPIPClient" name="comms::tcpip::client::CTCPIPClient">
-<area shape="rect" id="node1" title=" " alt="" coords="60,521,220,745"/>
-<area shape="rect" id="node2" href="$classIProtocolClient.html" title=" " alt="" coords="5,255,165,391"/>
-<area shape="rect" id="node3" href="$classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="189,175,360,472"/>
-<area shape="rect" id="node4" href="$structcomms_1_1tcpip_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="107,5,266,97"/>
-<area shape="rect" id="node5" href="$structSMessageHeader.html" title=" " alt="" coords="295,5,430,97"/>
+<area shape="rect" id="node1" title=" " alt="" coords="21,492,181,716"/>
+<area shape="rect" id="node2" href="$classIProtocolClient.html" title=" " alt="" coords="5,270,165,406"/>
+<area shape="rect" id="node3" href="$classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="190,233,349,443"/>
+<area shape="rect" id="node4" href="$structSMessageHeader.html" title="\ todo sort the padding out for linux (and windows)" alt="" coords="202,5,337,156"/>
 </map>

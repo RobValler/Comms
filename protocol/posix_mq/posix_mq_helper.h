@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -29,7 +29,7 @@ struct SReadBufferQ
 class CPOSIXMQHelper
 {
 public:
-    CPOSIXMQHelper()=default;                                       // Constructor
+    CPOSIXMQHelper();                                               // Constructor
     CPOSIXMQHelper(const CPOSIXMQHelper&) = delete;                 // Copy constructor
     CPOSIXMQHelper(CPOSIXMQHelper&&) = delete;                      // Move constructor
     CPOSIXMQHelper& operator=(const CPOSIXMQHelper&) = delete;      // Copy assignment operator
@@ -37,7 +37,7 @@ public:
     virtual ~CPOSIXMQHelper() { }                                   // Destructor
 
 protected:
-    bool channel_create(std::string name);
+    bool cchannel_create(std::string name);
     bool cclient_connect(std::string channel);
     bool cclient_disconnect();
     bool crecieve(std::vector<char>& data, int& size);

@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -13,6 +13,7 @@
 
 #include "iserialiser.h"
 #include "proto_helper.h"
+#include "basic.h"
 #include "common.h"
 
 #include <string>
@@ -20,75 +21,159 @@
 
 #include "Logger.h"
 
-CCommClient::CCommClient(client_proto::EProtocolType type)
+CCommClient::CCommClient(client_proto::EProtocolType protocol, client_proto::ESerialType serial)
 {
     CLogger::GetInstance();
 
-    switch(type)
+    switch(protocol)
     {
-    case client_proto::ENone:
-
+    case client_proto::EProtocolType::EPT_None:
+        ///\ todo add something here
         break;
-    case client_proto::ETCTPIP:
+    case client_proto::EProtocolType::EPT_TCTPIP:
         m_pProtocolClient = std::make_unique<comms::tcpip::client::CTCPIPClient>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
-    case client_proto::EPOSIX_MQ:
+    case client_proto::EProtocolType::EPT_POSIX_MQ:
         m_pProtocolClient = std::make_unique<comms::posix::client::CPOSIXMQClient>();
-        m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserHelper>();
         break;
+    }
+
+    switch(serial)
+    {
+        case client_proto::ESerialType::EST_None:
+            m_pSerialiser = std::make_shared<comms::serial::basic::CSerialiserBasic>();
+            break;
+        case client_proto::ESerialType::EST_PROTO:
+            m_pSerialiser = std::make_shared<comms::serial::protobuf::CSerialiserProto>();
+            break;
     }
 }
 
 CCommClient::~CCommClient()
 {
     m_pProtocolClient->client_disconnect();
+    m_shutdownrequest = true;
+
+    if(t_write.joinable())
+        t_write.join();
+
+    if(t_read.joinable())
+        t_read.join();
 }
 
 bool CCommClient::connect(std::string server_address)
 {
-    return m_pProtocolClient->client_connect(server_address);
+    if(!m_pProtocolClient->client_connect(server_address))
+        return false;
+
+    t_read = std::thread(&CCommClient::readThread, this);
+    t_write = std::thread(&CCommClient::writeThread, this);
+
+    return true;
 }
-bool CCommClient::read(void* message)
+
+bool CCommClient::read(void* message, int& size)
 {
-    // fetch the intput stream
-    if(!m_pProtocolClient->recieve(m_read_buffer, m_size_of_message))
+    if(true == m_shutdownrequest)
+        return false;
+
+    if(0U == m_read_queue.size())
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " protocol recieve returned an error");
+        CLOG(LOGLEV_RUN, "read queue is empty");
         return false;
     }
 
+    // fetch from buffer
+    m_readQueueProtect.lock();
+    m_readcall_container = std::move(m_read_queue.front());
+    m_read_queue.pop();
+    m_readQueueProtect.unlock();
+
+    size = m_readcall_container.payload.size();
+
     // deserialise the input stream
-    if(!m_pSerialiser->deserialise(m_read_buffer, m_size_of_message, message))
+    if(!m_pSerialiser->deserialise(m_readcall_container.payload, message, size))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
+        CLOG(LOGLEV_RUN, "deserialise returned an error");
         return false;
     }
 
     return true;
 }
 
-bool CCommClient::write(void* message)
+bool CCommClient::write(void* message, int size)
 {
+    if(true == m_shutdownrequest)
+        return false;
+
     // serialise the output stream
-    if(!m_pSerialiser->serialise(m_write_buffer, m_size_of_message, message))
+    int size_of_write_message = size;
+    client_proto::SReadBufferQ m_writecall_container{};
+    if(!m_pSerialiser->serialise(message, m_writecall_container.payload, size_of_write_message))
     {
-        CLogger::Print(LOGLEV_RUN, "read.", " serialiser returned an error");
+        CLOG(LOGLEV_RUN, "serialiser returned an error");
         return false;
     }
 
-    // transmit the output stream
-    if(!m_pProtocolClient->transmit(m_write_buffer.data(), m_size_of_message))
-        return false;
+    // add to write queue
+    m_writeQueueProtect.lock();
+    m_write_queue.push(std::move(m_writecall_container));
+    m_writeQueueProtect.unlock();
 
     return true;
 }
 
 int CCommClient::numOfMessages()
+{    
+    m_writeQueueProtect.lock();
+    int size = m_read_queue.size();
+    m_writeQueueProtect.unlock();
+    return size;
+}
+
+void CCommClient::readThread()
 {
-    int number = 0;
+    int size = 0;
+    while(!m_shutdownrequest)
+    {
+        // fetch the intput stream
+        if(!m_pProtocolClient->recieve(m_readthread_container.payload, size))
+        {
+            CLOG(LOGLEV_RUN, "recieve returned an error");
+            break;
+        }
 
+        // write to read buffer
+        m_readQueueProtect.lock();
+        m_read_queue.push(m_readthread_container);
+        m_readQueueProtect.unlock();
+    }
 
+    m_shutdownrequest = true;
+    CLOG(LOGLEV_RUN, "thread exited");
+}
 
-    return number;
+void CCommClient::writeThread()
+{
+    while(!m_shutdownrequest)
+    {
+        if(0U == m_write_queue.size())
+        {
+            continue;
+        }
+
+        m_writeQueueProtect.lock();
+        m_writethread_container = std::move(m_write_queue.front());
+        m_write_queue.pop();
+        m_writeQueueProtect.unlock();
+
+        // transmit the output stream
+        if(!m_pProtocolClient->transmit(m_writethread_container.payload.data(), m_writethread_container.payload.size()))
+        {
+            CLOG(LOGLEV_RUN, "transmition returned an error");
+        }
+    }
+
+    m_shutdownrequest = true;
+    CLOG(LOGLEV_RUN, "thread exited");
 }

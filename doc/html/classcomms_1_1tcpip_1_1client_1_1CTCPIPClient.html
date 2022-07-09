@@ -75,23 +75,22 @@ $(function() {
 <div class="dynheader">
 Inheritance diagram for comms::tcpip::client::CTCPIPClient:</div>
 <div class="dyncontent">
-<div class="center"><img src="classcomms_1_1tcpip_1_1client_1_1CTCPIPClient__inherit__graph.png" border="0" usemap="#acomms_1_1tcpip_1_1client_1_1CTCPIPClient_inherit__map" alt="Inheritance graph"/></div>
-<map name="acomms_1_1tcpip_1_1client_1_1CTCPIPClient_inherit__map" id="acomms_1_1tcpip_1_1client_1_1CTCPIPClient_inherit__map">
-<area shape="rect" title=" " alt="" coords="100,395,260,619"/>
-<area shape="rect" href="classIProtocolClient.html" title=" " alt="" coords="5,108,165,244"/>
-<area shape="rect" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="189,5,360,347"/>
+<div class="center"><img src="classcomms_1_1tcpip_1_1client_1_1CTCPIPClient__inherit__graph.png" border="0" usemap="#comms_1_1tcpip_1_1client_1_1CTCPIPClient_inherit__map" alt="Inheritance graph"/></div>
+<map name="comms_1_1tcpip_1_1client_1_1CTCPIPClient_inherit__map" id="comms_1_1tcpip_1_1client_1_1CTCPIPClient_inherit__map">
+<area shape="rect" title=" " alt="" coords="97,292,257,516"/>
+<area shape="rect" href="classIProtocolClient.html" title=" " alt="" coords="5,57,165,193"/>
+<area shape="rect" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="190,5,349,244"/>
 </map>
 </div>
 <div class="dynheader">
 Collaboration diagram for comms::tcpip::client::CTCPIPClient:</div>
 <div class="dyncontent">
-<div class="center"><img src="classcomms_1_1tcpip_1_1client_1_1CTCPIPClient__coll__graph.png" border="0" usemap="#acomms_1_1tcpip_1_1client_1_1CTCPIPClient_coll__map" alt="Collaboration graph"/></div>
-<map name="acomms_1_1tcpip_1_1client_1_1CTCPIPClient_coll__map" id="acomms_1_1tcpip_1_1client_1_1CTCPIPClient_coll__map">
-<area shape="rect" title=" " alt="" coords="60,521,220,745"/>
-<area shape="rect" href="classIProtocolClient.html" title=" " alt="" coords="5,255,165,391"/>
-<area shape="rect" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="189,175,360,472"/>
-<area shape="rect" href="structcomms_1_1tcpip_1_1helper_1_1SReadBufferQ.html" title=" " alt="" coords="107,5,266,97"/>
-<area shape="rect" href="structSMessageHeader.html" title=" " alt="" coords="295,5,430,97"/>
+<div class="center"><img src="classcomms_1_1tcpip_1_1client_1_1CTCPIPClient__coll__graph.png" border="0" usemap="#comms_1_1tcpip_1_1client_1_1CTCPIPClient_coll__map" alt="Collaboration graph"/></div>
+<map name="comms_1_1tcpip_1_1client_1_1CTCPIPClient_coll__map" id="comms_1_1tcpip_1_1client_1_1CTCPIPClient_coll__map">
+<area shape="rect" title=" " alt="" coords="21,492,181,716"/>
+<area shape="rect" href="classIProtocolClient.html" title=" " alt="" coords="5,270,165,406"/>
+<area shape="rect" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="190,233,349,443"/>
+<area shape="rect" href="structSMessageHeader.html" title="\ todo sort the padding out for linux (and windows)" alt="" coords="202,5,337,156"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -134,43 +133,21 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>transmit</b> (const c
 <tr class="memitem:ae7174e579f0be9a6b905ae229d9dcbb1 inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="ae7174e579f0be9a6b905ae229d9dcbb1"></a>
 <a class="el" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html">CTCPIPHelper</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html">CTCPIPHelper</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:ae7174e579f0be9a6b905ae229d9dcbb1 inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af147e499e0abd09fbeebe5f534d8dbee inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="af147e499e0abd09fbeebe5f534d8dbee"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>crecieve</b> (std::vector&lt; char &gt; &amp;data, int &amp;size)</td></tr>
-<tr class="separator:af147e499e0abd09fbeebe5f534d8dbee inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4118fdde71a669c8d78203cb7d8a54e inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="ae4118fdde71a669c8d78203cb7d8a54e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>crecieve</b> (const int fd, std::vector&lt; char &gt; &amp;data, int &amp;size)</td></tr>
+<tr class="separator:ae4118fdde71a669c8d78203cb7d8a54e inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cbcdcdbb209a8a87ebce1888e95098d inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html#a6cbcdcdbb209a8a87ebce1888e95098d">ctransmit</a> (const int fd, const char *data, const int size)</td></tr>
 <tr class="separator:a6cbcdcdbb209a8a87ebce1888e95098d inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7ca9dcdfac363b47771972e6b3464bb inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="ac7ca9dcdfac363b47771972e6b3464bb"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>csizeOfReadBuffer</b> ()</td></tr>
-<tr class="separator:ac7ca9dcdfac363b47771972e6b3464bb inherit pub_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html">comms::tcpip::helper::CTCPIPHelper</a></td></tr>
-<tr class="memitem:aae76ed2838f2583a5f261bcb3b6d0f96 inherit pro_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="aae76ed2838f2583a5f261bcb3b6d0f96"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>listenForData</b> (const int fd)</td></tr>
-<tr class="separator:aae76ed2838f2583a5f261bcb3b6d0f96 inherit pro_methods_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html">comms::tcpip::helper::CTCPIPHelper</a></td></tr>
-<tr class="memitem:a06144f33c4416cff724b47a3c6d13374 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="a06144f33c4416cff724b47a3c6d13374"></a>
-std::mutex&#160;</td><td class="memItemRight" valign="bottom"><b>m_recProtect</b></td></tr>
-<tr class="separator:a06144f33c4416cff724b47a3c6d13374 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c9d5ce2765549110fcf6eb6f073fad3 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="a0c9d5ce2765549110fcf6eb6f073fad3"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>m_sizeOfHeader</b> {0}</td></tr>
 <tr class="separator:a0c9d5ce2765549110fcf6eb6f073fad3 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5b31a4b34205501bb8aab223843ff91 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="ac5b31a4b34205501bb8aab223843ff91"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>m_socket_type</b> {0}</td></tr>
 <tr class="separator:ac5b31a4b34205501bb8aab223843ff91 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade5862823e9345b08c52e80974d5acc3 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="ade5862823e9345b08c52e80974d5acc3"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_blocking</b> {true}</td></tr>
-<tr class="separator:ade5862823e9345b08c52e80974d5acc3 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6176e98b847c04ea34d5e62043ef42a5 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="a6176e98b847c04ea34d5e62043ef42a5"></a>
-std::queue&lt; <a class="el" href="structcomms_1_1tcpip_1_1helper_1_1SReadBufferQ.html">SReadBufferQ</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_read_queue</b> {}</td></tr>
-<tr class="separator:a6176e98b847c04ea34d5e62043ef42a5 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a694fd2e85a6dd4b9ca6e4968cf0fdc80 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="a694fd2e85a6dd4b9ca6e4968cf0fdc80"></a>
-<a class="el" href="structcomms_1_1tcpip_1_1helper_1_1SReadBufferQ.html">SReadBufferQ</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_read_data_buffer</b> {}</td></tr>
-<tr class="separator:a694fd2e85a6dd4b9ca6e4968cf0fdc80 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74f8a78a1ad0eae6647bf5b3940fddcd inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="a74f8a78a1ad0eae6647bf5b3940fddcd"></a>
-std::vector&lt; char &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_write_data_buffer</b> {}</td></tr>
-<tr class="separator:a74f8a78a1ad0eae6647bf5b3940fddcd inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ac998a55f3d5a299700ba86821f6800 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memItemLeft" align="right" valign="top"><a id="a7ac998a55f3d5a299700ba86821f6800"></a>
 <a class="el" href="structSMessageHeader.html">SMessageHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_read_header</b> {}</td></tr>
 <tr class="separator:a7ac998a55f3d5a299700ba86821f6800 inherit pro_attribs_classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper"><td class="memSeparator" colspan="2">&#160;</td></tr>

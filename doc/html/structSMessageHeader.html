@@ -68,26 +68,51 @@ $(function() {
 <div class="title">SMessageHeader Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>\ todo sort the padding out for linux (and windows)  
+ <a href="structSMessageHeader.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="common_2common_8h_source.html">common.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for SMessageHeader:</div>
 <div class="dyncontent">
-<div class="center"><img src="structSMessageHeader__coll__graph.png" border="0" usemap="#aSMessageHeader_coll__map" alt="Collaboration graph"/></div>
-<map name="aSMessageHeader_coll__map" id="aSMessageHeader_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,140,97"/>
+<div class="center"><img src="structSMessageHeader__coll__graph.png" border="0" usemap="#SMessageHeader_coll__map" alt="Collaboration graph"/></div>
+<map name="SMessageHeader_coll__map" id="SMessageHeader_coll__map">
+<area shape="rect" title="\ todo sort the padding out for linux (and windows)" alt="" coords="5,5,140,156"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a1308f53a0347d2b71809bd475d440d9f"><td class="memItemLeft" align="right" valign="top"><a id="a1308f53a0347d2b71809bd475d440d9f"></a>
-std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b></td></tr>
-<tr class="separator:a1308f53a0347d2b71809bd475d440d9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd9e373afa1572ca197740c246c51344"><td class="memItemLeft" align="right" valign="top"><a id="abd9e373afa1572ca197740c246c51344"></a>
+std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSMessageHeader.html#abd9e373afa1572ca197740c246c51344">instID</a></td></tr>
+<tr class="memdesc:abd9e373afa1572ca197740c246c51344"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID for this message instance. <br /></td></tr>
+<tr class="separator:abd9e373afa1572ca197740c246c51344"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3752b58922b71b08c370229b4d0dd101"><td class="memItemLeft" align="right" valign="top"><a id="a3752b58922b71b08c370229b4d0dd101"></a>
+std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSMessageHeader.html#a3752b58922b71b08c370229b4d0dd101">frame_size</a></td></tr>
+<tr class="memdesc:a3752b58922b71b08c370229b4d0dd101"><td class="mdescLeft">&#160;</td><td class="mdescRight">message size size - NOT USED <br /></td></tr>
+<tr class="separator:a3752b58922b71b08c370229b4d0dd101"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a663a3aced63c8725986b827d6c492b7b"><td class="memItemLeft" align="right" valign="top"><a id="a663a3aced63c8725986b827d6c492b7b"></a>
+std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSMessageHeader.html#a663a3aced63c8725986b827d6c492b7b">max_size</a></td></tr>
+<tr class="memdesc:a663a3aced63c8725986b827d6c492b7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">total message size <br /></td></tr>
+<tr class="separator:a663a3aced63c8725986b827d6c492b7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af556c883bcd16a4ebb87ec1f28c98541"><td class="memItemLeft" align="right" valign="top"><a id="af556c883bcd16a4ebb87ec1f28c98541"></a>
-std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
+std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSMessageHeader.html#af556c883bcd16a4ebb87ec1f28c98541">type</a></td></tr>
+<tr class="memdesc:af556c883bcd16a4ebb87ec1f28c98541"><td class="mdescLeft">&#160;</td><td class="mdescRight">message type. data or control <br /></td></tr>
 <tr class="separator:af556c883bcd16a4ebb87ec1f28c98541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a407faafb0ed52bad6e4840c97c2dc0b4"><td class="memItemLeft" align="right" valign="top"><a id="a407faafb0ed52bad6e4840c97c2dc0b4"></a>
+std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSMessageHeader.html#a407faafb0ed52bad6e4840c97c2dc0b4">frame_no</a></td></tr>
+<tr class="memdesc:a407faafb0ed52bad6e4840c97c2dc0b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">curret frame - NOT USED <br /></td></tr>
+<tr class="separator:a407faafb0ed52bad6e4840c97c2dc0b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bcc58fc29ddd1bcb96a50b1acbd4de4"><td class="memItemLeft" align="right" valign="top"><a id="a4bcc58fc29ddd1bcb96a50b1acbd4de4"></a>
+std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSMessageHeader.html#a4bcc58fc29ddd1bcb96a50b1acbd4de4">max_frame_no</a></td></tr>
+<tr class="memdesc:a4bcc58fc29ddd1bcb96a50b1acbd4de4"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of frames for this message - NOT USED <br /></td></tr>
+<tr class="separator:a4bcc58fc29ddd1bcb96a50b1acbd4de4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>/home/rob/WORK/Development/Comms/common/<a class="el" href="common_8h_source.html">common.h</a></li>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>\ todo sort the padding out for linux (and windows) </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>/home/rob/WORK/Development/Comms/common/<a class="el" href="common_2common_8h_source.html">common.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

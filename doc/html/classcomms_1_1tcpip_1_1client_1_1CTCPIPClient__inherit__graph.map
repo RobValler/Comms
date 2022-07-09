@@ -1,5 +1,5 @@
 <map id="comms::tcpip::client::CTCPIPClient" name="comms::tcpip::client::CTCPIPClient">
-<area shape="rect" id="node1" title=" " alt="" coords="100,395,260,619"/>
-<area shape="rect" id="node2" href="$classIProtocolClient.html" title=" " alt="" coords="5,108,165,244"/>
-<area shape="rect" id="node3" href="$classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="189,5,360,347"/>
+<area shape="rect" id="node1" title=" " alt="" coords="97,292,257,516"/>
+<area shape="rect" id="node2" href="$classIProtocolClient.html" title=" " alt="" coords="5,57,165,193"/>
+<area shape="rect" id="node3" href="$classcomms_1_1tcpip_1_1helper_1_1CTCPIPHelper.html" title=" " alt="" coords="190,5,349,244"/>
 </map>

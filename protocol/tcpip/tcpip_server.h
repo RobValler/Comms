@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -25,27 +25,20 @@ class CTCPIPServer
         , public helper::CTCPIPHelper
 {
 public:
-    CTCPIPServer();
+    CTCPIPServer() = default;
     ~CTCPIPServer();
 
     bool client_connect(std::string) override { return false; }
     bool client_disconnect() override {return false; }
-    bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
+    bool recieve(std::vector<char>& data, int& size) override { return crecieve(m_connection_socket, data, size); }
     bool transmit(const char *data, const int size) override { return ctransmit(m_connection_socket, data, size); }
-    int sizeOfReadBuffer() override { return csizeOfReadBuffer(); }
+    bool channel_create(std::string name) override;
+    bool channel_destroy() override;
 
 private:
-    void threadfunc_server();
-    bool channel_create();
-
-    std::atomic<bool> m_shutdownrequest;
-    std::thread t_server;
-
+    std::atomic<bool> m_shutdownrequest{false};
     int m_connection_fd{0};
     int m_connection_socket{0};
-
-//    std::vector<char> m_input_data_entry;
-//    std::vector<std::vector<char>> m_input_data_buffer;
 };
 
 } // comms

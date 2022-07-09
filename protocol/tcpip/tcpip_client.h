@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -25,7 +25,7 @@ class CTCPIPClient
         , public helper::CTCPIPHelper
 {
 public:
-    CTCPIPClient();
+    CTCPIPClient() =default;
     CTCPIPClient(const CTCPIPClient&) = delete;                // Copy constructor
     CTCPIPClient(CTCPIPClient&&) = delete;                     // Move constructor
     CTCPIPClient& operator=(const CTCPIPClient&) = delete;     // Copy assignment operator
@@ -34,14 +34,11 @@ public:
 
     bool client_connect(std::string ip_address) override;
     bool client_disconnect() override;
-    bool recieve(std::vector<char>& data, int& size) override { return crecieve(data, size); }
+    bool recieve(std::vector<char>& data, int& size) override { return crecieve(m_connection_fd, data, size); }
     bool transmit(const char *data, const int size) override { return ctransmit(m_connection_fd, data, size); }
 
 private:
-    void threadfunc_client();
-
-    std::atomic<bool> m_shutdownrequest;
-    std::thread t_client;
+    std::atomic<bool> m_shutdownrequest{false};
     int m_connection_fd{0};
     std::vector<char> m_confirmMsgBuff;
 };

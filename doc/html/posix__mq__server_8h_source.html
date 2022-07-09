@@ -72,7 +72,7 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*****************************************************************</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2017-2022 Robert Valler - All rights reserved.</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * This file is part of the project: StarterApp</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * This file is part of the project: Comms</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * This project can not be copied and/or distributed</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * without the express permission of the copyright holder</span></div>
@@ -109,21 +109,21 @@ $(function() {
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">bool</span> client_disconnect()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> cclient_disconnect(); }</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">bool</span> recieve(std::vector&lt;char&gt;&amp; data, <span class="keywordtype">int</span>&amp; size)<span class="keyword"> override </span>{ <span class="keywordflow">return</span> crecieve(data, size); }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">bool</span> transmit(<span class="keyword">const</span> <span class="keywordtype">char</span> *data, <span class="keyword">const</span> <span class="keywordtype">int</span> size)<span class="keyword"> override </span>{ <span class="keywordflow">return</span> ctransmit(m_listener_channel_desc, data, size); }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">int</span> sizeOfReadBuffer()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> 0; }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> threadfunc_server();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    std::thread t_provider_channel_thread;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    std::atomic&lt;bool&gt; m_shutdownrequest;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;} <span class="comment">// comms</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;} <span class="comment">// posix</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;} <span class="comment">// client</span></div>
-<div class="ttc" id="aclassIProtocolServer_html"><div class="ttname"><a href="classIProtocolServer.html">IProtocolServer</a></div><div class="ttdef"><b>Definition:</b> iprotocol_server.h:16</div></div>
-<div class="ttc" id="aclasscomms_1_1posix_1_1helper_1_1CPOSIXMQHelper_html"><div class="ttname"><a href="classcomms_1_1posix_1_1helper_1_1CPOSIXMQHelper.html">comms::posix::helper::CPOSIXMQHelper</a></div><div class="ttdef"><b>Definition:</b> posix_mq_helper.h:30</div></div>
-<div class="ttc" id="aclasscomms_1_1posix_1_1server_1_1CPOSIXMQServer_html"><div class="ttname"><a href="classcomms_1_1posix_1_1server_1_1CPOSIXMQServer.html">comms::posix::server::CPOSIXMQServer</a></div><div class="ttdef"><b>Definition:</b> posix_mq_server.h:28</div></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">//int sizeOfReadBuffer() override { return 0; }</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">bool</span> channel_create(std::string name)<span class="keyword"> override </span>{ <span class="keywordflow">return</span> cchannel_create(name); }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">bool</span> channel_destroy()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classcomms_1_1posix_1_1server_1_1CPOSIXMQServer.html">   46</a></span>&#160;    <span class="keywordtype">void</span> threadfunc_server();</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::thread t_provider_channel_thread;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    std::atomic&lt;bool&gt; m_shutdownrequest;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;} <span class="comment">// comms</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;} <span class="comment">// posix</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;} <span class="comment">// client</span></div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="aclassIProtocolServer_html"><div class="ttname"><a href="classIProtocolServer.html">IProtocolServer</a></div><div class="ttdef"><b>Definition:</b> iprotocol_server.h:15</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1

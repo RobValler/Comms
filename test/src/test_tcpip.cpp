@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2019 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -26,16 +26,16 @@ namespace  {
 
 TEST(Comms_TCPIP, Connect)
 {
-    CCommClient client(client_proto::ETCTPIP);
-    ASSERT_EQ(client.connect("127.0.0.1"), false);
-    CCommServer server(server_proto::ETCTPIP);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
+//    ASSERT_EQ(client.connect("127.0.0.1"), false);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 }
 
 TEST(Comms_TCPIP, ReadThenWrite)
 {
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
 
     // set test data
@@ -69,8 +69,8 @@ TEST(Comms_TCPIP, ReadThenWrite)
 
 TEST(Comms_TCPIP, WriteOneReadMany)
 {
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
 
     out.set_test_int(out_int);
@@ -88,8 +88,8 @@ TEST(Comms_TCPIP, WriteOneReadMany)
 
 TEST(Comms_TCPIP, WriteManyThenReadMany)
 {
-    CCommServer server(server_proto::ETCTPIP);
-    CCommClient client(client_proto::ETCTPIP);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
     const int numberOfWrites = 1000;
 
@@ -115,3 +115,86 @@ TEST(Comms_TCPIP, WriteManyThenReadMany)
         EXPECT_EQ(index, in.test_int());
     }
 }
+
+
+TEST(Comms_TCPIP, LargeDataWriteThenReadProto)
+{
+    const int numberOfWrites = 1;
+    const int val = 460800U;
+    //const int val = 2048U;
+    //const int val = 65528U;
+    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_in(val);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
+    test_msg in, out;
+
+    ASSERT_EQ(client.connect("127.0.0.1"), true);
+
+    // write all ones to buffer
+    for(auto& it : buffer_out){
+        it = 1U;
+    }
+    *out.mutable_data() = {buffer_out.begin(), buffer_out.end()};
+
+    for(int index=0; index < numberOfWrites; ++index)
+    {
+        EXPECT_EQ(client.write(&out), true);
+
+        //read
+        //buffer_in={};
+        EXPECT_EQ(server.read(&in), true);
+        std::cout << "size = " << in.data_size() << std::endl;
+        buffer_in = {in.data().begin(), in.data().end()};
+
+        EXPECT_EQ(buffer_in, buffer_out);
+    }
+}
+
+TEST(Comms_TCPIP, LargeDataWriteThenRead)
+{
+    const int numberOfWrites = 100;
+    //const int val = 460800U;
+    const int val = 2048U;
+    //const int val = 65528U;
+    std::vector<char> buffer_out(val);
+    std::vector<char> buffer_in(val);
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_None);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_None);
+
+    ASSERT_EQ(client.connect("127.0.0.1"), true);
+
+    // write all ones to buffer
+    for(auto& it : buffer_out){
+        it = 1U;
+    }
+
+    for(int index=0; index < numberOfWrites; ++index)
+    {
+        std::this_thread::sleep_for( std::chrono::milliseconds(2) );
+
+        std::cout << "index = " << index << std::endl;
+        EXPECT_EQ(server.write(buffer_out.data(), buffer_out.size()), true);
+
+        std::this_thread::sleep_for( std::chrono::milliseconds(2) );
+
+        //read
+
+        buffer_in={};
+        buffer_in.resize(val);
+        EXPECT_EQ(client.read(&buffer_in[0]), true);
+//        for(int mini_index = 0; mini_index < 5; ++mini_index)
+//        {
+//            if(true == server.read(&buffer_in[0]))
+//                break;
+//            else
+//                std::this_thread::sleep_for( std::chrono::microseconds(100) );
+//        }
+
+        EXPECT_EQ(buffer_in, buffer_out);
+    }
+    //std::this_thread::sleep_for( std::chrono::seconds(100) );
+
+}
+
+

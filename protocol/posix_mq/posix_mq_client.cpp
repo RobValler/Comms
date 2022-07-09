@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -22,9 +22,7 @@ namespace client {
 
 CPOSIXMQClient::CPOSIXMQClient()
 {
-    m_sizeOfHeader = sizeof(SMessageHeader);
-
-    if(channel_create("_client"))
+    if(cchannel_create("_client"))
     {
         t_provider_channel_thread = std::thread(&CPOSIXMQClient::threadfunc_client, this);
     }

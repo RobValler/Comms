@@ -1,7 +1,7 @@
 #/*****************************************************************
 # * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
 # *
-# * This file is part of the project: StarterApp
+# * This file is part of the project: Comms
 # *
 # * This project can not be copied and/or distributed
 # * without the express permission of the copyright holder
@@ -20,14 +20,31 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_server/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_client/src)
 include_directories(${ProtobufIncludePath})
 
-file(GLOB_RECURSE SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+#server
+file(GLOB_RECURSE SERVER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/test_tcpip_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server_main.cpp
     ${ProtobufIncludePath}/*.pb.cc
     )
-file(GLOB_RECURSE HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+file(GLOB_RECURSE SERVER_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common.h
     ${ProtobufIncludePath}/*.pb.h
     )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} gtest_main gtest comms_client comms_server comms_messages)
+add_executable("${PROJECT_NAME}_server" ${SERVER_SOURCES} ${SERVER_HEADERS})
+target_link_libraries("${PROJECT_NAME}_server" gtest_main gtest comms_server comms_messages)
+
+
+#client
+file(GLOB_RECURSE CLIENT_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/test_tcpip_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/client_main.cpp
+    ${ProtobufIncludePath}/*.pb.cc
+    )
+file(GLOB_RECURSE CLIENT_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common.h
+    ${ProtobufIncludePath}/*.pb.h
+    )
+
+add_executable("${PROJECT_NAME}_client" ${CLIENT_SOURCES} ${CLIENT_HEADERS})
+target_link_libraries("${PROJECT_NAME}_client" gtest_main gtest comms_client comms_messages)

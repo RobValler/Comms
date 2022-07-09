@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -19,13 +19,18 @@ namespace comms {
 namespace posix {
 namespace helper {
 
-bool CPOSIXMQHelper::channel_create(std::string name)
+CPOSIXMQHelper::CPOSIXMQHelper()
+{
+    m_sizeOfHeader = sizeof(SMessageHeader);
+}
+
+bool CPOSIXMQHelper::cchannel_create(std::string name)
 {
     // create the posix mq channel
     struct mq_attr attr;
     attr.mq_flags = 0;
     attr.mq_maxmsg = posix_conf::max_msg;
-    attr.mq_msgsize = posix_conf::max_size;
+    attr.mq_msgsize = posix_conf::msg_size;
     attr.mq_curmsgs = 0;
 
     //mode_t mode  = S_IRWXU | S_IRWXG | S_IRWXO;
@@ -130,7 +135,7 @@ bool CPOSIXMQHelper::ctransmit(mqd_t queue, const char *data, const int size)
 {
     unsigned int priority = 1;
 
-    m_write_header.size = size;
+    m_write_header.max_size = size;
     m_write_header.type = EMsgTypData;
     m_transmitPackage.resize(size + m_sizeOfHeader);
     std::memcpy(&m_transmitPackage[0], &m_write_header, m_sizeOfHeader);
@@ -158,7 +163,7 @@ bool CPOSIXMQHelper::listenForData(const mqd_t queue)
     }
 
     SMessageHeader *pHeader = (SMessageHeader*)&m_rcvmsg[0];
-    if(numOfBytesRead != (pHeader->size + m_sizeOfHeader))
+    if(numOfBytesRead != (pHeader->max_size + m_sizeOfHeader))
     {
         CLOG(LOGLEV_RUN, "Header size mismatch: (", errno, ") ", strerror(errno));
         return false;
@@ -171,8 +176,8 @@ bool CPOSIXMQHelper::listenForData(const mqd_t queue)
         return false;
     }
 
-    m_read_data_buffer.payload.resize(pHeader->size);
-    std::memcpy(&m_read_data_buffer.payload[0], &m_rcvmsg[m_sizeOfHeader], pHeader->size);
+    m_read_data_buffer.payload.resize(pHeader->max_size);
+    std::memcpy(&m_read_data_buffer.payload[0], &m_rcvmsg[m_sizeOfHeader], pHeader->max_size);
 
     m_recProtect.lock();
     m_read_queue.push(m_read_data_buffer);

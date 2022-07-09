@@ -1,5 +1,5 @@
 <map id="comms::posix::helper::CPOSIXMQHelper" name="comms::posix::helper::CPOSIXMQHelper">
 <area shape="rect" id="node1" title=" " alt="" coords="78,5,291,391"/>
-<area shape="rect" id="node2" href="$classcomms_1_1posix_1_1client_1_1CPOSIXMQClient.html" title=" " alt="" coords="5,446,172,670"/>
-<area shape="rect" id="node3" href="$classcomms_1_1posix_1_1server_1_1CPOSIXMQServer.html" title=" " alt="" coords="197,439,367,677"/>
+<area shape="rect" id="node2" href="$classcomms_1_1posix_1_1client_1_1CPOSIXMQClient.html" title=" " alt="" coords="5,453,172,677"/>
+<area shape="rect" id="node3" href="$classcomms_1_1posix_1_1server_1_1CPOSIXMQServer.html" title=" " alt="" coords="197,439,367,692"/>
 </map>

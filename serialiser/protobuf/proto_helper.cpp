@@ -1,7 +1,7 @@
 /*****************************************************************
  * Copyright (C) 2017-2022 Robert Valler - All rights reserved.
  *
- * This file is part of the project: StarterApp
+ * This file is part of the project: Comms
  *
  * This project can not be copied and/or distributed
  * without the express permission of the copyright holder
@@ -19,17 +19,17 @@ namespace comms {
 namespace serial {
 namespace protobuf {
 
-CSerialiserHelper::CSerialiserHelper()
+CSerialiserProto::CSerialiserProto()
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 }
 
-CSerialiserHelper::~CSerialiserHelper()
+CSerialiserProto::~CSerialiserProto()
 {
     google::protobuf::ShutdownProtobufLibrary();
 }
 
-bool CSerialiserHelper::serialise(std::vector<char>& buffer, int& size_of_message, void* incomming_data)
+bool CSerialiserProto::serialise(void* incomming_data, std::vector<char>& outgoing_data, int& outgoing_size)
 {
     using namespace google::protobuf::io;
 
@@ -39,10 +39,10 @@ bool CSerialiserHelper::serialise(std::vector<char>& buffer, int& size_of_messag
     ::google::protobuf::Message* message = static_cast<::google::protobuf::Message*>(incomming_data);
 
     // serialise data
-    size_of_message = message->ByteSizeLong();
-    size_of_message += CodedOutputStream::VarintSize32(size_of_message);
-    buffer.resize(size_of_message);
-    google::protobuf::io::ArrayOutputStream aos(&buffer[0], size_of_message);
+    outgoing_size = message->ByteSizeLong();
+    outgoing_size += CodedOutputStream::VarintSize32(outgoing_size);
+    outgoing_data.resize(outgoing_size);
+    google::protobuf::io::ArrayOutputStream aos(&outgoing_data[0], outgoing_size);
     CodedOutputStream coded_output(&aos);
     coded_output.WriteVarint32(message->ByteSizeLong());
 
@@ -52,7 +52,7 @@ bool CSerialiserHelper::serialise(std::vector<char>& buffer, int& size_of_messag
     return true;
 }
 
-bool CSerialiserHelper::deserialise(const std::vector<char>& buffer, int size_of_message, void* outgoing_data)
+bool CSerialiserProto::deserialise(const std::vector<char>& incomming_data, void* outgoing_data, int& outgoing_size)
 {
     using namespace google::protobuf::io;
 
@@ -62,10 +62,11 @@ bool CSerialiserHelper::deserialise(const std::vector<char>& buffer, int size_of
     ::google::protobuf::Message* message = static_cast<::google::protobuf::Message*>(outgoing_data);
 
     // convert from serialised char array to protobuf message class
-    google::protobuf::io::ArrayInputStream ais(&buffer[0], size_of_message);
+    google::protobuf::io::ArrayInputStream ais(&incomming_data[0], outgoing_size);
     CodedInputStream coded_input(&ais);
-    std::uint32_t size = static_cast<std::uint32_t>(size_of_message);
+    std::uint32_t size = static_cast<std::uint32_t>(outgoing_size);
     coded_input.ReadVarint32(&size);
+    outgoing_size = size;
     google::protobuf::io::CodedInputStream::Limit msgLimit = coded_input.PushLimit(size);
     message->ParseFromCodedStream(&coded_input);
     coded_input.ConsumedEntireMessage();
