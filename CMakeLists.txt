@@ -25,8 +25,6 @@ else()
     message("The build config is RELEASE")
 endif()
 
-#FIND_PACKAGE(Protobuf REQUIRED)
-
 include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../DevFramework/Logger)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)

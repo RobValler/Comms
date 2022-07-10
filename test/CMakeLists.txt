@@ -9,19 +9,15 @@
 cmake_minimum_required(VERSION 3.15.0)
 project(comms_test)
 
-find_package(GTest REQUIRED)
 enable_testing()
 
-#set(ProtobufIncludePath ${CMAKE_CURRENT_BINARY_DIR}/../messages)
 set(ProtobufIncludePath ${CMAKE_BINARY_DIR}/messages/src)
 
-
-include_directories(${GTEST_INCLUDE_DIR})
+#include_directories(${GTEST_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_server/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../comms_client/src)
 include_directories(${ProtobufIncludePath})
-message("---->" ${ProtobufIncludePath})
 
 file(GLOB_RECURSE SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
@@ -34,11 +30,12 @@ file(GLOB_RECURSE HEADERS
     )
 
 add_executable("${PROJECT_NAME}" ${SOURCES} ${HEADERS})
-target_link_libraries("${PROJECT_NAME}" gtest
-                                        CONAN_PKG::protobuf
-                                        comms_messages
-                                        comms_client
-                                        comms_server)
+target_link_libraries("${PROJECT_NAME}"
+                        CONAN_PKG::protobuf
+                        CONAN_PKG::gtest
+                        comms_messages
+                        comms_client
+                        comms_server)
 
 
 #server

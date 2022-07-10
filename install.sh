@@ -3,7 +3,7 @@ set -e
 rm -rf build || true
 mkdir -p build
 cd build
-conan install ..
+conan install .. --build missing
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j16
 #test/./comms_test_server &

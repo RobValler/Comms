@@ -1,7 +1,13 @@
 [requires]
 protobuf/3.21.1
-gtest/cci.20210126
+gtest/1.10.0
+
+[options]
+#gtest:build_mock=False
+#gtest:build_gmock=False
  
 [generators]
 cmake
+#CMakeDeps
+#CMakeToolchain
 
