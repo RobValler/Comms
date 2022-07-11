@@ -1,6 +1,7 @@
 [requires]
 protobuf/3.21.1
 gtest/1.10.0
+Logger/0.1.0
 
 [options]
  

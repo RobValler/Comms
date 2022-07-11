@@ -32,9 +32,10 @@ file(GLOB HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../serialiser/basic/basic.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_client.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../protocol/posix_mq/posix_mq_helper.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../DevFramework/Logger/Logger.h
     )
 
 # compile
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} CONAN_PKG::protobuf rt)
+target_link_libraries(${PROJECT_NAME}
+                        CONAN_PKG::protobuf
+                        rt)
