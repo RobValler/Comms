@@ -53,6 +53,7 @@ CCommClient::~CCommClient()
 {
     m_pProtocolClient->client_disconnect();
     m_shutdownrequest = true;
+    cv_writeThread.notify_one();
 
     if(t_write.joinable())
         t_write.join();
@@ -108,10 +109,15 @@ bool CCommClient::write(void* message, int size)
 
     // serialise the output stream
     int size_of_write_message = size;
-    client_proto::SReadBufferQ m_writecall_container{};
     if(!m_pSerialiser->serialise(message, m_writecall_container.payload, size_of_write_message))
     {
         CLOG(LOGLEV_RUN, "serialiser returned an error");
+        return false;
+    }
+
+    if(0U == m_writecall_container.payload.size())
+    {
+        CLOG(LOGLEV_RUN, "The write container is empty and so won't be written to the queue");
         return false;
     }
 
@@ -119,6 +125,9 @@ bool CCommClient::write(void* message, int size)
     m_writeQueueProtect.lock();
     m_write_queue.push(std::move(m_writecall_container));
     m_writeQueueProtect.unlock();
+
+    // notify the write thread
+    cv_writeThread.notify_one();
 
     return true;
 }
@@ -157,11 +166,17 @@ void CCommClient::writeThread()
 {
     while(!m_shutdownrequest)
     {
-        if(0U == m_write_queue.size())
-        {
-            continue;
-        }
+        // block the loop until new data comes
+        std::unique_lock<std::mutex> thread_lock(cv_m);
+        cv_writeThread.wait(thread_lock);
 
+        if(m_shutdownrequest)
+            break;
+
+        if(0U == m_write_queue.size())
+            continue;
+
+        ///\todo make sure the complete buffer is flushed and not just one entry
         m_writeQueueProtect.lock();
         m_writethread_container = std::move(m_write_queue.front());
         m_write_queue.pop();
@@ -174,6 +189,6 @@ void CCommClient::writeThread()
         }
     }
 
-    m_shutdownrequest = true;
+    //m_shutdownrequest = true;
     CLOG(LOGLEV_RUN, "thread exited");
 }

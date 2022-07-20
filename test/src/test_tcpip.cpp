@@ -27,42 +27,33 @@ namespace  {
 TEST(Comms_TCPIP, Connect)
 {
     CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
-//    ASSERT_EQ(client.connect("127.0.0.1"), false);
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
     ASSERT_EQ(server.init(), true);
-
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 }
 
-#if 0
-TEST(Comms_TCPIP, ReadThenWrite)
+TEST(Comms_TCPIP, ServerWrite)
 {
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
     CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
     test_msg in, out;
+    int size; // not used
 
     // set test data
     out.set_test_int(out_int);
     out.set_test_int_2(out_int + 1);
     out.set_test_string(out_str);
 
+    ASSERT_EQ(server.init(), true);
     ASSERT_EQ(client.connect("127.0.0.1"), true);
 
+    // server write and client read
     for(int index=0; index < 1000; ++index)
-    {
-        // client write and server read
+    {        
         in.Clear();
-        EXPECT_EQ(client.write(&out), true);
-        EXPECT_EQ(server.read(&in), true);
-
-        EXPECT_EQ(out_int, in.test_int());
-        EXPECT_EQ(out_int+1, in.test_int_2());
-        EXPECT_EQ(out_str, in.test_string());
-
-        // server write and client read
-        in.Clear();
-        EXPECT_EQ(server.write(&out), true);
-        EXPECT_EQ(client.read(&in), true);
+        ASSERT_EQ(server.write(&out), true);
+        std::this_thread::sleep_for( std::chrono::microseconds(500) );
+        ASSERT_EQ(client.read(&in, size), true);
 
         EXPECT_EQ(out_int, in.test_int());
         EXPECT_EQ(out_int+1, in.test_int_2());
@@ -70,6 +61,37 @@ TEST(Comms_TCPIP, ReadThenWrite)
     }
 }
 
+TEST(Comms_TCPIP, ClientWrite)
+{
+    CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);
+    CCommClient client(client_proto::EPT_TCTPIP, client_proto::EST_PROTO);
+    test_msg in, out;
+    int size; // not used
+
+    // set test data
+    out.set_test_int(out_int);
+    out.set_test_int_2(out_int + 1);
+    out.set_test_string(out_str);
+
+    ASSERT_EQ(server.init(), true);
+    ASSERT_EQ(client.connect("127.0.0.1"), true);
+
+    // client write and server read
+    for(int index=0; index < 1000; ++index)
+    {
+        in.Clear();
+        ASSERT_EQ(client.write(&out), true);
+        std::this_thread::sleep_for( std::chrono::microseconds(500) );
+        ASSERT_EQ(server.read(&in, size), true);
+
+        EXPECT_EQ(out_int, in.test_int());
+        EXPECT_EQ(out_int+1, in.test_int_2());
+        EXPECT_EQ(out_str, in.test_string());
+        std::cout << "index = " << index << std::endl;
+    }
+}
+
+#if 0
 TEST(Comms_TCPIP, WriteOneReadMany)
 {
     CCommServer server(server_proto::EPT_TCTPIP, server_proto::EST_PROTO);

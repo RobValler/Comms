@@ -60,8 +60,10 @@ private:
     // threads
     void readThread();
     void writeThread();
+    void channelThread();
     std::thread t_read;
     std::thread t_write;
+    std::thread t_channel;
     std::mutex cv_m;
     std::condition_variable cv_writeThread;
 

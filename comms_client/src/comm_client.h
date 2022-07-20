@@ -14,6 +14,8 @@
 #include <atomic>
 #include <queue>
 #include <mutex>
+#include <condition_variable>
+
 
 class IProtocolClient;
 class ISerialiser;
@@ -52,6 +54,8 @@ private:
     void writeThread();
     std::thread t_read;
     std::thread t_write;
+    std::mutex cv_m;
+    std::condition_variable cv_writeThread;
 
     // delagates
     std::shared_ptr<IProtocolClient> m_pProtocolClient;

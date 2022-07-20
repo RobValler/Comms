@@ -64,6 +64,8 @@ CCommServer::~CCommServer()
 
     if(t_read.joinable())
         t_read.join();
+
+    t_channel.join();
 }
 
 bool CCommServer::connect(std::string server_address)
@@ -73,12 +75,9 @@ bool CCommServer::connect(std::string server_address)
 
 bool CCommServer::init()
 {
-    if(!m_pProtocolServer->channel_create("name"))
-        return false;
-
+    t_channel = std::thread(&CCommServer::channelThread, this);
     t_read = std::thread(&CCommServer::readThread, this);
     t_write = std::thread(&CCommServer::writeThread, this);
-
     return true;
 }
 
@@ -147,6 +146,11 @@ int CCommServer::sizeOfReadBuffer()
     return 0;
 }
 
+void CCommServer::channelThread()
+{
+    m_pProtocolServer->channel_create("name");
+}
+
 void CCommServer::readThread()
 {
     int size = 0;
@@ -165,7 +169,7 @@ void CCommServer::readThread()
         m_readQueueProtect.unlock();                
     }
 
-    m_shutdownrequest = true;
+    //m_shutdownrequest = true;
 }
 
 void CCommServer::writeThread()
@@ -179,26 +183,22 @@ void CCommServer::writeThread()
         if(m_shutdownrequest)
             break;
 
+        if(0U == m_write_queue.size())
+            continue;
+
         ///\todo make sure the complete buffer is flushed and not just one entry
         m_writeQueueProtect.lock();
         m_writethread_container = std::move(m_write_queue.front());
-        //m_writethread_container = m_write_queue.front();
         m_write_queue.pop();
         m_writeQueueProtect.unlock();
-
-        if(0U == m_writethread_container.payload.size())
-        {
-            CLOG(LOGLEV_RUN, "write queue entry is empty");
-            continue;
-        }
 
         // transmit the output stream
         if(!m_pProtocolServer->transmit(m_writethread_container.payload.data(), m_writethread_container.payload.size()))
         {
             CLOG(LOGLEV_RUN, "transmition returned an error");
-            break;
+            //break;
         }
     }
 
-    m_shutdownrequest = true;
+    //m_shutdownrequest = true;
 }
